@@ -1,3 +1,6 @@
+"""
+    This code will convert the data scrapped with the scrapper into a xlsx file into a pdf file
+"""
 import xlsxwriter
 import os
 
