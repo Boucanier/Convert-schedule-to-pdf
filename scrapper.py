@@ -1,3 +1,6 @@
+"""
+    This code will scrap the schedule data with requests
+"""
 import requests
 from bs4 import BeautifulSoup
 
@@ -102,9 +105,10 @@ def sortCourse(courseList : list):
         
     return courseW0, courseW1, courseW2, courseW3
 
+
 def getWeek(soup):
     wContent = []
-    
+
     rs = soup.findAll('rawweeks')
     rs = [clearText(e.text) for e in rs]
 
@@ -120,7 +124,7 @@ def getWeek(soup):
             min = tempval
         if tempval > max :
             max = tempval
-    
+
     for e in rs :
         y = 0
         while e[y] != 'Y':
@@ -134,18 +138,40 @@ def getWeek(soup):
             wContent.append(2)
         elif tempval == max :
             wContent.append(3)
+
     return wContent
 
 
-def notCourse(moduleContent : list, profContent : list, soup):
+def notCourse(moduleContent : list, profContent : list, timeContent : list, roomContent : list, soup):
     tp = [(clearText(e.text)) for e in soup.find_all('resources')]
-
+    tpNotes = 0
+    notes = soup.find_all('notes')
     for i in range(len(tp)):
         if len(tp[i].split()) == 2 :
-            moduleContent.insert(i,' Apprentissage')
-            profContent.insert(i,' CFA')
+            tpNotes = 1
+            if (len(moduleContent) != len(timeContent)):
+                if ('apprentissage' in notes[tpNotes].text or 'Apprentissage' in notes[tpNotes].text or 'APPRENTISSAGE' in notes[tpNotes].text):
+                    moduleContent.insert(i,' Apprentissage')
+                else :
+                    moduleContent.insert(i," Exceptionnel")
+                    
+            if (len(profContent) != len(timeContent)):
+                if ('CFA' in notes[tpNotes].text) :
+                    profContent.insert(i,' CFA')
+                else :
+                    profContent.insert(i,"inconnu")
+                    
+            if (len(roomContent) != len(timeContent)):
+                profContent.insert(i,'---')
     
-    return moduleContent, profContent
+    return moduleContent, profContent, roomContent
+
+
+def detectSAE(moduleContent : list, profContent : list) -> list :
+    for i in range(len(moduleContent)):
+        if "Travail d'équipe" in moduleContent[i]:
+            profContent.insert(i,'SAÉ')
+    return profContent
 
 
 def parseSchedule(response):
@@ -173,11 +199,9 @@ def parseSchedule(response):
     for i in range(len(startContent)):
         timeContent.append([startContent[i], endContent[i]])
 
-    for i in range(len(moduleContent)):
-        if "Travail d'équipe" in moduleContent[i]:
-            profContent.insert(i,'SAÉ')
+    profContent = detectSAE(moduleContent, profContent)
 
-    moduleContent, profContent = notCourse(moduleContent, profContent, soup)
+    moduleContent, profContent, roomContent = notCourse(moduleContent, profContent, timeContent, roomContent, soup)
 
     dayCt = len(moduleContent)
 
@@ -187,7 +211,7 @@ def parseSchedule(response):
         dayContent += dayTemp[-i]
     dayContent.reverse()
 
-    for i in range(len(moduleContent)):
+    for i in range(dayCt):
         courseList.append(Course(dayContent[i], timeContent[i], moduleContent[i], roomContent[i], profContent[i], groupContent[i], weekContent[i]))
     
     dayContent.clear()
