@@ -1,5 +1,6 @@
 """
     This code will scrap the schedule data with requests
+    It will parse it using beauriful soup in objects of a "Course" class
 """
 import requests
 from bs4 import BeautifulSoup
@@ -143,27 +144,41 @@ def getWeek(soup):
 
 
 def notCourse(moduleContent : list, profContent : list, timeContent : list, roomContent : list, soup):
-    tp = [(clearText(e.text)) for e in soup.find_all('resources')]
-    tpNotes = 0
-    notes = soup.find_all('notes')
+    res = soup.find_all("resources")
+    tp = [(clearText(e.text)) for e in res]
+    tpNotes = 1
+    notes = soup.find_all("notes")
+
     for i in range(len(tp)):
-        if len(tp[i].split()) == 2 :
-            tpNotes = 1
-            if (len(moduleContent) != len(timeContent)):
-                if ('apprentissage' in notes[tpNotes].text or 'Apprentissage' in notes[tpNotes].text or 'APPRENTISSAGE' in notes[tpNotes].text):
-                    moduleContent.insert(i,' Apprentissage')
-                else :
-                    moduleContent.insert(i," Exceptionnel")
-                    
-            if (len(profContent) != len(timeContent)):
-                if ('CFA' in notes[tpNotes].text) :
-                    profContent.insert(i,' CFA')
-                else :
-                    profContent.insert(i,"inconnu")
-                    
-            if (len(roomContent) != len(timeContent)):
-                profContent.insert(i,'---')
-    
+        verifNot = False
+
+        if not res[i].find("module"):
+            if ("apprentissage" in notes[tpNotes].text or "Apprentissage" in notes[tpNotes].text or "APPRENTISSAGE" in notes[tpNotes].text):
+                moduleContent.insert(i," Apprentissage")
+            else :
+                moduleContent.insert(i," Exceptionnel")
+            verifNot = True
+                
+        if not res[i].find("staff"):
+            verifNot = True
+            if "Travail d'équipe" in moduleContent[i]:
+                profContent.insert(i,"SAÉ")
+                verifNot = False
+            elif ("CFA" in notes[tpNotes].text) :
+                profContent.insert(i, " CFA")
+            else :
+                profContent.insert(i, "inconnu")
+
+        if not res[i].find("room"):
+            if "Cours à distance" in notes[tpNotes].text :
+                roomContent.insert(i, "Distanciel")
+            else :
+                roomContent.insert(i, "---")
+            verifNot = True
+        
+        if verifNot :
+            tpNotes += 1
+
     return moduleContent, profContent, roomContent
 
 
@@ -198,8 +213,6 @@ def parseSchedule(response):
     timeContent = []
     for i in range(len(startContent)):
         timeContent.append([startContent[i], endContent[i]])
-
-    profContent = detectSAE(moduleContent, profContent)
 
     moduleContent, profContent, roomContent = notCourse(moduleContent, profContent, timeContent, roomContent, soup)
 
