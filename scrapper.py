@@ -31,16 +31,30 @@ class Course :
 
 
 def clearText(txt : str) -> str :
+    txtLetters = list(txt)
+    if txtLetters[0] == ' ':
+        txtLetters[0] = ''
+    if txtLetters[-1] == ' ':
+        txtLetters[-1] = ''
     if '\n' in txt :
-        txtLetters = list(txt)
         for i in range(len(txtLetters)) :
             if txtLetters[i] == '\n':
                 txtLetters[i] = ' '
-        txt = ''.join(txtLetters)
+    txt = ''.join(txtLetters)
     return txt
 
 
-def getContent(element : str, soup) -> list :
+def getContent(element : str, resourceList) -> list :
+    content = []
+    for e in resourceList :
+        if not e.find(element):
+            content.append("- - -")
+        else :
+            content.append(clearText((e.find(element)).text))
+    return content
+
+
+def getTime(element : str, soup) -> list :
     content = soup.findAll(element)
     content = [clearText(e.text) for e in content]
     return content
@@ -48,11 +62,13 @@ def getContent(element : str, soup) -> list :
 
 def menu(groupList : list, linkList : list):
     weekChoice = -1
-    for i in range(len(groupList)):
-        print(i, groupList[i])
-    groupChoice = int(input('Group : '))
+    groupChoice = -1
+    while not (0<=groupChoice<=len(groupList)):
+        for i in range(len(groupList)):
+            print(i, groupList[i])
+        groupChoice = int(input('Group : '))
     while weekChoice not in [0,1,2,3]:
-        weekChoice = int(input("Semaine 0, 1, 2 ou 3 : "))
+        weekChoice = int(input(groupList[groupChoice] + " Semaine 0, 1, 2 ou 3 : "))
     return ("http://chronos.iut-velizy.uvsq.fr/EDT/" + linkList[groupChoice]), groupList[groupChoice], weekChoice
 
 
@@ -143,82 +159,32 @@ def getWeek(soup):
     return wContent
 
 
-def notCourse(moduleContent : list, profContent : list, timeContent : list, roomContent : list, soup):
-    res = soup.find_all("resources")
-    tp = [(clearText(e.text)) for e in res]
-    tpNotes = 1
-    notes = soup.find_all("notes")
-
-    for i in range(len(tp)):
-        verifNot = False
-
-        if not res[i].find("module"):
-            if ("apprentissage" in notes[tpNotes].text or "Apprentissage" in notes[tpNotes].text or "APPRENTISSAGE" in notes[tpNotes].text):
-                moduleContent.insert(i," Apprentissage")
-            else :
-                moduleContent.insert(i," Exceptionnel")
-            verifNot = True
-                
-        if not res[i].find("staff"):
-            verifNot = True
-            if "Travail d'équipe" in moduleContent[i]:
-                profContent.insert(i,"SAÉ")
-                verifNot = False
-            elif ("CFA" in notes[tpNotes].text) :
-                profContent.insert(i, " CFA")
-            else :
-                profContent.insert(i, "inconnu")
-
-        if not res[i].find("room"):
-            if "Cours à distance" in notes[tpNotes].text :
-                roomContent.insert(i, "Distanciel")
-            else :
-                roomContent.insert(i, "---")
-            verifNot = True
-        
-        if verifNot :
-            tpNotes += 1
-
-    return moduleContent, profContent, roomContent
-
-
-def detectSAE(moduleContent : list, profContent : list) -> list :
-    for i in range(len(moduleContent)):
-        if "Travail d'équipe" in moduleContent[i]:
-            profContent.insert(i,'SAÉ')
-    return profContent
-
-
 def parseSchedule(response):
     courseList = []
     soup = BeautifulSoup(response.content, "lxml")
 
-    moduleContent = soup.findAll('module')
-    dayCt = len(moduleContent)
-    moduleContent = [clearText(e.text) for e in moduleContent]
+    resourceList = soup.find_all("resources")
 
-    profContent = soup.findAll('staff')
-    
-    profContent = [clearText(e.text) for e in profContent]
+    moduleContent = getContent("module", resourceList)
 
-    roomContent = getContent('room', soup)
+    profContent = getContent("staff", resourceList)
 
-    groupContent = getContent('group', soup)
+    roomContent = getContent("room", resourceList)
 
-    startContent = getContent('starttime', soup)
-    endContent = getContent('endtime', soup)
+    groupContent = getContent("group", resourceList)
+
+    startContent = getTime("starttime", soup)
+    endContent = getTime("endtime", soup)
 
     weekContent = getWeek(soup)
-    
+
     timeContent = []
     for i in range(len(startContent)):
         timeContent.append([startContent[i], endContent[i]])
 
-    moduleContent, profContent, roomContent = notCourse(moduleContent, profContent, timeContent, roomContent, soup)
-
     dayCt = len(moduleContent)
 
-    dayTemp = soup.findAll('day')
+    dayTemp = soup.findAll("day")
     dayContent = []
     for i in range(1, dayCt + 1):
         dayContent += dayTemp[-i]
@@ -226,6 +192,7 @@ def parseSchedule(response):
 
     for i in range(dayCt):
         courseList.append(Course(dayContent[i], timeContent[i], moduleContent[i], roomContent[i], profContent[i], groupContent[i], weekContent[i]))
+    
     
     dayContent.clear()
     timeContent.clear()
