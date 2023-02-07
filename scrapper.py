@@ -32,14 +32,17 @@ class Course :
 
 def clearText(txt : str) -> str :
     txtLetters = list(txt)
+    if '\n' in txt :
+        for i in range(len(txtLetters)) :
+            if txtLetters[i] == '\n':
+                if i == 0 :
+                    txtLetters[i] = ''
+                else :
+                    txtLetters[i] = ', '
     if txtLetters[0] == ' ':
         txtLetters[0] = ''
     if txtLetters[-1] == ' ':
         txtLetters[-1] = ''
-    if '\n' in txt :
-        for i in range(len(txtLetters)) :
-            if txtLetters[i] == '\n':
-                txtLetters[i] = ' '
     txt = ''.join(txtLetters)
     return txt
 
@@ -63,7 +66,7 @@ def getTime(element : str, soup) -> list :
 def menu(groupList : list, linkList : list):
     weekChoice = -1
     groupChoice = -1
-    while not (0<=groupChoice<=len(groupList)):
+    while not (0 <= groupChoice <= len(groupList)):
         for i in range(len(groupList)):
             print(i, groupList[i])
         groupChoice = int(input('Group : '))
@@ -166,11 +169,8 @@ def parseSchedule(response):
     resourceList = soup.find_all("resources")
 
     moduleContent = getContent("module", resourceList)
-
     profContent = getContent("staff", resourceList)
-
     roomContent = getContent("room", resourceList)
-
     groupContent = getContent("group", resourceList)
 
     startContent = getTime("starttime", soup)
@@ -192,7 +192,6 @@ def parseSchedule(response):
 
     for i in range(dayCt):
         courseList.append(Course(dayContent[i], timeContent[i], moduleContent[i], roomContent[i], profContent[i], groupContent[i], weekContent[i]))
-    
     
     dayContent.clear()
     timeContent.clear()
