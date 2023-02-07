@@ -76,11 +76,9 @@ def setFormatWS(workbook):
 
 def initWS(worksheet) -> list:
     worksheet.set_landscape()
-    worksheet.set_margins(left=0.15, right=0.15)
+    worksheet.set_margins(left = 0.15, right = 0.15, top = 0, bottom = 0)
     worksheet.center_horizontally()
     worksheet.center_vertically()
-    worksheet.fit_to_pages(1, 0)
-    worksheet.set_paper(9)
     letters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
     totalLetters = []
     for i in range(COL):
@@ -88,7 +86,8 @@ def initWS(worksheet) -> list:
             totalLetters.append(letters[i%26])
         else :
             totalLetters.append(totalLetters[(i//26)-1] + letters[i%26])
-    worksheet.set_column('B:' + str(totalLetters[-1]), 0.7)
+    worksheet.set_column('B:' + str(totalLetters[-1]), 0.8)
+    worksheet.set_column('A:A', 12)
     for i in range(27):
         worksheet.set_row((i+1),19)
     for i in range(5):
@@ -96,6 +95,8 @@ def initWS(worksheet) -> list:
         worksheet.set_row(4 + 5*i, 25)
     worksheet.set_row(1,20)
     worksheet.print_area('A1:' + str(totalLetters[-1]) + '27')
+    worksheet.set_paper(9)
+    worksheet.fit_to_pages(1, 0)
     return totalLetters
 
 def formatWS(worksheet, dayFormat, totalLetters : list, underFormat, rightFormat, cornerFormat, title) -> None:
