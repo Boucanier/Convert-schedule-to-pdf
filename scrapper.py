@@ -16,18 +16,35 @@ class Course :
         self.groupContent = parGroup
         self.weekContent = parWeek
 
-        self.duration = self.cTime()
-    
-    def display(self) -> None:
-        print(self.dayContent, self.timeContent, self.moduleContent, self.roomContent, self.profContent, self.groupContent)
+        self.duration = self.dTime()
+        self.startMinutes = self.toMinutes()
+        self.endMinutes = self.startMinutes + self.duration
 
-    def cTime(self) -> str :
-        dt = (int((self.timeContent[1].split(':'))[0]) - int((self.timeContent[0].split(':'))[0])) + ((int((self.timeContent[1].split(':'))[1]) - int((self.timeContent[0].split(':'))[1])) / 60)
-        d1 = round(dt // 1)
-        d2 = str(round((dt - d1) * 60))
-        d1 = str(d1)
-        dt = ':'.join([d1,d2])
+        self.compatible = True
+
+    def __str__(self) -> str:
+        display = str(self.weekContent) + ' ' + str(self.dayContent) + ' [' + self.timeContent[0] + ':' + self.timeContent[1] + '] - [' + str(self.startMinutes) + ':' + str(self.endMinutes) + '] - ' + str(self.duration) + ', ' \
+            + self.moduleContent + ' ' + self.roomContent + ' ' + self.profContent + ' ' + self.groupContent
+        return display
+
+    def dTime(self) -> int :
+        d1 = (int((self.timeContent[1].split(':'))[0]) - int((self.timeContent[0].split(':'))[0]))
+        d2 = ((int((self.timeContent[1].split(':'))[1]) - int((self.timeContent[0].split(':'))[1])))
+        d1 *= 60
+        dt = d1 + d2
         return dt
+
+    def toMinutes(self) -> int:
+        hr = (self.timeContent[0]).split(':')
+        return (int(hr[0])*60) + int(hr[-1])
+    
+    def isCompatible(self, hr2):
+        if (self.weekContent == hr2.weekContent) and (self.dayContent == hr2.dayContent) and hr2.compatible :
+            if ((self.startMinutes <= hr2.startMinutes < self.endMinutes) or (self.startMinutes < hr2.endMinutes <= self.endMinutes)):
+                return False
+            # if ((hr2.startMinutes <= self.startMinutes < hr2.endMinutes) or (hr2.startMinutes < self.endMinutes <= hr2.endMinutes)):
+            #     return False
+        return True
 
 
 def clearText(txt : str) -> str :
@@ -122,7 +139,7 @@ def sortCourse(courseList : list):
             courseW2.append(e)
         elif e.weekContent == 3 :
             courseW3.append(e)
-        
+
     return courseW0, courseW1, courseW2, courseW3
 
 
@@ -160,6 +177,17 @@ def getWeek(soup):
             wContent.append(3)
 
     return wContent
+
+
+def checkMultiple(courseList):
+    temp = []
+    for i in range(len(courseList)):
+        for j in range(len(courseList)):
+            if (i != j):
+                if not courseList[i].isCompatible(courseList[j]):
+                    courseList[i].compatible = False
+    courseList = [e for e in courseList if e.compatible==True]
+    return courseList
 
 
 def parseSchedule(response):
