@@ -273,7 +273,7 @@ def parseSchedule(response):
     resourceList = soup.find_all("resources")
 
     tWeek = soup.find_all("description")
-    tWeek = [(e.text)[-10:-1] for e in tWeek]
+    tWeek = [(e.text)[-10:] for e in tWeek]
     weekDesc = []
     for e in tWeek:
         temp = ''
