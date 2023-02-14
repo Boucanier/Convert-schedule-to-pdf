@@ -4,11 +4,11 @@ import scrapper
 
 if __name__ == "__main__" :
 
-    url, title, weekChoice = scrapper.getLink()
+    url, title = scrapper.getLink()
     response = scrapper.getSchedule(url)
 
-    courseList = scrapper.parseSchedule(response)
+    courseList, weekDesc = scrapper.parseSchedule(response)
 
     courseList, overCourse, overIndex = scrapper.sortCourse(courseList)
 
-    toXLSX.transformToXls(courseList[weekChoice], title)
+    toXLSX.transformToXls(courseList, weekDesc, title)
