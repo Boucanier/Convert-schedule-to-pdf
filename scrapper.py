@@ -92,9 +92,8 @@ def menu(groupList : list, linkList : list):
         for i in range(len(groupList)):
             print(i, groupList[i])
         groupChoice = int(input('Group : '))
-    while weekChoice not in [0,1,2,3]:
-        weekChoice = int(input(groupList[groupChoice] + " Semaine 0, 1, 2 ou 3 : "))
-    return ("http://chronos.iut-velizy.uvsq.fr/EDT/" + linkList[groupChoice]), groupList[groupChoice], weekChoice
+    print(groupList[groupChoice])
+    return ("http://chronos.iut-velizy.uvsq.fr/EDT/" + linkList[groupChoice]), groupList[groupChoice]
 
 
 def getLink():
@@ -113,11 +112,11 @@ def getLink():
     linkList = soup.findAll('link',  {"class": "xml"}, href = True)
     linkList = [e['href'] for e in linkList]
     
-    link, group, weekChoice = menu(groupList, linkList)
+    link, group = menu(groupList, linkList)
 
     title = 'Emploi du temps - ' + group
     
-    return link, title, weekChoice
+    return link, title
 
 
 def getSchedule(url : str):
@@ -273,6 +272,18 @@ def parseSchedule(response):
 
     resourceList = soup.find_all("resources")
 
+    tWeek = soup.find_all("description")
+    tWeek = [(e.text)[-10:-1] for e in tWeek]
+    weekDesc = []
+    for e in tWeek:
+        temp = ''
+        for i in range(len(e)):
+            if e[i] == "/":
+                temp += "_"
+            else :
+                temp += e[i]
+        weekDesc.append(temp)
+
     moduleContent = getContent("module", resourceList)
     profContent = getContent("staff", resourceList)
     roomContent = getContent("room", resourceList)
@@ -305,4 +316,4 @@ def parseSchedule(response):
     profContent.clear()
     groupContent.clear()
     
-    return courseList
+    return courseList, weekDesc
