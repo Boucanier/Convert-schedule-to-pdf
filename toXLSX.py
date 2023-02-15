@@ -148,8 +148,8 @@ def convertToPdf() -> None:
         os.system('xdg-open schedule.pdf')
         
     elif platform.system() == "Windows" :
-        os.system('libreoffice --convert-to pdf schedule.xlsx')
-        os.system('remove schedule.xlsx')
+        # os.system('libreoffice --convert-to pdf schedule.xlsx')
+        # os.system('del schedule.xlsx')
         os.system('cls')
 
 def transformToXls(courseList, weekDesc : list, title : str) -> None:
