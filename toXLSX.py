@@ -3,6 +3,7 @@
 """
 import xlsxwriter
 import os
+import platform
 
 ROW = 27
 COL = 133 #EC
@@ -86,15 +87,15 @@ def initWS(worksheet) -> list:
             totalLetters.append(letters[i%26])
         else :
             totalLetters.append(totalLetters[(i//26)-1] + letters[i%26])
-    worksheet.set_column('B:' + str(totalLetters[-1]), 0.7)
-    # worksheet.set_column('A:A', 12)
+    worksheet.set_column('B:' + str(totalLetters[-1]), 0.8)
+    worksheet.set_column('A:A', 12)
     for i in range(27):
         worksheet.set_row((i+1),19)
     for i in range(5):
         worksheet.set_row(5 + 5*i, 25)
         worksheet.set_row(4 + 5*i, 25)
     worksheet.set_row(1,20)
-    worksheet.print_area('A1:' + str(totalLetters[-1]) + str(ROW))
+    worksheet.print_area('A1:' + str(totalLetters[-1]) + '27')
     worksheet.set_paper(9)
     worksheet.fit_to_pages(1, 0)
     return totalLetters
@@ -140,10 +141,16 @@ def convertToPdf() -> None:
         Clear the terminal \n
         Open the previously created pdf
     '''
-    os.system('libreoffice --convert-to pdf schedule.xlsx')
-    os.system('rm schedule.xlsx')
-    os.system('clear')
-    os.system('xdg-open schedule.pdf')
+    if platform.system() == "Linux" :
+        os.system('libreoffice --convert-to pdf schedule.xlsx')
+        os.system('rm schedule.xlsx')
+        os.system('clear')
+        os.system('xdg-open schedule.pdf')
+        
+    elif platform.system() == "Windows" :
+        os.system('libreoffice --convert-to pdf schedule.xlsx')
+        os.system('remove schedule.xlsx')
+        os.system('cls')
 
 def transformToXls(courseList, weekDesc : list, title : str) -> None:
     workbook = xlsxwriter.Workbook('schedule.xlsx')
