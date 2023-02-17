@@ -13,16 +13,16 @@ def setFormatWS(workbook):
         Create all the formats used to set the sheet of the schedule in the xlsx document
 
         Args :
-            workbook (xlsxwriter workbook) : workbook containing the schedule
+            - workbook (xlsxwriter workbook) : workbook containing the schedule
         
-        Return :
-            dayFormat (xlsxwriter format) : format for the days cells and more
-            courseFormat (xlsxwriter format) : format for course cells
-            topCourseFormat (xlsxwriter format) : format for course cells with a top border
-            bottomCourseFormat (xlsxwriter format) : format for course cells with a bottom border
-            underFormat (xlsxwriter format) : format used to create the bottom border of the schedule
-            rightFormat (xlsxwriter format) : format used to create the right border of the schedule
-            cornerFormat (xlsxwriter format) : format used to create the right bottom hand corner border of the schedule
+        Returns :
+            - dayFormat (xlsxwriter format) : format for the days cells and more
+            - courseFormat (xlsxwriter format) : format for course cells
+            - topCourseFormat (xlsxwriter format) : format for course cells with a top border
+            - bottomCourseFormat (xlsxwriter format) : format for course cells with a bottom border
+            - underFormat (xlsxwriter format) : format used to create the bottom border of the schedule
+            - rightFormat (xlsxwriter format) : format used to create the right border of the schedule
+            - cornerFormat (xlsxwriter format) : format used to create the right bottom hand corner border of the schedule
     '''
     dayFormat = workbook.add_format()
     dayFormat.set_align('center')
@@ -76,6 +76,9 @@ def setFormatWS(workbook):
     return dayFormat, courseFormat, topCourseFormat, bottomCourseFormat, underFormat, rightFormat, cornerFormat
 
 def initWS(worksheet) -> list:
+    """
+        Initialize the worksheet
+    """
     worksheet.set_landscape()
     worksheet.set_margins(left = 0.15, right = 0.15, top = 0, bottom = 0)
     worksheet.center_horizontally()
@@ -100,11 +103,12 @@ def initWS(worksheet) -> list:
     worksheet.fit_to_pages(1, 0)
     return totalLetters
 
-def formatWS(worksheet, dayFormat, totalLetters : list, underFormat, rightFormat, cornerFormat, title) -> None:
+def formatWS(worksheet, dayFormat, totalLetters : list, underFormat, rightFormat, cornerFormat, title : str) -> None:
     weekDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi']
     for i in range(0,ROW - 2,5):
         worksheet.merge_range('A' + str(i+3) + ':A' + str(i+7), weekDays[i//5], dayFormat)
     worksheet.merge_range('B1:' + str(totalLetters[-1]) + '1', title, dayFormat)
+    worksheet.set_row(0,25)
     for i in range(1,COL-10,12):
         worksheet.merge_range(str(totalLetters[i]) + '2:' + str(totalLetters[i+11]) + '2', str(round(i/12)+8) + ':00 - ' + str(round(i/12)+9) + ':00', dayFormat)
     for i in range(3,ROW + 1) :
@@ -114,7 +118,7 @@ def formatWS(worksheet, dayFormat, totalLetters : list, underFormat, rightFormat
     worksheet.write_blank(str(totalLetters[-1]) + '27', None, cornerFormat)
 
 
-def setToColumn(courseList, totalLetters : list) -> list :
+def setToColumn(courseList : list, totalLetters : list) -> list :
     timeColumn = []
     for j in range(len(courseList)):
         tempList = []
@@ -125,7 +129,18 @@ def setToColumn(courseList, totalLetters : list) -> list :
         timeColumn.append(tempList)
     return timeColumn
 
-def addCourse(worksheet, cFormat, topCourseFormat, bottomCourseFormat, columnTime : list, courseList) -> None:
+def addCourse(worksheet, cFormat, topCourseFormat, bottomCourseFormat, columnTime : list, courseList : list) -> None:
+    """
+        Add a course to the xlsx file
+        
+        Args :
+            - worksheet (xlsx worksheet)
+            - cFormat (xlsx format)
+            - topCourseFormat (xlsx format)
+            - bottomCourseFormat (xlsx format)
+            - columntime (list)
+            - courseList (list)
+    """
     for i in range(len(courseList)):
         rowNbr = int(courseList[i].dayContent)*5+3
         worksheet.merge_range(columnTime[i][0] + str(rowNbr) + ':' + columnTime[i][1] + str(rowNbr), courseList[i].timeContent[0] + ' - ' + courseList[i].timeContent[1], topCourseFormat)
@@ -148,11 +163,19 @@ def convertToPdf() -> None:
         os.system('xdg-open schedule.pdf')
         
     elif platform.system() == "Windows" :
-        # os.system('libreoffice --convert-to pdf schedule.xlsx')
         # os.system('del schedule.xlsx')
+        os.system('start /B schedule.xlsx')
         os.system('cls')
 
-def transformToXls(courseList, weekDesc : list, title : str) -> None:
+def transformToXls(courseList : list, weekDesc : list, title : str) -> None:
+    """
+        Create a xlsx file from course list of 4 weeks and then convert it to a pdf file
+        
+        Args :
+            - courseList (list)
+            - weekDesc (list)
+            - title (str)
+    """
     workbook = xlsxwriter.Workbook('schedule.xlsx')
 
     for i in range (len(weekDesc)):
