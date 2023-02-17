@@ -2,6 +2,7 @@
 
 sudo apt update
 sudo apt install python3
+pip install requests
 pip install bs4
 pip install lxml
 pip istall xlsxwriter
