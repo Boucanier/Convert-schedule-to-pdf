@@ -7,6 +7,9 @@ from bs4 import BeautifulSoup
 
 
 class Course :
+    """
+        Class of a course containing day, time, "content", room, staff, group, week, duration parameters
+    """
     def __init__(self, parDay, parTime, parModule, parRoom, parProf, parGroup, parWeek):
         self.dayContent = parDay
         self.timeContent = parTime
@@ -31,6 +34,12 @@ class Course :
         return display
 
     def dTime(self) -> int :
+        """
+            Calculate the duration of the course
+            
+            Returns :
+                - dt (int)
+        """
         d1 = (int((self.timeContent[1].split(':'))[0]) - int((self.timeContent[0].split(':'))[0]))
         d2 = ((int((self.timeContent[1].split(':'))[1]) - int((self.timeContent[0].split(':'))[1])))
         d1 *= 60
@@ -38,10 +47,25 @@ class Course :
         return dt
 
     def toMinutes(self) -> int:
+        """
+            Convert time content in minutes
+            
+            Returns :
+                - (int)
+        """
         hr = (self.timeContent[0]).split(':')
         return (int(hr[0])*60) + int(hr[-1])
     
     def isCompatible(self, hr2):
+        """
+            Check if the parameter course overlap or is overlapped by the current course
+            
+            Args :
+                - hr2 (Course)
+            
+            Returns :
+                - (boolean)
+        """
         if (self.weekContent == hr2.weekContent) and (self.dayContent == hr2.dayContent) :
             if ((self.startMinutes <= hr2.startMinutes < self.endMinutes) or (self.startMinutes < hr2.endMinutes <= self.endMinutes)):
                 return False
@@ -53,6 +77,15 @@ class Course :
 
 
 def clearText(txt : str) -> str :
+    """
+        Clean a text : Remove all unnecessary blank and new line characters
+        
+        Args :
+            - txt (str)
+            
+        Returns :
+            - txt (str)
+    """
     txtLetters = list(txt)
     if '\n' in txt :
         for i in range(len(txtLetters)) :
@@ -69,7 +102,17 @@ def clearText(txt : str) -> str :
     return txt
 
 
-def getContent(element : str, resourceList) -> list :
+def getContent(element : str, resourceList : list) -> list :
+    """
+        Get all the content of a type for every resource in the xml file
+        
+        Args :
+            - element (str)
+            - resourceList (list)
+        
+        Returns :
+            - content (list)
+    """
     content = []
     for e in resourceList :
         if not e.find(element):
@@ -80,12 +123,33 @@ def getContent(element : str, resourceList) -> list :
 
 
 def getTime(element : str, soup) -> list :
+    """
+        Get time content on the xml file
+        
+        Args :
+            - element (str)
+            - soup (BeautifulSoup soup)
+            
+        Returns :
+            - content (list)
+    """
     content = soup.findAll(element)
     content = [clearText(e.text) for e in content]
     return content
 
 
 def menu(groupList : list, linkList : list):
+    """
+        Display the list of all group and ask the user the one he wants
+        
+        Args :
+            - groupList (list)
+            - linkList (list)
+            
+        Returns :
+            - (str)
+            - (str)
+    """
     weekChoice = -1
     groupChoice = -1
     while not (0 <= groupChoice <= len(groupList)):
@@ -97,6 +161,13 @@ def menu(groupList : list, linkList : list):
 
 
 def getLink():
+    """
+        Get the url for the requested schedule and title of it after calling menu
+        
+        Returns :
+            - link (str)
+            - title (str)
+    """
     url = "http://chronos.iut-velizy.uvsq.fr/EDT/finder.xml"
 
     response = requests.get(url)
@@ -120,6 +191,15 @@ def getLink():
 
 
 def getSchedule(url : str):
+    """
+        Get response of the requested schedule
+        
+        Args :
+            - url (str)
+        
+        Returns :
+            - response (response)
+    """
     response = requests.get(url)
     response.encoding = 'utf-8'
 
@@ -129,6 +209,16 @@ def getSchedule(url : str):
 
 
 def sortCourse(courseList : list):
+    """
+        Check overlapping courses and divide all courses into 4 lists (2 per week) of normal courses and overlapping courses
+        
+        Args :
+            - courseList (list)
+        
+        Returns :
+            - courseList (list)
+            - overCourse (list)
+    """
     courseW0 = []
     courseW1 = []
     courseW2 = []
@@ -156,12 +246,21 @@ def sortCourse(courseList : list):
         res = multipleSort(courseList[i])
         courseList[i] = res[0]
         overCourse[i] = res[1]
-        overIndex[i] = res[2]
 
-    return courseList, overCourse, overIndex
+    return courseList, overCourse
 
 
-def multipleSort(courseList) :
+def multipleSort(courseList : list) :
+    """
+        Check which courses are overlapping and parse split into multiple list
+        
+        Args :
+            - courseList (list)
+        
+        Returns :
+            - gComp (list) : Courses that are not overlapping
+            - nComp (list) : Coures that are overlapping
+    """
     tempindex = []
     temp2index = []
     replaceCourse = []
@@ -217,10 +316,19 @@ def multipleSort(courseList) :
             nComp.append(e)
     gComp = [e for e in courseList if e not in nComp]
     [gComp.append(e) for e in replaceCourse]
-    return gComp, nComp, tempindex
+    return gComp, nComp
 
 
-def getWeek(soup):
+def getWeek(soup) -> list:
+    """
+        Get in which week is a course in the next 4 weeks
+        
+        Args :
+            - soup (BeautifulSoup soup)
+        
+        Returns :
+            - wcontent (list)
+    """
     wContent = []
 
     rs = soup.findAll('rawweeks')
@@ -233,30 +341,37 @@ def getWeek(soup):
         y = 0
         while e[y] != 'Y':
             y += 1
-        tempval = y
-        if tempval < min :
-            min = tempval
-        if tempval > max :
-            max = tempval
+        if y < min :
+            min = y
+        if y > max :
+            max = y
 
     for e in rs :
         y = 0
         while e[y] != 'Y':
             y += 1
-        tempval = y
-        if tempval == min :
+        if y == min :
             wContent.append(0)
-        elif tempval == (min+1) :
+        elif y == (min+1) :
             wContent.append(1)
-        elif tempval == (min+2) :
+        elif y == (min+2) :
             wContent.append(2)
-        elif tempval == max :
+        elif y == max :
             wContent.append(3)
 
     return wContent
 
 
-def checkMultiple(courseList):
+def checkMultiple(courseList : list) -> list:
+    """
+        Check if several courses overlap themselves
+        
+        Args :
+            - courseList (list)
+        
+        Returns :
+            - courseList (list)
+    """
     for i in range(len(courseList)):
         for j in range(len(courseList)):
             if (i != j):
@@ -267,6 +382,16 @@ def checkMultiple(courseList):
 
 
 def parseSchedule(response):
+    """
+        Main function of the scrapper module
+        
+        Args :
+            - response (xml request response)
+            
+        Returns :
+            - courseList (list)
+            - weekDesc (list)
+    """
     courseList = []
     soup = BeautifulSoup(response.content, "lxml")
 
