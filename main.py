@@ -1,5 +1,5 @@
 import toXLSX
-import scrapper
+import scraper
 
 
 if __name__ == "__main__" :
