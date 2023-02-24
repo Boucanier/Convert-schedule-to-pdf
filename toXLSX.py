@@ -5,6 +5,7 @@ import xlsxwriter
 import os
 import platform
 
+
 ROW = 27
 COL = 133 #EC
 
@@ -12,10 +13,10 @@ def setFormatWS(workbook):
     '''
         Create all the formats used to set the sheet of the schedule in the xlsx document
 
-        Args :
+        - Args :
             - workbook (xlsxwriter workbook) : workbook containing the schedule
         
-        Returns :
+        - Returns :
             - dayFormat (xlsxwriter format) : format for the days cells and more
             - courseFormat (xlsxwriter format) : format for course cells
             - topCourseFormat (xlsxwriter format) : format for course cells with a top border
@@ -76,9 +77,12 @@ def setFormatWS(workbook):
     return dayFormat, courseFormat, topCourseFormat, bottomCourseFormat, underFormat, rightFormat, cornerFormat
 
 
-def initWS(worksheet) -> tuple:
+def initWS(worksheet) -> tuple[str]:
     """
         Initialize the worksheet
+
+        - Returns :
+            - totalLetters (tuple[str])
     """
     worksheet.set_landscape()
     worksheet.set_margins(left = 0.15, right = 0.15, top = 0, bottom = 0)
@@ -106,7 +110,7 @@ def initWS(worksheet) -> tuple:
     return totalLetters
     
 
-def formatWS(worksheet, dayFormat, totalLetters : tuple, underFormat, rightFormat, cornerFormat, title : str) -> None:
+def formatWS(worksheet, dayFormat, totalLetters : tuple[str], underFormat, rightFormat, cornerFormat, title : str) -> None:
     weekDays = ('lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi')
     for i in range(0,ROW - 2,5):
         worksheet.merge_range('A' + str(i+3) + ':A' + str(i+7), weekDays[i//5], dayFormat)
@@ -121,7 +125,7 @@ def formatWS(worksheet, dayFormat, totalLetters : tuple, underFormat, rightForma
     worksheet.write_blank(str(totalLetters[-1]) + '27', None, cornerFormat)
 
 
-def setToColumn(courseList : tuple, totalLetters : tuple) -> list :
+def setToColumn(courseList : tuple, totalLetters : tuple[str]) -> list :
     timeColumn = []
     for j in range(len(courseList)):
         tempList = []
@@ -137,13 +141,13 @@ def addCourse(worksheet, cFormat, topCourseFormat, bottomCourseFormat, columnTim
     """
         Add a course to the xlsx file
         
-        Args :
+        - Args :
             - worksheet (xlsx worksheet)
             - cFormat (xlsx format)
             - topCourseFormat (xlsx format)
             - bottomCourseFormat (xlsx format)
             - columntime (list)
-            - courseList (list)
+            - courseList (tuple[list[Course]])
     """
     for i in range(len(courseList)):
         rowNbr = int(courseList[i].dayContent)*5+3
@@ -156,9 +160,9 @@ def addCourse(worksheet, cFormat, topCourseFormat, bottomCourseFormat, columnTim
 
 def convertToPdf() -> None:
     '''
-        Convert the created xlsx file to pdf using a libreOffice command on Linux \n
-        Then, remove the xlsx file since it is useless \n
-        Clear the terminal \n
+        Convert the created xlsx file to pdf using a libreOffice command on Linux\n
+        Then, remove the xlsx file since it is useless\n
+        Clear the terminal\n
         Open the previously created pdf
     '''
     if platform.system() == "Linux" :
@@ -172,13 +176,13 @@ def convertToPdf() -> None:
         os.system('cls')
 
 
-def transformToXls(courseList : tuple, weekDesc : list, title : str) -> None:
+def transformToXls(courseList : tuple, weekDesc : list[str], title : str) -> None:
     """
         Create a xlsx file from course list of 4 weeks and then convert it to a pdf file
         
-        Args :
-            - courseList (list)
-            - weekDesc (list)
+        - Args :
+            - courseList (tuple[list[Course]])
+            - weekDesc (list[str])
             - title (str)
     """
     workbook = xlsxwriter.Workbook('schedule.xlsx')
