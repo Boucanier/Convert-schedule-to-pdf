@@ -12,5 +12,4 @@ To run the code, you need to have :
  - __xlsxwriter__ (_pip install xlsxwriter_)
  - __lxml parser__ (_pip install lxml_)
  - __LibreOffice 7.3__ or above (_sudo apt install libreoffice_)
- - __xdg-utils__ (_sudo apt install xdg-utils_)
- - a __Linux__ distribution
+ - __xdg-utils__ (_sudo apt install xdg-utils_) : _only for __Linux__ distribution_
