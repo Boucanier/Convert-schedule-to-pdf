@@ -9,6 +9,6 @@ if __name__ == "__main__" :
 
     courseList, weekDesc = scraper.parseSchedule(response)
 
-    courseList, overCourse = scraper.sortCourse(courseList)
+    courseList = scraper.sortCourse(courseList)
 
     toXLSX.transformToXls(courseList, weekDesc, title)
