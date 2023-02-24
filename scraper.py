@@ -1,5 +1,5 @@
 """
-    This code will scrap the schedule data with requests
+    This code will scrap the schedule data with requests\n
     It will parse it using beauriful soup in objects of a "Course" class
 """
 import requests
@@ -10,7 +10,7 @@ class Course :
     """
         Class of a course containing day, time, "content", room, staff, group, week, duration parameters
     """
-    def __init__(self, parDay, parTime, parModule, parRoom, parProf, parGroup, parWeek):
+    def __init__(self, parDay : str, parTime : list[str], parModule : str, parRoom : str, parProf : str, parGroup : str, parWeek : int) -> None:
         self.dayContent = parDay
         self.timeContent = parTime
         self.moduleContent = parModule
@@ -37,7 +37,7 @@ class Course :
         """
             Calculate the duration of the course
             
-            Returns :
+            - Returns :
                 - dt (int)
         """
         d1 = (int((self.timeContent[1].split(':'))[0]) - int((self.timeContent[0].split(':'))[0]))
@@ -50,20 +50,20 @@ class Course :
         """
             Convert time content in minutes
             
-            Returns :
+            - Returns :
                 - (int)
         """
         hr = (self.timeContent[0]).split(':')
         return (int(hr[0])*60) + int(hr[-1])
     
-    def isCompatible(self, hr2):
+    def isCompatible(self, hr2) -> bool:
         """
             Check if the parameter course overlap or is overlapped by the current course
             
-            Args :
+            - Args :
                 - hr2 (Course)
             
-            Returns :
+            - Returns :
                 - (boolean)
         """
         if (self.weekContent == hr2.weekContent) and (self.dayContent == hr2.dayContent) :
@@ -80,10 +80,10 @@ def clearText(txt : str) -> str :
     """
         Clean a text : Remove all unnecessary blank and new line characters
         
-        Args :
+        - Args :
             - txt (str)
             
-        Returns :
+        - Returns :
             - txt (str)
     """
     txtLetters = list(txt)
@@ -102,15 +102,15 @@ def clearText(txt : str) -> str :
     return txt
 
 
-def getContent(element : str, resourceList : list) -> list :
+def getContent(element : str, resourceList : list) -> list[str] :
     """
         Get all the content of a type for every resource in the xml file
         
-        Args :
+        - Args :
             - element (str)
             - resourceList (list)
         
-        Returns :
+        - Returns :
             - content (list)
     """
     content = []
@@ -122,15 +122,15 @@ def getContent(element : str, resourceList : list) -> list :
     return content
 
 
-def getTime(element : str, soup) -> list :
+def getTime(element : str, soup) -> list[str] :
     """
         Get time content on the xml file
         
-        Args :
+        - Args :
             - element (str)
             - soup (BeautifulSoup soup)
             
-        Returns :
+        - Returns :
             - content (list)
     """
     content = soup.findAll(element)
@@ -138,19 +138,18 @@ def getTime(element : str, soup) -> list :
     return content
 
 
-def menu(groupList : list, linkList : list):
+def menu(groupList : list, linkList : list) -> tuple[str, str]:
     """
         Display the list of all group and ask the user the one he wants
         
-        Args :
+        - Args :
             - groupList (list)
             - linkList (list)
             
-        Returns :
+        - Returns :
             - (str)
             - (str)
     """
-    weekChoice = -1
     groupChoice = -1
     while not (0 <= groupChoice <= len(groupList)):
         for i in range(len(groupList)):
@@ -160,11 +159,11 @@ def menu(groupList : list, linkList : list):
     return ("http://chronos.iut-velizy.uvsq.fr/EDT/" + linkList[groupChoice]), groupList[groupChoice]
 
 
-def getLink():
+def getLink() -> tuple[str, str]:
     """
         Get the url for the requested schedule and title of it after calling menu
         
-        Returns :
+        - Returns :
             - link (str)
             - title (str)
     """
@@ -194,10 +193,10 @@ def getSchedule(url : str):
     """
         Get response of the requested schedule
         
-        Args :
+        - Args :
             - url (str)
         
-        Returns :
+        - Returns :
             - response (response)
     """
     response = requests.get(url)
@@ -208,14 +207,14 @@ def getSchedule(url : str):
     return response
 
 
-def sortCourse(courseList : list):
+def sortCourse(courseList : list) -> tuple :
     """
         Check overlapping courses and divide all courses into 4 lists (2 per week) of normal courses and overlapping courses
         
-        Args :
+        - Args :
             - courseList (list)
         
-        Returns :
+        - Returns :
             - courseList (list)
             - overCourse (list)
     """
@@ -255,10 +254,10 @@ def multipleSort(courseList : list) :
     """
         Check which courses are overlapping and parse split into multiple list
         
-        Args :
+        - Args :
             - courseList (list)
         
-        Returns :
+        - Returns :
             - gComp (list) : Courses that are not overlapping
             - nComp (list) : Coures that are overlapping
     """
@@ -320,14 +319,14 @@ def multipleSort(courseList : list) :
     return gComp, nComp
 
 
-def getWeek(soup) -> list:
+def getWeek(soup) -> list[int]:
     """
         Get in which week is a course in the next 4 weeks
         
-        Args :
+        - Args :
             - soup (BeautifulSoup soup)
         
-        Returns :
+        - Returns :
             - wcontent (list)
     """
     wContent = []
@@ -367,10 +366,10 @@ def checkMultiple(courseList : list) -> list:
     """
         Check if several courses overlap themselves
         
-        Args :
+        - Args :
             - courseList (list)
         
-        Returns :
+        - Returns :
             - courseList (list)
     """
     for i in range(len(courseList)):
@@ -386,10 +385,10 @@ def parseSchedule(response):
     """
         Main function of the scrapper module
         
-        Args :
+        - Args :
             - response (xml request response)
             
-        Returns :
+        - Returns :
             - courseList (list)
             - weekDesc (list)
     """
@@ -434,12 +433,5 @@ def parseSchedule(response):
 
     for i in range(dayCt):
         courseList.append(Course(dayContent[i], timeContent[i], moduleContent[i], roomContent[i], profContent[i], groupContent[i], weekContent[i]))
-    
-    dayContent.clear()
-    timeContent.clear()
-    moduleContent.clear()
-    roomContent.clear()
-    profContent.clear()
-    groupContent.clear()
     
     return courseList, weekDesc
