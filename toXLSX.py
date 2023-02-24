@@ -163,7 +163,6 @@ def convertToPdf() -> None:
         os.system('xdg-open schedule.pdf')
         
     elif platform.system() == "Windows" :
-        # os.system('del schedule.xlsx')
         os.system('start /B schedule.xlsx')
         os.system('cls')
 
