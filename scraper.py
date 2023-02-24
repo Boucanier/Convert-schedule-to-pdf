@@ -240,14 +240,15 @@ def sortCourse(courseList : list):
         e = checkMultiple(e)
     
     overCourse = [[],[],[],[]]
-    overIndex = [[],[],[],[]]
 
     for i in range(len(courseList)):
         res = multipleSort(courseList[i])
         courseList[i] = res[0]
         overCourse[i] = res[1]
 
-    return courseList, overCourse
+    tCourseList = tuple(courseList)
+
+    return tCourseList
 
 
 def multipleSort(courseList : list) :
