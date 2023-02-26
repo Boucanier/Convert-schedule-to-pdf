@@ -1,5 +1,5 @@
 """
-    This code will convert the data scrapped with the scrapper into a xlsx file into a pdf file
+    This code will convert the data scrapped with the scrapper into a xlsx file (into a pdf file if on Linux distribution)
 """
 import xlsxwriter
 import os
@@ -9,18 +9,16 @@ import platform
 ROW = 27
 COL = 133 #EC
 
+
 def setFormatWS(workbook):
     '''
-        Create all the formats used to set the sheet of the schedule in the xlsx document
+        Create formats used to set the sheet of the schedule in the xlsx document
 
         - Args :
             - workbook (xlsxwriter workbook) : workbook containing the schedule
         
         - Returns :
             - dayFormat (xlsxwriter format) : format for the days cells and more
-            - courseFormat (xlsxwriter format) : format for course cells
-            - topCourseFormat (xlsxwriter format) : format for course cells with a top border
-            - bottomCourseFormat (xlsxwriter format) : format for course cells with a bottom border
             - underFormat (xlsxwriter format) : format used to create the bottom border of the schedule
             - rightFormat (xlsxwriter format) : format used to create the right border of the schedule
             - cornerFormat (xlsxwriter format) : format used to create the right bottom hand corner border of the schedule
@@ -32,37 +30,7 @@ def setFormatWS(workbook):
     dayFormat.set_font_size(13)
     dayFormat.set_text_wrap()
     dayFormat.set_border()
-
-    courseFormat = workbook.add_format()
-    courseFormat.set_align('center')
-    courseFormat.set_align('vcenter')
-    courseFormat.set_font_name('Arial')
-    courseFormat.set_font_size(11)
-    courseFormat.set_text_wrap()
-    courseFormat.set_right()
-    courseFormat.set_left()
-    courseFormat.set_shrink()
-
-    topCourseFormat = workbook.add_format()
-    topCourseFormat.set_align('center')
-    topCourseFormat.set_align('vcenter')
-    topCourseFormat.set_font_name('Arial')
-    topCourseFormat.set_font_size(13)
-    topCourseFormat.set_text_wrap()
-    topCourseFormat.set_right()
-    topCourseFormat.set_left()
-    topCourseFormat.set_top()
-    topCourseFormat.set_bold()
-
-    bottomCourseFormat = workbook.add_format()
-    bottomCourseFormat.set_align('center')
-    bottomCourseFormat.set_align('vcenter')
-    bottomCourseFormat.set_font_name('Arial')
-    bottomCourseFormat.set_font_size(13)
-    bottomCourseFormat.set_text_wrap()
-    bottomCourseFormat.set_right()
-    bottomCourseFormat.set_left()
-    bottomCourseFormat.set_bottom()
+    dayFormat.set_bg_color('#DCDCDC')
 
     underFormat = workbook.add_format()
     underFormat.set_bottom()
@@ -74,7 +42,7 @@ def setFormatWS(workbook):
     cornerFormat.set_bottom()
     cornerFormat.set_right()
 
-    return dayFormat, courseFormat, topCourseFormat, bottomCourseFormat, underFormat, rightFormat, cornerFormat
+    return dayFormat, underFormat, rightFormat, cornerFormat
 
 
 def initWS(worksheet) -> tuple[str]:
@@ -95,8 +63,9 @@ def initWS(worksheet) -> tuple[str]:
             totalLetters.append(letters[i%26])
         else :
             totalLetters.append(totalLetters[(i//26)-1] + letters[i%26])
-    worksheet.set_column('B:' + str(totalLetters[-1]), 0.8)
-    worksheet.set_column('A:A', 12)
+    # worksheet.set_column('B:' + str(totalLetters[-1]), 0.8)
+    worksheet.set_column('B:' + str(totalLetters[-1]), 0.7)
+    # worksheet.set_column('A:A', 12)
     for i in range(27):
         worksheet.set_row((i+1),19)
     for i in range(5):
@@ -111,6 +80,18 @@ def initWS(worksheet) -> tuple[str]:
     
 
 def formatWS(worksheet, dayFormat, totalLetters : tuple[str], underFormat, rightFormat, cornerFormat, title : str) -> None:
+    """
+        Set the frame for the schedule with days and times
+
+        - Args :
+            - worksheet
+            - dayFormat
+            - totalLetters (tuple[str])
+            - underFormat
+            - rightFormat
+            - cornerFormat
+            - title (str)
+    """
     weekDays = ('lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi')
     for i in range(0,ROW - 2,5):
         worksheet.merge_range('A' + str(i+3) + ':A' + str(i+7), weekDays[i//5], dayFormat)
@@ -129,7 +110,7 @@ def setToColumn(courseList : tuple, totalLetters : tuple[str]) -> list :
     timeColumn = []
     for j in range(len(courseList)):
         tempList = []
-        for i in range (2):
+        for i in range(2):
             tempTime = 0
             tempTime += (int(((courseList[j].timeContent)[i].split(':'))[0])-8) * 12 + 1 + int(((courseList[j].timeContent)[i].split(':'))[1])//5 - i
             tempList.append(totalLetters[tempTime])
@@ -137,25 +118,63 @@ def setToColumn(courseList : tuple, totalLetters : tuple[str]) -> list :
     return timeColumn
 
 
-def addCourse(worksheet, cFormat, topCourseFormat, bottomCourseFormat, columnTime : list, courseList : tuple) -> None:
+def addCourse(worksheet, columnTime : list, courseList : tuple, workbook) -> None:
     """
-        Add a course to the xlsx file
+        Add a course to the xlsx file\n
+        Create formats used to add course
         
         - Args :
             - worksheet (xlsx worksheet)
-            - cFormat (xlsx format)
-            - topCourseFormat (xlsx format)
-            - bottomCourseFormat (xlsx format)
             - columntime (list)
             - courseList (tuple[list[Course]])
     """
+    fmtList = [[],[],[]]
+    for e in courseList :
+        topfmt = workbook.add_format()
+        topfmt.set_align('center')
+        topfmt.set_align('vcenter')
+        topfmt.set_font_name('Arial')
+        topfmt.set_font_size(11)
+        topfmt.set_text_wrap()
+        topfmt.set_right()
+        topfmt.set_left()
+        topfmt.set_top()
+        topfmt.set_bold()
+        topfmt.set_bg_color(e.colorContent)
+        fmtList[0].append(topfmt)
+
+        fmt = workbook.add_format()
+        fmt.set_align('center')
+        fmt.set_align('vcenter')
+        fmt.set_font_name('Arial')
+        fmt.set_font_size(11)
+        fmt.set_text_wrap()
+        fmt.set_right()
+        fmt.set_left()
+        fmt.set_shrink()
+        fmt.set_bg_color(e.colorContent)
+        fmtList[1].append(fmt)
+
+        botfmt = workbook.add_format()
+        botfmt.set_align('center')
+        botfmt.set_align('vcenter')
+        botfmt.set_font_name('Arial')
+        botfmt.set_font_size(13)
+        botfmt.set_text_wrap()
+        botfmt.set_right()
+        botfmt.set_left()
+        botfmt.set_bottom()
+        botfmt.set_bg_color(e.colorContent)
+        fmtList[2].append(botfmt)
+
     for i in range(len(courseList)):
         rowNbr = int(courseList[i].dayContent)*5+3
-        worksheet.merge_range(columnTime[i][0] + str(rowNbr) + ':' + columnTime[i][1] + str(rowNbr), courseList[i].timeContent[0] + ' - ' + courseList[i].timeContent[1], topCourseFormat)
-        worksheet.merge_range(columnTime[i][0] + str(rowNbr + 1) + ':' + columnTime[i][1] + str(rowNbr + 1), courseList[i].groupContent, cFormat)
-        worksheet.merge_range(columnTime[i][0] + str(rowNbr + 2) + ':' + columnTime[i][1] + str(rowNbr + 2), courseList[i].moduleContent, cFormat)
-        worksheet.merge_range(columnTime[i][0] + str(rowNbr + 3) + ':' + columnTime[i][1] + str(rowNbr + 3), courseList[i].profContent, cFormat)
-        worksheet.merge_range(columnTime[i][0] + str(rowNbr + 4) + ':' + columnTime[i][1] + str(rowNbr + 4), courseList[i].roomContent, bottomCourseFormat)
+
+        worksheet.merge_range(columnTime[i][0] + str(rowNbr) + ':' + columnTime[i][1] + str(rowNbr), courseList[i].timeContent[0] + ' - ' + courseList[i].timeContent[1], fmtList[0][i])
+        worksheet.merge_range(columnTime[i][0] + str(rowNbr + 1) + ':' + columnTime[i][1] + str(rowNbr + 1), courseList[i].groupContent, fmtList[1][i])
+        worksheet.merge_range(columnTime[i][0] + str(rowNbr + 2) + ':' + columnTime[i][1] + str(rowNbr + 2), courseList[i].moduleContent, fmtList[1][i])
+        worksheet.merge_range(columnTime[i][0] + str(rowNbr + 3) + ':' + columnTime[i][1] + str(rowNbr + 3), courseList[i].profContent, fmtList[1][i])
+        worksheet.merge_range(columnTime[i][0] + str(rowNbr + 4) + ':' + columnTime[i][1] + str(rowNbr + 4), courseList[i].roomContent, fmtList[2][i])
 
 
 def convertToPdf() -> None:
@@ -189,11 +208,11 @@ def transformToXls(courseList : tuple, weekDesc : list[str], title : str) -> Non
 
     for i in range (len(weekDesc)):
         worksheet = workbook.add_worksheet(str(weekDesc[i]))
-        dayFormat, courseFormat, topCourseFormat, bottomCourseFormat, underFormat, rightFormat, cornerFormat = setFormatWS(workbook)
+        dayFormat, underFormat, rightFormat, cornerFormat = setFormatWS(workbook)
         totalLetters = initWS(worksheet)
         formatWS(worksheet, dayFormat, totalLetters, underFormat, rightFormat, cornerFormat, title)
         columnTime = setToColumn(courseList[i], totalLetters)
-        addCourse(worksheet, courseFormat, topCourseFormat, bottomCourseFormat, columnTime, courseList[i])
+        addCourse(worksheet, columnTime, courseList[i], workbook)
         
     workbook.close()
     convertToPdf()
