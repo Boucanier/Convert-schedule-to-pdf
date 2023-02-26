@@ -5,12 +5,11 @@
 import requests
 from bs4 import BeautifulSoup
 
-
 class Course :
     """
-        Class of a course containing day, time, "content", room, staff, group, week, duration parameters
+        Class of a course containing day, time, "content", room, staff, group, week, duration, colour parameters
     """
-    def __init__(self, parDay : str, parTime : list[str], parModule : str, parRoom : str, parProf : str, parGroup : str, parWeek : int) -> None:
+    def __init__(self, parDay : str, parTime : list[str], parModule : str, parRoom : str, parProf : str, parGroup : str, parWeek : int, parColor : str) -> None:
         self.dayContent = parDay
         self.timeContent = parTime
         self.moduleContent = parModule
@@ -18,6 +17,7 @@ class Course :
         self.profContent = parProf
         self.groupContent = parGroup
         self.weekContent = parWeek
+        self.colorContent = parColor
 
         self.duration = self.dTime()
         self.startMinutes = self.toMinutes()
@@ -215,8 +215,7 @@ def sortCourse(courseList : list) -> tuple :
             - courseList (list)
         
         - Returns :
-            - courseList (list)
-            - overCourse (list)
+            - tcourseList (list)
     """
     courseW0 = []
     courseW1 = []
@@ -309,7 +308,7 @@ def multipleSort(courseList : list) :
             if courseList[k].endMinutes > tempend :
                 tempend = courseList[k].endMinutes
                 hend = courseList[k].timeContent[1]
-        replaceCourse.append(Course(courseList[e[0]].dayContent, [hstart,hend], "COURS", "- - -", "MULTIPLES", "- - -", courseList[e[0]].weekContent))
+        replaceCourse.append(Course(courseList[e[0]].dayContent, [hstart,hend], "COURS", "- - -", "MULTIPLES", "- - -", courseList[e[0]].weekContent, '#7BEBFF'))
 
     for e in courseList:
         if len(e.sameTime) != 0 :
@@ -431,7 +430,10 @@ def parseSchedule(response):
         dayContent += dayTemp[-i]
     dayContent.reverse()
 
+    colorContent = soup.findAll('event')
+    colorContent = [('#' + e['colour']) for e in colorContent]
+
     for i in range(dayCt):
-        courseList.append(Course(dayContent[i], timeContent[i], moduleContent[i], roomContent[i], profContent[i], groupContent[i], weekContent[i]))
+        courseList.append(Course(dayContent[i], timeContent[i], moduleContent[i], roomContent[i], profContent[i], groupContent[i], weekContent[i], colorContent[i]))
     
     return courseList, weekDesc
