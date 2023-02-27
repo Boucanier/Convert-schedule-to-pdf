@@ -63,9 +63,8 @@ def initWS(worksheet) -> tuple[str]:
             totalLetters.append(letters[i%26])
         else :
             totalLetters.append(totalLetters[(i//26)-1] + letters[i%26])
-    # worksheet.set_column('B:' + str(totalLetters[-1]), 0.8)
-    worksheet.set_column('B:' + str(totalLetters[-1]), 0.7)
-    # worksheet.set_column('A:A', 12)
+    worksheet.set_column('B:' + str(totalLetters[-1]), 0.8)
+    worksheet.set_column('A:A', 12)
     for i in range(27):
         worksheet.set_row((i+1),19)
     for i in range(5):
