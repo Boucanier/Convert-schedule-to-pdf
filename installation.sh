@@ -8,3 +8,11 @@ pip install lxml
 pip istall xlsxwriter
 sudo apt install libreoffice-calc
 sudo apt install xdg-utils
+clear
+echo "Everything is installed"
+sleep 1
+echo ...
+sleep 1
+echo "The program is ready to run"
+sleep 2
+clear
