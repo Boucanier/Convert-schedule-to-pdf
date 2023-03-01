@@ -7,10 +7,10 @@ from bs4 import BeautifulSoup
 
 class Course :
     """
-        Class of a course containing day, time, "content", room, staff, group, week, duration, colour parameters
+        Class of a course containing day, time, "content", room, staff, group, week, duration, color parameters
     """
     def __init__(self, parDay : str, parTime : list[str], parModule : str, parRoom : str, parProf : str, parGroup : str, parWeek : int, parColor : str) -> None:
-        self.dayContent = parDay
+        self.dayContent = int(parDay)
         self.timeContent = parTime
         self.moduleContent = parModule
         self.roomContent = parRoom
@@ -138,7 +138,7 @@ def getTime(element : str, soup) -> list[str] :
     return content
 
 
-def menu(groupList : list, linkList : list) -> tuple[str, str]:
+def menu(groupList : list, linkList : list[str]) -> tuple[str, str]:
     """
         Display the list of all group and ask the user the one he wants
         
@@ -179,7 +179,7 @@ def getLink() -> tuple[str, str]:
     groupList = soup.findAll('name')
     groupList = [e.text for e in groupList]
 
-    linkList = soup.findAll('link',  {"class": "xml"}, href = True)
+    linkList = soup.findAll('link',  {"class": "xml"})
     linkList = [e['href'] for e in linkList]
     
     link, group = menu(groupList, linkList)
@@ -246,7 +246,7 @@ def sortCourse(courseList : list) -> tuple :
 
     tCourseList = tuple(courseList)
 
-    return tCourseList
+    return tCourseList, overCourse
 
 
 def multipleSort(courseList : list) :
