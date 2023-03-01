@@ -53,9 +53,8 @@ def initWS(worksheet) -> tuple[str]:
             - totalLetters (tuple[str])
     """
     worksheet.set_landscape()
-    worksheet.set_margins(left = 0.15, right = 0.15, top = 0, bottom = 0)
+    worksheet.set_margins(left = 0.15, right = 0.15, top = 0.15, bottom = 0.15)
     worksheet.center_horizontally()
-    worksheet.center_vertically()
     letters = ('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z')
     totalLetters = []
     for i in range(COL):
@@ -65,13 +64,13 @@ def initWS(worksheet) -> tuple[str]:
             totalLetters.append(totalLetters[(i//26)-1] + letters[i%26])
     worksheet.set_column('B:' + str(totalLetters[-1]), 0.8)
     worksheet.set_column('A:A', 12)
-    for i in range(27):
+    for i in range(ROW):
         worksheet.set_row((i+1),19)
     for i in range(5):
         worksheet.set_row(5 + 5*i, 25)
         worksheet.set_row(4 + 5*i, 25)
     worksheet.set_row(1,20)
-    worksheet.print_area('A1:' + str(totalLetters[-1]) + '27')
+    worksheet.print_area('A1:' + str(totalLetters[-1]) + str(ROW))
     worksheet.set_paper(9)
     worksheet.fit_to_pages(1, 0)
     totalLetters = tuple(totalLetters)
@@ -91,7 +90,7 @@ def formatWS(worksheet, dayFormat, totalLetters : tuple[str], underFormat, right
             - cornerFormat
             - title (str)
     """
-    weekDays = ('lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi')
+    weekDays = ('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi')
     for i in range(0,ROW - 2,5):
         worksheet.merge_range('A' + str(i+3) + ':A' + str(i+7), weekDays[i//5], dayFormat)
     worksheet.merge_range('B1:' + str(totalLetters[-1]) + '1', title, dayFormat)
@@ -101,11 +100,21 @@ def formatWS(worksheet, dayFormat, totalLetters : tuple[str], underFormat, right
     for i in range(3,ROW + 1) :
         worksheet.write_blank(str(totalLetters[-1]) + str(i), None, rightFormat)
     for i in range(1,COL):
-        worksheet.write_blank(str(totalLetters[i]) + '27', None, underFormat)
-    worksheet.write_blank(str(totalLetters[-1]) + '27', None, cornerFormat)
+        worksheet.write_blank(str(totalLetters[i]) + str(ROW), None, underFormat)
+    worksheet.write_blank(str(totalLetters[-1]) + str(ROW), None, cornerFormat)
 
 
-def setToColumn(courseList : tuple, totalLetters : tuple[str]) -> list :
+def setToColumn(courseList : list, totalLetters : tuple[str]) -> list[list[list[str]]] :
+    """
+        Get the range of column at the xlsx format for every course
+
+        Args :
+            - courseList (list[Course])
+            - totalLetters (tuple[str])
+        
+        Returns :
+            - timeColumn (list[list[list[str]]])
+    """
     timeColumn = []
     for j in range(len(courseList)):
         tempList = []
@@ -117,7 +126,7 @@ def setToColumn(courseList : tuple, totalLetters : tuple[str]) -> list :
     return timeColumn
 
 
-def addCourse(worksheet, columnTime : list, courseList : tuple, workbook) -> None:
+def addCourse(worksheet, columnTime : list, courseList : list, workbook) -> None:
     """
         Add a course to the xlsx file\n
         Create formats used to add course
@@ -125,7 +134,7 @@ def addCourse(worksheet, columnTime : list, courseList : tuple, workbook) -> Non
         - Args :
             - worksheet (xlsx worksheet)
             - columntime (list)
-            - courseList (tuple[list[Course]])
+            - courseList (list[Course])
     """
     fmtList = [[],[],[]]
     for e in courseList :
@@ -176,6 +185,59 @@ def addCourse(worksheet, columnTime : list, courseList : tuple, workbook) -> Non
         worksheet.merge_range(columnTime[i][0] + str(rowNbr + 4) + ':' + columnTime[i][1] + str(rowNbr + 4), courseList[i].roomContent, fmtList[2][i])
 
 
+def writeOverCourse(workbook, worksheet, overCourse : list, week : str, totalLetters : tuple[str]) -> None :
+    """
+        Write a list of every overlapping courses
+
+        Args :
+            - workbook
+            - worksheet
+            - overCourse (list[Course])
+            - week (str)
+            - totalLetters (tuple[str])
+    """
+    bigfmt = workbook.add_format()
+    bigfmt.set_align('center')
+    bigfmt.set_align('vcenter')
+    bigfmt.set_font_name('Arial')
+    bigfmt.set_font_size(15)
+    bigfmt.set_bold()
+    bigfmt.set_text_wrap()
+    bigfmt.set_shrink()
+    bigfmt.set_border()
+
+    fmt = workbook.add_format()
+    fmt.set_align('vcenter')
+    fmt.set_font_name('Arial')
+    fmt.set_font_size(13)
+    fmt.set_text_wrap()
+    fmt.set_shrink()
+    fmt.set_border()
+
+    worksheet.set_row(0, 20)
+    worksheet.merge_range('A1:' + totalLetters[-1] + '1', 'Liste des cours simultanés - semaine du ' + week[:2] + '/' + week[3:5] + '/' + week[-4:], bigfmt)
+
+    weekDays = ('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi')
+
+    newLine = 2
+    for i in range(len(overCourse)) :
+        if i == 0 or (overCourse[i-1].dayContent != overCourse[i].dayContent) :
+            worksheet.write_blank('A' + str(newLine) + ':' + totalLetters[-1] + str(newLine), None)
+            newLine += 1
+            worksheet.merge_range('A' + str(newLine) + ':' + totalLetters[-1] + str(newLine), weekDays[overCourse[i].dayContent], bigfmt)
+            newLine += 1
+        msg = overCourse[i].groupContent + ', ' + overCourse[i].moduleContent + ', ' + overCourse[i].profContent + ' : ' + overCourse[i].roomContent
+        if len(msg) > 115 :
+            worksheet.set_row(newLine - 1, 32)
+        else :
+            worksheet.set_row(newLine - 1, 18)
+        worksheet.merge_range('A' + str(newLine) + ':D' + str(newLine), overCourse[i].timeContent[0] + '-' + overCourse[i].timeContent[1], bigfmt)
+        worksheet.merge_range('E' + str(newLine) + ':' + totalLetters[-1] + str(newLine), msg, fmt)
+        newLine += 1
+
+    worksheet.print_area('A1:' + str(totalLetters[-1]) + str(newLine))
+
+
 def convertToPdf() -> None:
     '''
         Convert the created xlsx file to pdf using a libreOffice command on Linux\n
@@ -194,7 +256,7 @@ def convertToPdf() -> None:
         os.system('cls')
 
 
-def transformToXls(courseList : tuple, weekDesc : list[str], title : str) -> None:
+def transformToXlsx(courseList : tuple, overCourse : list, weekDesc : list[str], title : str) -> None:
     """
         Create a xlsx file from course list of 4 weeks and then convert it to a pdf file
         
@@ -205,13 +267,21 @@ def transformToXls(courseList : tuple, weekDesc : list[str], title : str) -> Non
     """
     workbook = xlsxwriter.Workbook('schedule.xlsx')
 
+    cpt = 1
     for i in range (len(weekDesc)):
         worksheet = workbook.add_worksheet(str(weekDesc[i]))
+        worksheet.center_vertically()
         dayFormat, underFormat, rightFormat, cornerFormat = setFormatWS(workbook)
         totalLetters = initWS(worksheet)
         formatWS(worksheet, dayFormat, totalLetters, underFormat, rightFormat, cornerFormat, title)
         columnTime = setToColumn(courseList[i], totalLetters)
         addCourse(worksheet, columnTime, courseList[i], workbook)
+
+        if len(overCourse[i]) > 0 :
+            worksheet = workbook.add_worksheet('Complément ' + str(cpt))
+            totalLetters = initWS(worksheet)
+            writeOverCourse(workbook, worksheet, overCourse[i], weekDesc[i], totalLetters)
+            cpt += 1
         
     workbook.close()
     convertToPdf()
