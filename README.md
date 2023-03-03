@@ -6,13 +6,13 @@ This project is a schedule scrapper that will convert it into a .pdf file.
 
 To run the code, you need to have :
 
- - __Python 3.10__ or above (_sudo apt install python3_)
- - __requests__ module (_pip install requests_)
- - __BeautifulSoup__ (_pip install bs4_)
- - __xlsxwriter__ (_pip install xlsxwriter_)
- - __lxml parser__ (_pip install lxml_)
- - __LibreOffice 7.3__ or above (_sudo apt install libreoffice_)
- - __xdg-utils__ (_sudo apt install xdg-utils_) : _only for __Linux__ distribution_
+ - __Python 3.10__ or above (_```sudo apt install python3```_)
+ - __requests__ module (_```pip install requests```_)
+ - __BeautifulSoup__ (_```pip install bs4```_)
+ - __xlsxwriter__ (_```pip install xlsxwriter```_)
+ - __lxml parser__ (_```pip install lxml```_)
+ - __LibreOffice 7.3__ or above (_```sudo apt install libreoffice```_)
+ - __xdg-utils__ (_```sudo apt install xdg-utils```_) : _only for __Linux__ distribution_
  
  To install all these requirements on a Linux distribution, you can run the script _installation.sh_
  
