@@ -74,6 +74,22 @@ class Course :
             if (hr2.startMinutes == self.startMinutes) and (hr2.endMinutes == self.endMinutes):
                 return False
         return True
+    
+    def startBefore(self, course2) -> bool :
+        """
+            Check if the current course start before the parameter course
+
+            - Args :
+                - course2 (Course)
+            
+            - Returns :
+                - (boolean)
+        """
+        if self.dayContent < course2.dayContent :
+            return True
+        elif (course2.dayContent == self.dayContent) and (self.startMinutes < course2.startMinutes) :
+            return True
+        return False
 
 
 def clearText(txt : str) -> str :
