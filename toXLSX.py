@@ -185,9 +185,9 @@ def addCourse(worksheet, columnTime : list, courseList : list, workbook) -> None
         worksheet.merge_range(columnTime[i][0] + str(rowNbr + 4) + ':' + columnTime[i][1] + str(rowNbr + 4), courseList[i].roomContent, fmtList[2][i])
 
 
-def writeOverCourse(workbook, worksheet, overCourse : list, week : str, totalLetters : tuple[str]) -> None :
+def writeToList(workbook, worksheet, overCourse : list, courseList : list, week : str, totalLetters : tuple[str]) -> None :
     """
-        Write a list of every overlapping courses
+        Write a list of every courses
 
         Args :
             - workbook
@@ -196,6 +196,8 @@ def writeOverCourse(workbook, worksheet, overCourse : list, week : str, totalLet
             - week (str)
             - totalLetters (tuple[str])
     """
+    weekDays = ('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi')
+
     bigfmt = workbook.add_format()
     bigfmt.set_align('center')
     bigfmt.set_align('vcenter')
@@ -215,26 +217,44 @@ def writeOverCourse(workbook, worksheet, overCourse : list, week : str, totalLet
     fmt.set_border()
 
     worksheet.set_row(0, 20)
-    worksheet.merge_range('A1:' + totalLetters[-1] + '1', 'Liste des cours simultanés - semaine du ' + week[:2] + '/' + week[3:5] + '/' + week[-4:], bigfmt)
+    worksheet.merge_range('A1:' + totalLetters[-1] + '1', 'Liste des cours - semaine du ' + week[:2] + '/' + week[3:5] + '/' + week[-4:], bigfmt)
 
-    weekDays = ('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi')
+    overCpt = 0
+    courseCpt = 0
+    totalCourse = []
 
-    newLine = 2
-    for i in range(len(overCourse)) :
-        if i == 0 or (overCourse[i-1].dayContent != overCourse[i].dayContent) :
+    while overCpt < len(overCourse) or courseCpt < len(courseList):
+        if (overCpt < len(overCourse) and courseCpt < len(courseList) and overCourse[overCpt].startBefore(courseList[courseCpt])) or courseCpt == len(courseList):
+            totalCourse.append(overCourse[overCpt])
+            overCpt += 1
+        else :
+            if courseList[courseCpt].profContent != 'MULTIPLES' :
+                totalCourse.append(courseList[courseCpt])
+            courseCpt += 1
+
+    newLine = 3
+
+    for i in range(len(totalCourse)):
+
+        if i == 0 or (totalCourse[i-1].dayContent != totalCourse[i].dayContent) :
+            worksheet.set_row(newLine, 22)
             worksheet.write_blank('A' + str(newLine) + ':' + totalLetters[-1] + str(newLine), None)
             newLine += 1
-            worksheet.merge_range('A' + str(newLine) + ':' + totalLetters[-1] + str(newLine), weekDays[overCourse[i].dayContent], bigfmt)
+            worksheet.merge_range('A' + str(newLine) + ':' + totalLetters[-1] + str(newLine), weekDays[totalCourse[i].dayContent], bigfmt)
             newLine += 1
-        msg = overCourse[i].groupContent + ', ' + overCourse[i].moduleContent + ', ' + overCourse[i].profContent + ' : ' + overCourse[i].roomContent
+
+        msg = ' ' + totalCourse[i].groupContent + ', ' + totalCourse[i].moduleContent + ', ' + totalCourse[i].profContent + ' : ' + totalCourse[i].roomContent
+        worksheet.merge_range('A' + str(newLine) + ':D' + str(newLine), totalCourse[i].timeContent[0] + '-' + totalCourse[i].timeContent[1], bigfmt)
+
         if len(msg) > 115 :
             worksheet.set_row(newLine - 1, 32)
+
         else :
             worksheet.set_row(newLine - 1, 18)
-        worksheet.merge_range('A' + str(newLine) + ':D' + str(newLine), overCourse[i].timeContent[0] + '-' + overCourse[i].timeContent[1], bigfmt)
+        
         worksheet.merge_range('E' + str(newLine) + ':' + totalLetters[-1] + str(newLine), msg, fmt)
         newLine += 1
-
+    
     worksheet.print_area('A1:' + str(totalLetters[-1]) + str(newLine))
 
 
@@ -277,10 +297,10 @@ def transformToXlsx(courseList : tuple, overCourse : list, weekDesc : list[str],
         columnTime = setToColumn(courseList[i], totalLetters)
         addCourse(worksheet, columnTime, courseList[i], workbook)
 
-        if len(overCourse[i]) > 0 :
+        if len(overCourse[i]) > 0 or len(courseList[i]) > 0:
             worksheet = workbook.add_worksheet('Complément ' + str(cpt))
             totalLetters = initWS(worksheet)
-            writeOverCourse(workbook, worksheet, overCourse[i], weekDesc[i], totalLetters)
+            writeToList(workbook, worksheet, overCourse[i], courseList[i], weekDesc[i], totalLetters)
             cpt += 1
         
     workbook.close()
