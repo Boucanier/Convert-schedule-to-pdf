@@ -30,7 +30,9 @@ class Course :
         for e in self.sameTime :
             st += ' ' + str(e)
         display = str(self.weekContent) + ' ' + str(self.dayContent) + ' [' + self.timeContent[0] + ':' + self.timeContent[1] + '] - [' + str(self.startMinutes) + ':' + str(self.endMinutes) + '] - ' + str(self.duration) + ', ' \
-            + self.moduleContent + ' ' + self.roomContent + ' ' + self.profContent + ' ' + self.groupContent + ', incompatible with :' + st
+            + self.moduleContent + ' ' + self.roomContent + ' ' + self.profContent + ' ' + self.groupContent
+        if len(self.sameTime) != 0 :
+            display += ', incompatible with :' + st
         return display
 
     def dTime(self) -> int :
