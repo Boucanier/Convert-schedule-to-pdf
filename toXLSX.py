@@ -128,8 +128,8 @@ def setToColumn(courseList : list, totalLetters : tuple[str]) -> list[list[list[
 
 def addCourse(worksheet, columnTime : list, courseList : list, workbook) -> None:
     """
-        Add a course to the xlsx file\n
-        Create formats used to add course
+        Create formats used to add course\n
+        Add a course to the xlsx file
         
         - Args :
             - worksheet (xlsx worksheet)
@@ -185,7 +185,7 @@ def addCourse(worksheet, columnTime : list, courseList : list, workbook) -> None
         worksheet.merge_range(columnTime[i][0] + str(rowNbr + 4) + ':' + columnTime[i][1] + str(rowNbr + 4), courseList[i].roomContent, fmtList[2][i])
 
 
-def writeToList(workbook, worksheet, overCourse : list, courseList : list, week : str, totalLetters : tuple[str]) -> None :
+def writeToList(workbook, worksheet, overCourse : list, courseList : list, week : str, totalLetters : tuple[str]):
     """
         Write a list of every courses
 
@@ -237,9 +237,8 @@ def writeToList(workbook, worksheet, overCourse : list, courseList : list, week 
     for i in range(len(totalCourse)):
 
         if i == 0 or (totalCourse[i-1].dayContent != totalCourse[i].dayContent) :
-            worksheet.set_row(newLine, 22)
-            worksheet.write_blank('A' + str(newLine) + ':' + totalLetters[-1] + str(newLine), None)
             newLine += 1
+            worksheet.set_row(newLine - 1, 22)
             worksheet.merge_range('A' + str(newLine) + ':' + totalLetters[-1] + str(newLine), weekDays[totalCourse[i].dayContent], bigfmt)
             newLine += 1
 
@@ -255,6 +254,102 @@ def writeToList(workbook, worksheet, overCourse : list, courseList : list, week 
         worksheet.merge_range('E' + str(newLine) + ':' + totalLetters[-1] + str(newLine), msg, fmt)
         newLine += 1
     
+    worksheet.print_area('A1:' + str(totalLetters[-1]) + str(newLine))
+
+    return totalCourse, bigfmt, fmt
+
+
+def avgTimeToStr(timeList : list[int]) -> str :
+    """
+        Get the average time from a list of times in minutes and return a str
+
+        - Args :
+            - timeList (list[int])
+        
+        - Returns :
+            - (str)
+    """
+    rTime = sum(timeList) / len(timeList)
+    hTime = 0
+    mTime = 0
+    hTime += int(rTime//60)
+    mTime += round((rTime/60 - rTime//60) * 60)
+    if mTime == 60 :
+        mTime = 0
+        hTime += 1
+    hTime = str(hTime)
+    mTime = str(mTime)
+    if len(mTime) == 1:
+        mTime = '0' + mTime
+    return hTime + ':' + mTime
+
+
+def statList(totalCourse : list, worksheet, bigfmt, fmt, totalLetters : tuple[str], week : str) -> None :
+    """
+        Create and display some statistical data from a list of courses in a new page
+
+        - Args :
+            - totalCourse (list[Course])
+            - worksheet
+            - bigfmt
+            - fmt
+            - totalLetters (tuple[str])
+            - week (str)
+    """
+    moduleDic = {}
+    for e in totalCourse :
+        moduleDic[e.moduleContent] = 0
+    for e in totalCourse :
+        moduleDic[e.moduleContent] += e.duration
+
+    moduleTime = list(moduleDic.values())
+
+    fullTime = avgTimeToStr([sum(moduleTime)])
+
+    moduleTime.sort()
+    moduleTime.reverse()
+    for i in range(len(moduleDic)):
+        moduleTime[i] = avgTimeToStr([moduleTime[i]])
+    
+    moduleName = list(moduleDic.keys())
+
+    moduleName = [x for _, x in sorted(zip(list(moduleDic.values()), list(moduleDic.keys())))]
+    moduleName.reverse()
+    
+    startList = []
+    endList = []
+
+    for i in range(len(totalCourse)):
+        if i == 0 or (totalCourse[i-1].dayContent != totalCourse[i].dayContent) :
+            startList.append(totalCourse[i].startMinutes)
+        if i == len(totalCourse) - 1:
+            endList.append(totalCourse[i].endMinutes)
+        elif i != 0 and totalCourse[i-1].dayContent != totalCourse[i].dayContent :
+            endList.append(totalCourse[i - 1].endMinutes)
+
+    startTime = avgTimeToStr(startList)
+    
+    endTime = avgTimeToStr(endList)
+
+    worksheet.set_row(0, 20)
+    worksheet.merge_range('A1:' + totalLetters[-1] + '1', 'Statistiques des cours - semaine du ' + week[:2] + '/' + week[3:5] + '/' + week[-4:], bigfmt)
+    newLine = 3
+
+    worksheet.merge_range('A' + str(newLine) + ':' + totalLetters[-1] + str(newLine), 'Horaires moyennes : ' + startTime + ' - ' + endTime, bigfmt)
+    newLine += 1
+
+    worksheet.merge_range('A' + str(newLine) + ':' + str(totalLetters[-1]) + str(newLine), 'Total des heures de cours : ' + fullTime, bigfmt)
+    newLine += 2
+
+    worksheet.merge_range('A' + str(newLine) + ':' + str(totalLetters[-1]) + str(newLine), 'Durées cumulées pour chaque module', bigfmt)
+    newLine += 1
+
+    for i in range(len(moduleDic)):
+        worksheet.set_row(newLine - 1, 25)
+        worksheet.merge_range('A' + str(newLine) + ':' + str(totalLetters[len(totalLetters) - 10]) + str(newLine), ' ' + moduleName[i], fmt)
+        worksheet.merge_range(str(totalLetters[len(totalLetters) - 9]) + str(newLine) + ':' + totalLetters[-1] + str(newLine), moduleTime[i], bigfmt)
+        newLine += 1
+
     worksheet.print_area('A1:' + str(totalLetters[-1]) + str(newLine))
 
 
@@ -298,9 +393,12 @@ def transformToXlsx(courseList : tuple, overCourse : list, weekDesc : list[str],
         addCourse(worksheet, columnTime, courseList[i], workbook)
 
         if len(overCourse[i]) > 0 or len(courseList[i]) > 0:
-            worksheet = workbook.add_worksheet('Complément ' + str(cpt))
+            worksheet = workbook.add_worksheet('Liste des cours ' + str(cpt))
             totalLetters = initWS(worksheet)
-            writeToList(workbook, worksheet, overCourse[i], courseList[i], weekDesc[i], totalLetters)
+            totalCourse, bigfmt, fmt = writeToList(workbook, worksheet, overCourse[i], courseList[i], weekDesc[i], totalLetters)
+            worksheet = workbook.add_worksheet('Statistiques ' + str(cpt))
+            totalLetters = initWS(worksheet)
+            statList(totalCourse, worksheet, bigfmt, fmt, totalLetters, weekDesc[i])
             cpt += 1
         
     workbook.close()
