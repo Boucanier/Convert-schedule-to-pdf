@@ -14,12 +14,9 @@ To run the code, you need to have :
  - __LibreOffice 7.3__ or above (_```sudo apt install libreoffice```_)
  - __xdg-utils__ (_```sudo apt install xdg-utils```_) : _only for __Linux__ distribution_
  
- To install all these requirements on a Linux distribution, you can run the script _installation.sh_
+To install all these requirements on a Linux distribution, you can run the script _installation.sh_
  
- ## Description
+## Description
  
- Run _main.py_, then enter the group you want.
- 
- On __Linux__, the program will create a pdf file and open it.
- 
- On __Windows__, it will only create a xlsx file that will be open at the end of the program
+Run _main.py_, then enter the group you want.
+Then the program will create a pdf file and open it.
