@@ -1,6 +1,6 @@
 # Convert-schedule-to-pdf
 
-This project is a schedule scrapper that will convert it into a .pdf file.
+This project is a schedule scrapper that will convert it into a pdf file.
 
 ## Requirements
 
