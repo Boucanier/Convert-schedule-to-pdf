@@ -1,8 +1,9 @@
 """
-    This code will convert the data scrapped with the scrapper into a xlsx file (into a pdf file if on Linux distribution)
+    This code will convert the data scrapped with the scrapper into a xlsx file into a pdf file and open it
 """
 import xlsxwriter
 import os
+import subprocess
 import platform
 
 
@@ -355,7 +356,7 @@ def statList(totalCourse : list, worksheet, bigfmt, fmt, totalLetters : tuple[st
 
 def convertToPdf() -> None:
     '''
-        Convert the created xlsx file to pdf using a libreOffice command on Linux\n
+        Convert the created xlsx file to pdf using a libreOffice command\n
         Then, remove the xlsx file since it is useless\n
         Clear the terminal\n
         Open the previously created pdf
@@ -367,8 +368,18 @@ def convertToPdf() -> None:
         os.system('xdg-open schedule.pdf')
         
     elif platform.system() == "Windows" :
-        os.system('start /B schedule.xlsx')
-        os.system('cls')
+        subprocess.run('cd > path.txt', shell = True)
+        with open("path.txt", "r") as fl :
+            path = str(fl.readlines()[0][:-1])
+        file_path = path
+        path = '\"' + path + '\"'
+        file_path += '\schedule.xlsx'
+        file_path = '\"' + file_path + '\"'
+        subprocess.run('"C:\Program Files\LibreOffice\program\soffice.exe" --convert-to pdf:writer_pdf_Export ' + file_path + ' --outdir ' + path)
+        subprocess.run('del schedule.xlsx', shell = True)
+        subprocess.run('del path.txt', shell = True)
+        subprocess.run('cls', shell = True)
+        subprocess.run('start /B schedule.pdf', shell = True)
 
 
 def transformToXlsx(courseList : tuple, overCourse : list, weekDesc : list[str], title : str) -> None:
