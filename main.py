@@ -1,4 +1,5 @@
 import toXLSX
+import toPDF
 import scraper
 
 
@@ -11,4 +12,6 @@ if __name__ == "__main__" :
 
     courseList, overCourse = scraper.sortCourse(courseList)
 
-    toXLSX.transformToXlsx(courseList, overCourse, weekDesc, title)
+    toXLSX.createXlsx(courseList, overCourse, weekDesc, title)
+
+    toPDF.convertToPdf("schedule.xlsx")
