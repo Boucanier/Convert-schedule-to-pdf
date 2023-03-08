@@ -1,10 +1,7 @@
 """
-    This code will convert the data scrapped with the scrapper into a xlsx file into a pdf file and open it
+    This module will convert the data scrapped with the scrapper into a xlsx file
 """
 import xlsxwriter
-import os
-import subprocess
-import platform
 
 
 ROW = 27
@@ -354,35 +351,7 @@ def statList(totalCourse : list, worksheet, bigfmt, fmt, totalLetters : tuple[st
     worksheet.print_area('A1:' + str(totalLetters[-1]) + str(newLine))
 
 
-def convertToPdf() -> None:
-    '''
-        Convert the created xlsx file to pdf using a libreOffice command\n
-        Then, remove the xlsx file since it is useless\n
-        Clear the terminal\n
-        Open the previously created pdf
-    '''
-    if platform.system() == "Linux" :
-        os.system('libreoffice --convert-to pdf schedule.xlsx')
-        os.system('rm schedule.xlsx')
-        os.system('clear')
-        os.system('xdg-open schedule.pdf')
-        
-    elif platform.system() == "Windows" :
-        subprocess.run('cd > path.txt', shell = True)
-        with open("path.txt", "r") as fl :
-            path = str(fl.readlines()[0][:-1])
-        file_path = path
-        path = '\"' + path + '\"'
-        file_path += '\schedule.xlsx'
-        file_path = '\"' + file_path + '\"'
-        subprocess.run('"C:\Program Files\LibreOffice\program\soffice.exe" --convert-to pdf:writer_pdf_Export ' + file_path + ' --outdir ' + path)
-        subprocess.run('del schedule.xlsx', shell = True)
-        subprocess.run('del path.txt', shell = True)
-        subprocess.run('cls', shell = True)
-        subprocess.run('start /B schedule.pdf', shell = True)
-
-
-def transformToXlsx(courseList : tuple, overCourse : list, weekDesc : list[str], title : str) -> None:
+def createXlsx(courseList : tuple, overCourse : list, weekDesc : list[str], title : str) -> None:
     """
         Create a xlsx file from course list of 4 weeks and then convert it to a pdf file
         
@@ -413,4 +382,3 @@ def transformToXlsx(courseList : tuple, overCourse : list, weekDesc : list[str],
             cpt += 1
         
     workbook.close()
-    convertToPdf()
