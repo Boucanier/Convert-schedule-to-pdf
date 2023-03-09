@@ -214,7 +214,7 @@ def writeToList(workbook, worksheet, overCourse : list, courseList : list, week 
     fmt.set_shrink()
     fmt.set_border()
 
-    worksheet.set_row(0, 20)
+    worksheet.set_row(0, 25)
     worksheet.merge_range('A1:' + totalLetters[-1] + '1', 'Liste des cours - semaine du ' + week[:2] + '/' + week[3:5] + '/' + week[-4:], bigfmt)
 
     overCpt = 0
@@ -302,7 +302,10 @@ def statList(totalCourse : list, worksheet, bigfmt, fmt, totalLetters : tuple[st
 
     moduleTime = list(moduleDic.values())
 
-    fullTime = avgTimeToStr([sum(moduleTime)])
+    sumTime = sum(moduleTime)
+
+    fullTime = avgTimeToStr([sumTime])
+    avgDailyTime = avgTimeToStr([sumTime//5])
 
     moduleTime.sort()
     moduleTime.reverse()
@@ -329,16 +332,23 @@ def statList(totalCourse : list, worksheet, bigfmt, fmt, totalLetters : tuple[st
     
     endTime = avgTimeToStr(endList)
 
-    worksheet.set_row(0, 20)
+    worksheet.set_row(0, 25)
     worksheet.merge_range('A1:' + totalLetters[-1] + '1', 'Statistiques des cours - semaine du ' + week[:2] + '/' + week[3:5] + '/' + week[-4:], bigfmt)
     newLine = 3
 
+    worksheet.set_row(newLine - 1, 20)
     worksheet.merge_range('A' + str(newLine) + ':' + totalLetters[-1] + str(newLine), 'Horaires moyennes : ' + startTime + ' - ' + endTime, bigfmt)
     newLine += 1
 
-    worksheet.merge_range('A' + str(newLine) + ':' + str(totalLetters[-1]) + str(newLine), 'Total des heures de cours : ' + fullTime, bigfmt)
+    worksheet.set_row(newLine - 1, 20)
+    worksheet.merge_range('A' + str(newLine) + ':' + str(totalLetters[-1]) + str(newLine), 'Temps de cours journalier moyen : ' + avgDailyTime, bigfmt)
+    newLine += 1
+
+    worksheet.set_row(newLine - 1, 20)
+    worksheet.merge_range('A' + str(newLine) + ':' + str(totalLetters[-1]) + str(newLine), 'Total des heures de cours : ' + fullTime + ' - ' + str(len(totalCourse)) + ' cours', bigfmt)
     newLine += 2
 
+    worksheet.set_row(newLine - 1, 20)
     worksheet.merge_range('A' + str(newLine) + ':' + str(totalLetters[-1]) + str(newLine), 'Durées cumulées pour chaque module', bigfmt)
     newLine += 1
 
