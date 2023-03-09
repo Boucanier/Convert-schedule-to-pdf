@@ -31,3 +31,7 @@ def convertToPdf(fileName : str) -> None:
         subprocess.run('del path.txt', shell = True)
         subprocess.run('cls', shell = True)
         subprocess.run('start /B ' + fileName.split('.')[0] + '.pdf', shell = True)
+
+
+if __name__ == "__main__" :
+    convertToPdf(input("File to convert with its extension : "))
