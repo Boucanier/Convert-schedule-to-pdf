@@ -251,6 +251,15 @@ def writeToList(workbook, worksheet, overCourse : list, courseList : list, week 
         
         worksheet.merge_range('E' + str(newLine) + ':' + totalLetters[-1] + str(newLine), msg, fmt)
         newLine += 1
+
+        if totalCourse[i].noteContent != '- - -':
+            if len(totalCourse[i].noteContent) > 115 :
+                worksheet.set_row(newLine - 1, 32)
+            else :
+                worksheet.set_row(newLine - 1, 20)
+            worksheet.merge_range('A' + str(newLine) + ':D' + str(newLine), 'Remarques', bigfmt)
+            worksheet.merge_range('E' + str(newLine) + ':' + totalLetters[-1] + str(newLine), ' ' + totalCourse[i].noteContent, fmt)
+            newLine += 1
     
     worksheet.print_area('A1:' + str(totalLetters[-1]) + str(newLine))
 
