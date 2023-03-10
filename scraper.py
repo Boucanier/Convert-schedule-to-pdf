@@ -9,7 +9,7 @@ class Course :
     """
         Class of a course containing day, time, "content", room, staff, group, week, duration, color parameters
     """
-    def __init__(self, parDay : str, parTime : list[str], parModule : str, parRoom : str, parProf : str, parGroup : str, parWeek : int, parColor : str) -> None:
+    def __init__(self, parDay : str, parTime : list[str], parModule : str, parRoom : str, parProf : str, parGroup : str, parWeek : int, parNote : str, parColor : str) -> None:
         self.dayContent = int(parDay)
         self.timeContent = parTime
         self.moduleContent = parModule
@@ -18,6 +18,7 @@ class Course :
         self.groupContent = parGroup
         self.weekContent = parWeek
         self.colorContent = parColor
+        self.noteContent = parNote
 
         self.duration = self.dTime()
         self.startMinutes = self.toMinutes()
@@ -137,22 +138,6 @@ def getContent(element : str, resourceList : list) -> list[str] :
             content.append("- - -")
         else :
             content.append(clearText((e.find(element)).text))
-    return content
-
-
-def getTime(element : str, soup) -> list[str] :
-    """
-        Get time content on the xml file
-        
-        - Args :
-            - element (str)
-            - soup (BeautifulSoup soup)
-            
-        - Returns :
-            - content (list)
-    """
-    content = soup.findAll(element)
-    content = [clearText(e.text) for e in content]
     return content
 
 
@@ -326,7 +311,7 @@ def multipleSort(courseList : list) :
             if courseList[k].endMinutes > tempend :
                 tempend = courseList[k].endMinutes
                 hend = courseList[k].timeContent[1]
-        replaceCourse.append(Course(courseList[e[0]].dayContent, [hstart,hend], "COURS", "- - -", "MULTIPLES", "- - -", courseList[e[0]].weekContent, '#7BEBFF'))
+        replaceCourse.append(Course(courseList[e[0]].dayContent, [hstart,hend], "COURS", "- - -", "MULTIPLES", "- - -", courseList[e[0]].weekContent, "- - -", '#7BEBFF'))
 
     for e in courseList:
         if len(e.sameTime) != 0 :
@@ -412,7 +397,7 @@ def parseSchedule(response):
     courseList = []
     soup = BeautifulSoup(response.content, "lxml")
 
-    resourceList = soup.find_all("resources")
+    resourceList = soup.find_all("event")
 
     tWeek = soup.find_all("description")
     tWeek = [(e.text)[-10:] for e in tWeek]
@@ -431,8 +416,12 @@ def parseSchedule(response):
     roomContent = getContent("room", resourceList)
     groupContent = getContent("group", resourceList)
 
-    startContent = getTime("starttime", soup)
-    endContent = getTime("endtime", soup)
+    notecontent = getContent("notes", resourceList)
+
+    startContent = getContent("starttime", resourceList)
+    endContent = getContent("endtime", resourceList)
+    
+    colorContent = [('#' + e['colour']) for e in resourceList]
 
     weekContent = getWeek(soup)
 
@@ -448,10 +437,7 @@ def parseSchedule(response):
         dayContent += dayTemp[-i]
     dayContent.reverse()
 
-    colorContent = soup.findAll('event')
-    colorContent = [('#' + e['colour']) for e in colorContent]
-
     for i in range(dayCt):
-        courseList.append(Course(dayContent[i], timeContent[i], moduleContent[i], roomContent[i], profContent[i], groupContent[i], weekContent[i], colorContent[i]))
+        courseList.append(Course(dayContent[i], timeContent[i], moduleContent[i], roomContent[i], profContent[i], groupContent[i], weekContent[i], notecontent[i], colorContent[i]))
     
     return courseList, weekDesc
