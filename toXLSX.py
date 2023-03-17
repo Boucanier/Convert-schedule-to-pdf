@@ -75,7 +75,7 @@ def initWS(worksheet) -> tuple[str]:
     return totalLetters
     
 
-def formatWS(worksheet, dayFormat, totalLetters : tuple[str], underFormat, rightFormat, cornerFormat, title : str) -> None:
+def formatWS(worksheet, dayFormat, totalLetters : tuple[str], underFormat, rightFormat, cornerFormat, title : str, week : str) -> None:
     """
         Set the frame for the schedule with days and times
 
@@ -91,7 +91,12 @@ def formatWS(worksheet, dayFormat, totalLetters : tuple[str], underFormat, right
     weekDays = ('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi')
     for i in range(0,ROW - 2,5):
         worksheet.merge_range('A' + str(i+3) + ':A' + str(i+7), weekDays[i//5], dayFormat)
-    worksheet.merge_range('B1:' + str(totalLetters[-1]) + '1', title, dayFormat)
+    listWeek = list(week)
+    for i in range(len(listWeek)):
+        if listWeek[i] == '_':
+            listWeek[i] = '/'
+    week = ''.join(listWeek)
+    worksheet.merge_range('B1:' + str(totalLetters[-1]) + '1', title + ', semaine du ' + week, dayFormat)
     worksheet.set_row(0,25)
     for i in range(1,COL-10,12):
         worksheet.merge_range(str(totalLetters[i]) + '2:' + str(totalLetters[i+11]) + '2', str(round(i/12)+8) + ':00 - ' + str(round(i/12)+9) + ':00', dayFormat)
@@ -387,7 +392,7 @@ def createXlsx(courseList : tuple, overCourse : list, weekDesc : list[str], titl
         worksheet.center_vertically()
         dayFormat, underFormat, rightFormat, cornerFormat = setFormatWS(workbook)
         totalLetters = initWS(worksheet)
-        formatWS(worksheet, dayFormat, totalLetters, underFormat, rightFormat, cornerFormat, title)
+        formatWS(worksheet, dayFormat, totalLetters, underFormat, rightFormat, cornerFormat, title, str(weekDesc[i]))
         columnTime = setToColumn(courseList[i], totalLetters)
         addCourse(worksheet, columnTime, courseList[i], workbook)
 
