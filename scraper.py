@@ -121,24 +121,35 @@ def clearText(txt : str) -> str :
     return txt
 
 
-def getContent(element : str, resourceList : list) -> list[str] :
+def getContent(dayContent : list[str], weekContent : list[int], resourceList : list) -> list :
     """
-        Get all the content of a type for every resource in the xml file
+        Collect all the content of a type for every resource in the xml file and create every Course with it
         
         - Args :
-            - element (str)
+            - dayContent (list[str])
+            - weekContent (list[int])
             - resourceList (list)
         
         - Returns :
-            - content (list)
+            - courseList (list[Course])
     """
-    content = []
-    for e in resourceList :
-        if not e.find(element):
-            content.append("- - -")
-        else :
-            content.append(clearText((e.find(element)).text))
-    return content
+
+    courseList = []
+    elementList = ["starttime", "endtime", "module", "room", "staff", "group", "notes"]
+    
+    cpt = 0
+    for resource in resourceList :
+        paramList = []
+        for element in elementList :
+            if not resource.find(element):
+                paramList.append("- - -")
+            else :
+                paramList.append(clearText((resource.find(element)).text))
+        paramList.append(resource['colour'])
+        courseList.append(Course(dayContent[cpt], [paramList[0], paramList[1]], paramList[2], paramList[3], paramList[4], paramList[5], weekContent[cpt], paramList[6], paramList[7]))
+        cpt += 1
+    
+    return courseList
 
 
 def menu(groupList : list, linkList : list[str]) -> tuple[str, str]:
@@ -411,33 +422,14 @@ def parseSchedule(response):
                 temp += e[i]
         weekDesc.append(temp)
 
-    moduleContent = getContent("module", resourceList)
-    profContent = getContent("staff", resourceList)
-    roomContent = getContent("room", resourceList)
-    groupContent = getContent("group", resourceList)
-
-    notecontent = getContent("notes", resourceList)
-
-    startContent = getContent("starttime", resourceList)
-    endContent = getContent("endtime", resourceList)
-    
-    colorContent = [('#' + e['colour']) for e in resourceList]
-
     weekContent = getWeek(soup)
-
-    timeContent = []
-    for i in range(len(startContent)):
-        timeContent.append([startContent[i], endContent[i]])
-
-    dayCt = len(moduleContent)
 
     dayTemp = soup.findAll("day")
     dayContent = []
-    for i in range(1, dayCt + 1):
+    for i in range(1, len(resourceList) + 1):
         dayContent += dayTemp[-i]
     dayContent.reverse()
 
-    for i in range(dayCt):
-        courseList.append(Course(dayContent[i], timeContent[i], moduleContent[i], roomContent[i], profContent[i], groupContent[i], weekContent[i], notecontent[i], colorContent[i]))
+    courseList = getContent(dayContent, weekContent, resourceList)
     
     return courseList, weekDesc
