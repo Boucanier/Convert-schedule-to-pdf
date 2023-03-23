@@ -3,10 +3,9 @@
 """
 import platform
 import subprocess
-import os
+
 
 def convertToPdf(fileName : str) -> None:
-    path = str(os.path.dirname(__file__))
     '''
         Convert a file to pdf using a libreOffice command\n
         Clear the terminal\n
@@ -16,10 +15,9 @@ def convertToPdf(fileName : str) -> None:
             - filename (str) : file name with extension
     '''
     if platform.system() == "Linux" :
-        subprocess.run('mv ' +  fileName + ' ' + path + '/' + fileName, shell = True)
-        subprocess.run('libreoffice --convert-to pdf ' + path + '/'+ fileName + ' --outdir ' + path, shell = True)
+        subprocess.run('libreoffice --convert-to pdf ' + fileName, shell = True)
         subprocess.run('clear', shell = True)
-        subprocess.run('xdg-open ' + path + "/" + fileName.split('.')[0] + '.pdf', shell = True)
+        subprocess.run('xdg-open ' + fileName.split('.')[0] + '.pdf', shell = True)
         
     elif platform.system() == "Windows" :
         subprocess.run('cd > path.txt', shell = True)
