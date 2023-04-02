@@ -94,6 +94,18 @@ class Course :
             return True
         return False
 
+    def __eq__(self, course2) :
+        if self.weekContent == course2.weekContent :
+            if self.profContent == course2.profContent :
+                if self.moduleContent == course2.moduleContent :
+                    if self.dayContent == course2.dayContent :
+                        if self.timeContent == course2.timeContent :
+                            if self.moduleContent == course2.moduleContent :
+                                if self.groupContent == course2.groupContent :
+                                    if self.roomContent == course2.roomContent :
+                                        return True
+        return False
+
 
 def clearText(txt : str) -> str :
     """
@@ -107,6 +119,7 @@ def clearText(txt : str) -> str :
     """
     txtLetters = list(txt)
     if '\n' in txt :
+        txtLetters = list(txt)
         for i in range(len(txtLetters)) :
             if txtLetters[i] == '\n':
                 if i == 0 :
@@ -152,7 +165,7 @@ def getContent(dayContent : list[str], weekContent : list[int], resourceList : l
     return courseList
 
 
-def menu(groupList : list, linkList : list[str]) -> tuple[str, str]:
+def menu(groupList : list, linkList : list[str], groupChoice = -1) -> tuple[str, str]:
     """
         Display the list of all group and ask the user the one he wants
         
@@ -164,16 +177,16 @@ def menu(groupList : list, linkList : list[str]) -> tuple[str, str]:
             - (str)
             - (str)
     """
-    groupChoice = -1
-    while not (0 <= groupChoice <= len(groupList)):
-        for i in range(len(groupList)):
-            print(i, groupList[i])
-        groupChoice = int(input('Group : '))
-    print(groupList[groupChoice])
+    if groupChoice == -1 :
+        while not (0 <= groupChoice <= len(groupList)):
+            for i in range(len(groupList)):
+                print(i, groupList[i])
+            groupChoice = int(input('Group : '))
+        print(groupList[groupChoice])
     return ("http://chronos.iut-velizy.uvsq.fr/EDT/" + linkList[groupChoice]), groupList[groupChoice]
 
 
-def getLink() -> tuple[str, str]:
+def getLink(fullList = False):
     """
         Get the url for the requested schedule and title of it after calling menu
         
@@ -196,11 +209,21 @@ def getLink() -> tuple[str, str]:
     linkList = soup.findAll('link',  {"class": "xml"})
     linkList = [e['href'] for e in linkList]
     
-    link, group = menu(groupList, linkList)
+    if not fullList :
+        link, group = menu(groupList, linkList)
 
-    title = 'Emploi du temps - ' + group
+        title = 'Emploi du temps - ' + group
+        
+        return link, title
     
-    return link, title
+    else :
+        fullLinkList = [[],[]]
+        for i in range(len(linkList)) :
+            link, group = menu(groupList, linkList, i)
+            fullLinkList[0].append(link)
+            fullLinkList[1].append(group)
+
+        return fullLinkList
 
 
 def getSchedule(url : str):

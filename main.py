@@ -1,17 +1,46 @@
 import toXLSX
 import toPDF
 import scraper
+import staffSchedule
 
 
 if __name__ == "__main__" :
+    
+    print("1 Emploi du temps de groupe")
+    print("2 Emploi du temps de personnel")
 
-    url, title = scraper.getLink()
-    response = scraper.getSchedule(url)
+    choice = 0
 
-    courseList, weekDesc = scraper.parseSchedule(response)
+    while choice not in (1, 2) :
+        choice = int(input("Sélectionner une option : "))
 
-    courseList, overCourse = scraper.sortCourse(courseList)
+    if choice == 1 :
 
-    toXLSX.createXlsx(courseList, overCourse, weekDesc, title)
+        url, title = scraper.getLink()
+        response = scraper.getSchedule(url)
 
-    toPDF.convertToPdf("schedule.xlsx")
+        courseList, weekDesc = scraper.parseSchedule(response)
+
+        courseList, overCourse = scraper.sortCourse(courseList)
+
+        toXLSX.createXlsx(courseList, overCourse, weekDesc, title)
+
+        toPDF.convertToPdf("schedule.xlsx")
+    
+    else :
+
+        courseFullList = scraper.getLink(True)
+
+        staffList, courseList, weekDesc = staffSchedule.getFullList(courseFullList)
+
+        profChoice = staffSchedule.staffChoice(staffList)
+
+        courseList = staffSchedule.getCourseProf(profChoice, courseList)
+
+        courseList = staffSchedule.checkEquals(courseList)
+
+        courseList, overCourse = scraper.sortCourse(courseList)
+
+        toXLSX.createXlsx(courseList, overCourse, weekDesc, profChoice)
+
+        toPDF.convertToPdf("schedule.xlsx")
