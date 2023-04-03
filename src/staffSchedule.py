@@ -69,6 +69,7 @@ def staffChoice(staffList : list[str]) -> str:
             - (str)
     """
     choice = -1
+    staffList.sort()
     for i in range(len(staffList)) :
         print(i, staffList[i])
 
