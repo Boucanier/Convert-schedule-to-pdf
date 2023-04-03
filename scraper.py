@@ -167,15 +167,15 @@ def getContent(dayContent : list[str], weekContent : list[int], resourceList : l
 
 def menu(groupList : list, linkList : list[str], groupChoice = -1) -> tuple[str, str]:
     """
-        Display the list of all group and ask the user the one he wants
+        Display the list of all group and ask the user the one he wants if groupChoice == -1, if not, do not display the menu
         
         - Args :
             - groupList (list)
             - linkList (list)
+            - groupChoice (int) : Default value = -1
             
         - Returns :
-            - (str)
-            - (str)
+            - (tuple[str, str])
     """
     if groupChoice == -1 :
         while not (0 <= groupChoice <= len(groupList)):
@@ -186,13 +186,18 @@ def menu(groupList : list, linkList : list[str], groupChoice = -1) -> tuple[str,
     return ("http://chronos.iut-velizy.uvsq.fr/EDT/" + linkList[groupChoice]), groupList[groupChoice]
 
 
-def getLink(fullList = False):
+def getLink(fullList : bool = False):
     """
         Get the url for the requested schedule and title of it after calling menu
+
+        - Args :
+            - fullList (boolean) : Default value = False, if True, get every available course in a list with titles using a loop and function menu()
         
         - Returns :
-            - link (str)
-            - title (str)
+            - link (str) : if not fullList
+            - title (str) : if not fullList
+
+            - fullLinkTitle (list[str]) : if fullList, list containing list of schedule link and ist of schedule title
     """
     url = "http://chronos.iut-velizy.uvsq.fr/EDT/finder.xml"
 
@@ -425,8 +430,8 @@ def parseSchedule(response):
             - response (xml request response)
             
         - Returns :
-            - courseList (list)
-            - weekDesc (list)
+            - courseList (list[Course])
+            - weekDesc (list[str])
     """
     courseList = []
     soup = BeautifulSoup(response.content, "lxml")
