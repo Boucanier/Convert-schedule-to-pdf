@@ -1,3 +1,6 @@
+"""
+    This code contains functions that will be used to fetch a specific schedule based on a room/professor
+"""
 import scraper
 
 def getFullList(linkTitleList : list[list[str]], element : str):
@@ -43,7 +46,7 @@ def getFullList(linkTitleList : list[list[str]], element : str):
 
 def clearElement(elementList : list[str]) -> list[str] :
     """
-        Check if many elements are assigned to a same course and add them to the main element list if they are not already in
+        Check if many elements are assigned to a same course and add them to the main element list if they are not already in it
 
         - Args :
             - elementList (list[str])
@@ -69,7 +72,7 @@ def clearElement(elementList : list[str]) -> list[str] :
 
 def elementChoice(elementList : list[str]) -> str:
     """
-        Display the list of every element and ask the user to chose an element
+        Display the list of every element and ask the user to choose an element
 
         - Args :
             - elementList (list[str])
@@ -92,7 +95,7 @@ def elementChoice(elementList : list[str]) -> str:
 
 def getCourseElement(elementChoice : str, courseList, element : str) :
     """
-        Add every course of a specified element from every schedule to a single schedule
+        Merge every course of a specified element from every schedule in a single schedule
 
         - Args :
             - elementChoice (str)
@@ -143,7 +146,7 @@ def checkEquals(courseList) :
                 if courseList[i] == courseList[j] :
                     toRemove.append(courseList[j])
                     intToRemove.append(j)
-                    
+
     for e in toRemove :
         courseList.remove(e)
 
