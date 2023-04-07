@@ -1,13 +1,13 @@
 import toXLSX
 import toPDF
 import scraper
-import staffSchedule
+import elementSchedule
 
 
 if __name__ == "__main__" :
     
     print("1 Emploi du temps de groupe")
-    print("2 Emploi du temps de personnel")
+    print("2 Emploi du temps par prof/salle")
 
     choice = 0
 
@@ -31,13 +31,13 @@ if __name__ == "__main__" :
 
         courseFullList = scraper.getLink(True)
 
-        staffList, courseList, weekDesc = staffSchedule.getFullList(courseFullList)
+        staffList, courseList, weekDesc = elementSchedule.getFullList(courseFullList, "staff")
 
-        profChoice = staffSchedule.staffChoice(staffList)
+        profChoice = elementSchedule.elementChoice(staffList)
 
-        courseList = staffSchedule.getCourseProf(profChoice, courseList)
+        courseList = elementSchedule.getCourseElement(profChoice, courseList)
 
-        courseList = staffSchedule.checkEquals(courseList)
+        courseList = elementSchedule.checkEquals(courseList)
 
         courseList, overCourse = scraper.sortCourse(courseList)
 

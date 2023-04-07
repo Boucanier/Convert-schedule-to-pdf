@@ -1,14 +1,14 @@
 import scraper
 
-def getFullList(linkTitleList : list[list[str]]):
+def getFullList(linkTitleList : list[list[str]], element : str):
     """
-        Get every schedule available, then extract the staff list of every different professor using function clearStaff()
+        Get every schedule available, then extract the list of every different element using function clearElement()
 
         - Args :
             - linkTitleList (list[list[str]]) : list containing list of schedule link and ist of schedule title
         
         - Returns :
-            - staffList (list[str])
+            - elementList (list[str])
             - courseFullList (list[list[Course]])
             - weekDesc (list[str])
     """
@@ -21,72 +21,73 @@ def getFullList(linkTitleList : list[list[str]]):
         courseFullList.append(courseList)
         print(i, linkTitleList[1][i])
 
-    staffList = []
+    elementList = []
     for e in courseFullList :
         for k in e :
-            if k.profContent not in staffList :
-                staffList.append(k.profContent)
+            if element == "staff" :
+                if k.profContent not in elementList :
+                    elementList.append(k.profContent)
 
-    staffList = clearStaff(staffList)
+    elementList = clearElement(elementList)
         
-    return staffList, courseFullList, weekDesc
+    return elementList, courseFullList, weekDesc
 
 
-def clearStaff(profList : list[str]) -> list[str] :
+def clearElement(elementList : list[str]) -> list[str] :
     """
-        Check if many professors are assigned to a same course and add them to the main staff list if they are not already in
+        Check if many elements are assigned to a same course and add them to the main element list if they are not already in
 
         - Args :
-            - profList (list[str])
+            - elementList (list[str])
         
         - Returns :
-            - profList (list[str])
+            - elementList (list[str])
     """
     toRemove = []
     toAdd = []
-    for i in range(len(profList)):
-        if ',' in profList[i] :
-            toRemove.append(profList[i])
-            tempProfList = profList[i].split(', ')
-            [toAdd.append(e) for e in tempProfList]
+    for i in range(len(elementList)):
+        if ',' in elementList[i] :
+            toRemove.append(elementList[i])
+            tempElementList = elementList[i].split(', ')
+            [toAdd.append(e) for e in tempElementList]
     for e in toAdd :
-        if e not in profList :
-            profList.append(e)
+        if e not in elementList :
+            elementList.append(e)
     for e in toRemove :
-        profList.remove(e)
+        elementList.remove(e)
 
-    return profList
+    return elementList
 
 
-def staffChoice(staffList : list[str]) -> str:
+def elementChoice(elementList : list[str]) -> str:
     """
         Display the list of every professor and ask the user to chose a professor
 
         - Args :
-            - staffList (list[str])
+            - elementList (list[str])
         
         - Returns :
             - (str)
     """
     choice = -1
-    staffList.sort()
-    for i in range(len(staffList)) :
-        print(i, staffList[i])
+    elementList.sort()
+    for i in range(len(elementList)) :
+        print(i, elementList[i])
 
-    while not (0 <= choice <= len(staffList)) :
-        choice = int(input("\nProf : "))
+    while not (0 <= choice <= len(elementList)) :
+        choice = int(input("\nChoix : "))
     
-    print(staffList[choice] + '\n')
+    print(elementList[choice] + '\n')
 
-    return staffList[choice]
+    return elementList[choice]
 
 
-def getCourseProf(profChoice : str, courseList) :
+def getCourseElement(elementChoice : str, courseList) :
     """
-        Add every course of a specified professor from every schedule to a single schedule
+        Add every course of a specified element from every schedule to a single schedule
 
         - Args :
-            - profChoice (str)
+            - elementChoice (str)
             - courseList (list[Course])
 
         - Returns :
@@ -95,9 +96,9 @@ def getCourseProf(profChoice : str, courseList) :
     courseFullList = []
     for e in courseList :
         for k in e :
-            if k.profContent == profChoice :
+            if k.profContent == elementChoice :
                 courseFullList.append(k)
-            elif profChoice in (k.profContent).split(", "):
+            elif elementChoice in (k.profContent).split(", "):
                 courseFullList.append(k)
     return courseFullList
 
