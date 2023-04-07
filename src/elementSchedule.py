@@ -22,11 +22,19 @@ def getFullList(linkTitleList : list[list[str]], element : str):
         print(i, linkTitleList[1][i])
 
     elementList = []
-    for e in courseFullList :
-        for k in e :
-            if element == "staff" :
+
+
+    if element == "staff" :
+        for e in courseFullList :
+            for k in e :
                 if k.profContent not in elementList :
                     elementList.append(k.profContent)
+
+    elif element == "room" :
+        for e in courseFullList :
+            for k in e :
+                if k.roomContent not in elementList :
+                    elementList.append(k.roomContent)
 
     elementList = clearElement(elementList)
         
@@ -61,7 +69,7 @@ def clearElement(elementList : list[str]) -> list[str] :
 
 def elementChoice(elementList : list[str]) -> str:
     """
-        Display the list of every professor and ask the user to chose a professor
+        Display the list of every element and ask the user to chose an element
 
         - Args :
             - elementList (list[str])
@@ -82,7 +90,7 @@ def elementChoice(elementList : list[str]) -> str:
     return elementList[choice]
 
 
-def getCourseElement(elementChoice : str, courseList) :
+def getCourseElement(elementChoice : str, courseList, element : str) :
     """
         Add every course of a specified element from every schedule to a single schedule
 
@@ -94,12 +102,23 @@ def getCourseElement(elementChoice : str, courseList) :
             - courseFullList (list[Course])
     """
     courseFullList = []
-    for e in courseList :
-        for k in e :
-            if k.profContent == elementChoice :
-                courseFullList.append(k)
-            elif elementChoice in (k.profContent).split(", "):
-                courseFullList.append(k)
+
+    if element == "staff" :
+        for e in courseList :
+            for k in e :
+                if k.profContent == elementChoice :
+                    courseFullList.append(k)
+                elif elementChoice in (k.profContent).split(", "):
+                    courseFullList.append(k)
+
+    elif element == "room" :
+        for e in courseList :
+            for k in e :
+                if k.roomContent == elementChoice :
+                    courseFullList.append(k)
+                elif elementChoice in (k.roomContent).split(", "):
+                    courseFullList.append(k)
+
     return courseFullList
 
 
@@ -117,16 +136,19 @@ def checkEquals(courseList) :
     """
     toRemove = []
     intToRemove = []
+
     for i in range(len(courseList)):
         for j in range(len(courseList)):
             if i != j and i not in intToRemove :
                 if courseList[i] == courseList[j] :
                     toRemove.append(courseList[j])
                     intToRemove.append(j)
+                    
     for e in toRemove :
         courseList.remove(e)
 
     n = len(courseList)
+
     for i in range(n):
         for j in range(0, n-i-1):
             if courseList[j].dayContent > courseList[j+1].dayContent :

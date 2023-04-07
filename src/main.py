@@ -7,11 +7,12 @@ import elementSchedule
 if __name__ == "__main__" :
     
     print("1 Emploi du temps de groupe")
-    print("2 Emploi du temps par prof/salle")
+    print("2 Emploi du temps par prof")
+    print("3 Emploi du temps par salle")
 
     choice = 0
 
-    while choice not in (1, 2) :
+    while choice not in (1, 2, 3) :
         choice = int(input("Sélectionner une option : "))
 
     if choice == 1 :
@@ -31,16 +32,24 @@ if __name__ == "__main__" :
 
         courseFullList = scraper.getLink(True)
 
-        staffList, courseList, weekDesc = elementSchedule.getFullList(courseFullList, "staff")
+        if choice == 2 :
+            elementList, courseList, weekDesc = elementSchedule.getFullList(courseFullList, "staff")
 
-        profChoice = elementSchedule.elementChoice(staffList)
+        else :
+            elementList, courseList, weekDesc = elementSchedule.getFullList(courseFullList, "room")
 
-        courseList = elementSchedule.getCourseElement(profChoice, courseList)
+        elementChoice = elementSchedule.elementChoice(elementList)
+
+        if choice == 2 :
+            courseList = elementSchedule.getCourseElement(elementChoice, courseList, "staff")
+
+        else :
+            courseList = elementSchedule.getCourseElement(elementChoice, courseList, "room")
 
         courseList = elementSchedule.checkEquals(courseList)
 
         courseList, overCourse = scraper.sortCourse(courseList)
 
-        toXLSX.createXlsx(courseList, overCourse, weekDesc, profChoice)
+        toXLSX.createXlsx(courseList, overCourse, weekDesc, elementChoice)
 
         toPDF.convertToPdf("schedule.xlsx")
