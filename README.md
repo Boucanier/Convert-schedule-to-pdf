@@ -20,6 +20,6 @@ To install all these requirements on a Linux distribution, you can run the scrip
 
 Run _main.py_, then enter the element you want your schedule based on (1 : group, 2 : staff, 3 : room) or refresh the list of schedule (refresh : 4) or exit the program (quit : 5).
 
-If you chose to get a schedule based on room or staff, the program will get the schedule of every group and then you will have to specify a room/professor. The program will filter every schedule with your choice and merge everything together. Once you have created a schedule based on a room/professor, the program will not refresh every schedule unless you refresh it with option 4 in the menu.
+If you chose to get a schedule based on room or staff (option 3 or 4), the program will get the schedule of every group and then you will have to specify a room/professor. The program will filter every schedule with your choice and merge everything together. Once you have created a schedule based on a room/professor, the program will not refresh every schedule unless you refresh it with option 4 in the menu.
 
 Then the program will create a xlsx file and a pdf file from it. It will open the pdf file automatically.
