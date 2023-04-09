@@ -5,51 +5,60 @@ import elementSchedule
 
 
 if __name__ == "__main__" :
-    
-    print("1 Emploi du temps de groupe")
-    print("2 Emploi du temps par prof")
-    print("3 Emploi du temps par salle")
 
+    firstReq = True
     choice = 0
 
-    while choice not in (1, 2, 3) :
-        choice = int(input("Sélectionner une option : "))
-
-    if choice == 1 :
-
-        url, title = scraper.getLink()
-        response = scraper.getSchedule(url)
-
-        courseList, weekDesc = scraper.parseSchedule(response)
-
-        courseList, overCourse = scraper.sortCourse(courseList)
-
-        toXLSX.createXlsx(courseList, overCourse, weekDesc, title)
-
-        toPDF.convertToPdf("schedule.xlsx")
+    while choice != 4 :
     
-    else :
+        print("1 Emploi du temps de groupe")
+        print("2 Emploi du temps par prof")
+        print("3 Emploi du temps par salle")
+        print("4 Quitter")
 
-        courseFullList = scraper.getLink(True)
+        while choice not in (1, 2, 3, 4) :
+            choice = input("Sélectionner une option : ")
+            if choice.isdigit() :
+                choice = int(choice)
+            else :
+                choice = 0
 
-        if choice == 2 :
-            elementList, courseList, weekDesc = elementSchedule.getFullList(courseFullList, "staff")
+        if choice == 1 :
 
-        else :
-            elementList, courseList, weekDesc = elementSchedule.getFullList(courseFullList, "room")
+            url, title = scraper.getLink()
+            response = scraper.getSchedule(url)
 
-        elementChoice = elementSchedule.elementChoice(elementList)
+            courseList, weekDesc = scraper.parseSchedule(response)
 
-        if choice == 2 :
-            courseList = elementSchedule.getCourseElement(elementChoice, courseList, "staff")
+            courseList, overCourse = scraper.sortCourse(courseList)
 
-        else :
-            courseList = elementSchedule.getCourseElement(elementChoice, courseList, "room")
+            toXLSX.createXlsx(courseList, overCourse, weekDesc, title)
 
-        courseList = elementSchedule.checkEquals(courseList)
+            toPDF.convertToPdf("schedule.xlsx")
 
-        courseList, overCourse = scraper.sortCourse(courseList)
+            choice = 0
+        
+        elif choice in (2, 3) :
 
-        toXLSX.createXlsx(courseList, overCourse, weekDesc, elementChoice)
+            if firstReq :
+                courseFullList = scraper.getLink(True)
+                allCourse, weekDesc = elementSchedule.getFullSchedule(courseFullList)
 
-        toPDF.convertToPdf("schedule.xlsx")
+            options = ("staff", "room")
+
+            elementList, courseList = elementSchedule.getFullList(allCourse, options[choice - 2])
+
+            elementChoice = elementSchedule.elementChoice(elementList)
+
+            courseList = elementSchedule.getCourseElement(elementChoice, courseList, options[choice - 2])
+
+            courseList = elementSchedule.checkEquals(courseList)
+
+            courseList, overCourse = scraper.sortCourse(courseList)
+
+            toXLSX.createXlsx(courseList, overCourse, weekDesc, elementChoice)
+
+            toPDF.convertToPdf("schedule.xlsx")
+        
+            choice = 0
+            firstReq = False

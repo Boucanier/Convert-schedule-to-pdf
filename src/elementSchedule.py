@@ -3,7 +3,21 @@
 """
 import scraper
 
-def getFullList(linkTitleList : list[list[str]], element : str):
+
+def getFullSchedule(linkTitleList : list[list[str]]) :
+    courseFullList = []
+
+    for i in range(len(linkTitleList[0])):
+        response = scraper.getSchedule(linkTitleList[0][i])
+
+        courseList, weekDesc = scraper.parseSchedule(response)
+        courseFullList.append(courseList)
+        print(i, linkTitleList[1][i])
+    
+    return courseFullList, weekDesc
+
+
+def getFullList(courseFullList, element : str):
     """
         Get every schedule available, then extract the list of every different element using function clearElement()
 
@@ -13,19 +27,9 @@ def getFullList(linkTitleList : list[list[str]], element : str):
         - Returns :
             - elementList (list[str])
             - courseFullList (list[list[Course]])
-            - weekDesc (list[str])
     """
-    courseFullList = []
-
-    for i in range(len(linkTitleList[0])):
-        response = scraper.getSchedule(linkTitleList[0][i])
-
-        courseList, weekDesc = scraper.parseSchedule(response)
-        courseFullList.append(courseList)
-        print(i, linkTitleList[1][i])
 
     elementList = []
-
 
     if element == "staff" :
         for e in courseFullList :
@@ -41,7 +45,7 @@ def getFullList(linkTitleList : list[list[str]], element : str):
 
     elementList = clearElement(elementList)
         
-    return elementList, courseFullList, weekDesc
+    return elementList, courseFullList
 
 
 def clearElement(elementList : list[str]) -> list[str] :
