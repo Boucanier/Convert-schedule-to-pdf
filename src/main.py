@@ -9,14 +9,16 @@ if __name__ == "__main__" :
     firstReq = True
     choice = 0
 
-    while choice != 4 :
-    
+    while choice != 5 :
+
+        print("\n")
         print("1 Emploi du temps de groupe")
         print("2 Emploi du temps par prof")
         print("3 Emploi du temps par salle")
-        print("4 Quitter")
+        print("4 Mise à jour des emploi du temps")
+        print("5 Quitter\n")
 
-        while choice not in (1, 2, 3, 4) :
+        while choice not in (1, 2, 3, 4, 5) :
             choice = input("Sélectionner une option : ")
             if choice.isdigit() :
                 choice = int(choice)
@@ -62,3 +64,11 @@ if __name__ == "__main__" :
         
             choice = 0
             firstReq = False
+        
+        elif choice == 4 :
+
+            courseFullList = scraper.getLink(True)
+            allCourse, weekDesc = elementSchedule.getFullSchedule(courseFullList)
+
+            firstReq = False
+            choice = 0
