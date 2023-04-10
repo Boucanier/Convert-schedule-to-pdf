@@ -222,13 +222,12 @@ def getLink(fullList : bool = False):
         return link, title
     
     else :
-        fullLinkList = [[],[]]
+        linkFullList = []
         for i in range(len(linkList)) :
-            link, group = menu(groupList, linkList, i)
-            fullLinkList[0].append(link)
-            fullLinkList[1].append(group)
+            link = menu(groupList, linkList, i)[0]
+            linkFullList.append(link)
 
-        return fullLinkList
+        return linkFullList, groupList
 
 
 def getSchedule(url : str):

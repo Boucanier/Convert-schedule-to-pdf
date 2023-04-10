@@ -43,8 +43,8 @@ if __name__ == "__main__" :
         elif choice in (2, 3) :
 
             if firstReq :
-                linkFullList = scraper.getLink(True)
-                allCourse, weekDesc = elementSchedule.getFullSchedule(linkFullList)
+                urlList, titleList = scraper.getLink(True)
+                allCourse, weekDesc = elementSchedule.getFullSchedule(urlList, titleList)
 
             options = ("staff", "room")
 
@@ -67,8 +67,8 @@ if __name__ == "__main__" :
         
         elif choice == 4 :
 
-            linkFullList = scraper.getLink(True)
-            allCourse, weekDesc = elementSchedule.getFullSchedule(linkFullList)
+            urlList, titleList = scraper.getLink(True)
+            allCourse, weekDesc = elementSchedule.getFullSchedule(urlList, titleList)
 
             firstReq = False
             choice = 0
