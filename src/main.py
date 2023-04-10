@@ -15,7 +15,7 @@ if __name__ == "__main__" :
         print("1 Emploi du temps de groupe")
         print("2 Emploi du temps par prof")
         print("3 Emploi du temps par salle")
-        print("4 Mise à jour des emploi du temps")
+        print("4 Mise à jour des emplois du temps")
         print("5 Quitter\n")
 
         while choice not in (1, 2, 3, 4, 5) :
