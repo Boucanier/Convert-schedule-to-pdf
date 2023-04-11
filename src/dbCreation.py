@@ -1,11 +1,12 @@
 import sqlite3
 import os
-import scraper
 import elementSchedule
 
-FILE_PATH = "data/schedule.db"
 
-def resetDB():
+FILE_PATH = "data/schedule.db"
+ELEMENTS = ("staff", "room", "module", "groups")
+
+def resetDB(allCourse):
     new_db = os.path.exists(FILE_PATH)
     conn = sqlite3.connect(FILE_PATH)
     cur = conn.cursor()
@@ -18,20 +19,15 @@ def resetDB():
 
     cur.execute("CREATE TABLE staff (staff_id INTEGER PRIMARY KEY, staff_name TEXT)")
     cur.execute("CREATE TABLE module (module_id INTEGER PRIMARY KEY, module_name TEXT)")
-    cur.execute("CREATE TABLE groups (group_id INTEGER PRIMARY KEY, group_name VARCHAR(20))")
+    cur.execute("CREATE TABLE groups (groups_id INTEGER PRIMARY KEY, group_name VARCHAR(20))")
     cur.execute("CREATE TABLE room (room_id INTEGER PRIMARY KEY, room_name VARCHAR(10))")
     cur.execute("CREATE TABLE course (first_day_week DATE, date_cours DATE, t_start VARCHAR(5), t_end VARCHAR(5),\
-                 group_id INTEGER REFERENCES groups(group_id),\
+                 groups_id INTEGER REFERENCES groups(groups_id),\
                  module_id INTEGER REFERENCES module(module_id),\
                  staff_id INTEGER REFERENCES staff(staff_id),\
                  room_id INTEGER REFERENCES room(room_id))")
-    
-    elements = ("staff", "room", "module")
 
-    urlList, titleList = scraper.getLink(True)
-    allCourse, weekDesc = elementSchedule.getFullSchedule(urlList, titleList)
-
-    for e in elements :
+    for e in ELEMENTS :
         elementList, courseList = elementSchedule.getFullList(allCourse, e)
         for i in range(len(elementList)) :
             cur.execute("INSERT INTO " + e + " VALUES (" + str(i) + ", '" + elementList[i] + "')")
@@ -40,4 +36,22 @@ def resetDB():
     cur.close()
     conn.close()
 
-resetDB()
+
+def updateDB(allCourse):
+    new_db = os.path.exists(FILE_PATH)
+    if not new_db :
+        resetDB(allCourse)
+    conn = sqlite3.connect(FILE_PATH)
+    cur = conn.cursor()
+
+    for e in ELEMENTS :
+        elementList, courseList = elementSchedule.getFullList(allCourse, e)
+        elementData = (cur.execute("SELECT * FROM " + e + " ORDER BY " + e + "_id")).fetchall()
+        for l in elementList :
+            if not any(l in sub for sub in elementData):
+                elementData.append((elementData[-1][0] + 1, l))
+                cur.execute("INSERT INTO " + e + " VALUES (" + str(elementData[-1][0]) + ", '" + l + "')")
+    
+    conn.commit()
+    cur.close()
+    conn.close()
