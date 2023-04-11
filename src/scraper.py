@@ -26,6 +26,8 @@ def clearText(txt : str) -> str :
                     txtLetters[i] = ''
                 else :
                     txtLetters[i] = ', '
+            if txtLetters[i] == "'" :
+                txtLetters[i] = " "
     if txtLetters[0] == ' ':
         txtLetters[0] = ''
     if txtLetters[-1] == ' ':
