@@ -49,6 +49,12 @@ def getFullList(courseFullList, element : str):
                 if k.moduleContent not in elementList :
                     elementList.append(k.moduleContent)
 
+    elif element == "groups" :
+        for e in courseFullList :
+            for k in e :
+                if k.groupContent not in elementList :
+                    elementList.append(k.groupContent)
+
     elementList = clearElement(elementList)
         
     return elementList, courseFullList
