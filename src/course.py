@@ -88,13 +88,12 @@ class Course :
         return False
 
     def __eq__(self, course2) :
-        if self.weekContent == course2.weekContent :
-            if self.profContent == course2.profContent :
-                if self.moduleContent == course2.moduleContent :
-                    if self.dayContent == course2.dayContent :
-                        if self.timeContent == course2.timeContent :
-                            if self.moduleContent == course2.moduleContent :
-                                if self.groupContent == course2.groupContent :
-                                    if self.roomContent == course2.roomContent :
-                                        return True
+        if self.groupContent == course2.groupContent :
+            if self.moduleContent == course2.moduleContent :
+                if self.weekContent == course2.weekContent :
+                    if self.profContent == course2.profContent :
+                        if self.dayContent == course2.dayContent :
+                            if self.timeContent == course2.timeContent :
+                                if self.roomContent == course2.roomContent :
+                                    return True
         return False
