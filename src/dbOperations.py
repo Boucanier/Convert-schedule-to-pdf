@@ -6,10 +6,12 @@ import elementSchedule
 FILE_PATH = "data/schedule.db"
 ELEMENTS = ("staff", "room", "module", "groups")
 
-def resetDB(allCourse):
+def createDB(allCourse):
     new_db = os.path.exists(FILE_PATH)
     conn = sqlite3.connect(FILE_PATH)
     cur = conn.cursor()
+
+    print("DataBase creation")
     if new_db :
         cur.execute("DROP TABLE staff")
         cur.execute("DROP TABLE module")
@@ -28,24 +30,26 @@ def resetDB(allCourse):
                  room_id INTEGER REFERENCES room(room_id))")
 
     for e in ELEMENTS :
-        elementList, courseList = elementSchedule.getFullList(allCourse, e)
+        elementList = elementSchedule.getFullList(allCourse, e)
         for i in range(len(elementList)) :
             cur.execute("INSERT INTO " + e + " VALUES (" + str(i) + ", '" + elementList[i] + "')")
 
     conn.commit()
     cur.close()
     conn.close()
+    print("DataBase created\n")
 
 
 def updateDB(allCourse):
     new_db = os.path.exists(FILE_PATH)
     if not new_db :
-        resetDB(allCourse)
+        print("DataBase does not exist")
+        createDB(allCourse)
     conn = sqlite3.connect(FILE_PATH)
     cur = conn.cursor()
 
     for e in ELEMENTS :
-        elementList, courseList = elementSchedule.getFullList(allCourse, e)
+        elementList = elementSchedule.getFullList(allCourse, e)
         elementData = (cur.execute("SELECT * FROM " + e + " ORDER BY " + e + "_id")).fetchall()
         for l in elementList :
             if not any(l in sub for sub in elementData):
@@ -55,3 +59,4 @@ def updateDB(allCourse):
     conn.commit()
     cur.close()
     conn.close()
+    print("DataBase updated\n")

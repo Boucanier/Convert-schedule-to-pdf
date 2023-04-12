@@ -2,7 +2,7 @@ import toXLSX
 import toPDF
 import scraper
 import elementSchedule
-import dbCreation
+import dbOperations
 
 
 if __name__ == "__main__" :
@@ -12,7 +12,7 @@ if __name__ == "__main__" :
 
     while choice != 7 :
 
-        print("\n")
+        # print("\n")
         print("1 Emploi du temps de groupe")
         print("2 Emploi du temps par prof")
         print("3 Emploi du temps par salle")
@@ -53,11 +53,11 @@ if __name__ == "__main__" :
             if choice in (2, 3) :
                 options = ("staff", "room")
 
-                elementList, courseList = elementSchedule.getFullList(allCourse, options[choice - 2])
+                elementList = elementSchedule.getFullList(allCourse, options[choice - 2])
 
                 elementChoice = elementSchedule.elementChoice(elementList)
 
-                courseList = elementSchedule.getCourseElement(elementChoice, courseList, options[choice - 2])
+                courseList = elementSchedule.getCourseElement(elementChoice, allCourse, options[choice - 2])
 
                 courseList = elementSchedule.checkEquals(courseList)
 
@@ -68,10 +68,10 @@ if __name__ == "__main__" :
                 toPDF.convertToPdf("schedule.xlsx")
 
             elif choice == 5 :
-                dbCreation.resetDB(allCourse)
+                dbOperations.createDB(allCourse)
             
             else :
-                dbCreation.updateDB(allCourse)
+                dbOperations.updateDB(allCourse)
         
             choice = 0
         

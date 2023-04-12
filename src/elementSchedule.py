@@ -13,6 +13,7 @@ def getFullSchedule(urlList : list[list[str]], titleList : list[str]) :
         courseList, weekDesc = scraper.parseSchedule(response)
         courseFullList.append(courseList)
         print(i, titleList[i])
+    print()
     
     return courseFullList, weekDesc
 
@@ -26,7 +27,6 @@ def getFullList(courseFullList, element : str):
         
         - Returns :
             - elementList (list[str])
-            - courseFullList (list[list[Course]])
     """
 
     elementList = []
@@ -57,7 +57,7 @@ def getFullList(courseFullList, element : str):
 
     elementList = clearElement(elementList)
         
-    return elementList, courseFullList
+    return elementList
 
 
 def clearElement(elementList : list[str]) -> list[str] :
