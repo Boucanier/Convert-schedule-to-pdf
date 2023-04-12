@@ -6,7 +6,15 @@ import elementSchedule
 FILE_PATH = "data/schedule.db"
 ELEMENTS = ("staff", "room", "module", "groups")
 
-def createDB(allCourse):
+def createDB(allCourse) -> None:
+    """
+        Create new database with every tables and fill tables STAFF, ROOM, MODULE, GROUPS
+
+        If database already exists, it drops every table before insertion
+
+        - Args :
+            - allCourse (list[list[Course]])
+    """
     new_db = os.path.exists(FILE_PATH)
     conn = sqlite3.connect(FILE_PATH)
     cur = conn.cursor()
@@ -40,7 +48,15 @@ def createDB(allCourse):
     print("DataBase created\n")
 
 
-def updateDB(allCourse):
+def updateDB(allCourse) -> None:
+    """
+        Update database by adding missing elements of tables
+
+        If database does not exist, it calls createDB() to create it
+
+        - Args :
+            - allCourse (list[list[Course]])
+    """
     new_db = os.path.exists(FILE_PATH)
     if not new_db :
         print("DataBase does not exist")

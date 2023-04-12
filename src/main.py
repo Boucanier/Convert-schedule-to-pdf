@@ -12,7 +12,6 @@ if __name__ == "__main__" :
 
     while choice != 7 :
 
-        # print("\n")
         print("1 Emploi du temps de groupe")
         print("2 Emploi du temps par prof")
         print("3 Emploi du temps par salle")

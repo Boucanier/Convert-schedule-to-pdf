@@ -4,7 +4,7 @@
 import scraper
 
 
-def getFullSchedule(urlList : list[list[str]], titleList : list[str]) :
+def getFullSchedule(urlList : list[str], titleList : list[str]) :
     courseFullList = []
 
     for i in range(len(urlList)):
@@ -23,7 +23,7 @@ def getFullList(courseFullList, element : str):
         Get every schedule available, then extract the list of every different element using function clearElement()
 
         - Args :
-            - linkTitleList (list[list[str]]) : list containing list of schedule link and ist of schedule title
+            - courseFullList (list[list[Course]]) : list containing list of schedule link and ist of schedule title
         
         - Returns :
             - elementList (list[str])
