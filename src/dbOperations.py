@@ -79,4 +79,14 @@ def updateDB(allCourse) -> None:
     cur.close()
     conn.close()
     print("DataBase updated\n")
-    
+
+
+def getElements(tableName):
+    conn = sqlite3.connect(FILE_PATH)
+    cur = conn.cursor()
+    data = cur.execute("SELECT * FROM " + tableName).fetchall()
+    elementDic = {e[1] : e[0] for e in data}
+
+    cur.close()
+    conn.close()
+    return elementDic
