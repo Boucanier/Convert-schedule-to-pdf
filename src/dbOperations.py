@@ -27,15 +27,18 @@ def createDB(allCourse) -> None:
         cur.execute("DROP TABLE room")
         cur.execute("DROP TABLE course")
 
-    cur.execute("CREATE TABLE staff (staff_id INTEGER PRIMARY KEY, staff_name TEXT)")
-    cur.execute("CREATE TABLE module (module_id INTEGER PRIMARY KEY, module_name TEXT)")
-    cur.execute("CREATE TABLE groups (groups_id INTEGER PRIMARY KEY, group_name VARCHAR(20))")
-    cur.execute("CREATE TABLE room (room_id INTEGER PRIMARY KEY, room_name VARCHAR(10))")
-    cur.execute("CREATE TABLE course (first_day_week VARCHAR(10), date_cours VARCHAR(10), t_start VARCHAR(5), t_end VARCHAR(5),\
+    cur.execute("CREATE TABLE staff (staff_id NUMBER(3) PRIMARY KEY, staff_name TEXT)")
+    cur.execute("CREATE TABLE module (module_id NUMBER(3) PRIMARY KEY, module_name TEXT)")
+    cur.execute("CREATE TABLE groups (groups_id NUMBER(3) PRIMARY KEY, group_name VARCHAR(20))")
+    cur.execute("CREATE TABLE room (room_id NUMBER(3) PRIMARY KEY, room_name VARCHAR(10))")
+    cur.execute("CREATE TABLE course (first_day_week VARCHAR(10), week_day NUMBER(1), t_start VARCHAR(5) NOT NULL, t_end VARCHAR(5) NOT NULL,\
+                 man_set BOOLEAN NOT NULL,\
                  groups_id INTEGER REFERENCES groups(groups_id),\
                  module_id INTEGER REFERENCES module(module_id),\
                  staff_id INTEGER REFERENCES staff(staff_id),\
-                 room_id INTEGER REFERENCES room(room_id))")
+                 room_id INTEGER REFERENCES room(room_id),\
+                 note TEXT,\
+                 PRIMARY KEY(first_day_week, week_day, t_start, t_end, groups_id, module_id))")
 
     for e in ELEMENTS :
         elementList = elementSchedule.getFullList(allCourse, e)
@@ -76,3 +79,4 @@ def updateDB(allCourse) -> None:
     cur.close()
     conn.close()
     print("DataBase updated\n")
+    
