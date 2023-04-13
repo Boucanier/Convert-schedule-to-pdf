@@ -31,7 +31,7 @@ def createDB(allCourse) -> None:
     cur.execute("CREATE TABLE module (module_id INTEGER PRIMARY KEY, module_name TEXT)")
     cur.execute("CREATE TABLE groups (groups_id INTEGER PRIMARY KEY, group_name VARCHAR(20))")
     cur.execute("CREATE TABLE room (room_id INTEGER PRIMARY KEY, room_name VARCHAR(10))")
-    cur.execute("CREATE TABLE course (first_day_week DATE, date_cours DATE, t_start VARCHAR(5), t_end VARCHAR(5),\
+    cur.execute("CREATE TABLE course (first_day_week VARCHAR(10), date_cours VARCHAR(10), t_start VARCHAR(5), t_end VARCHAR(5),\
                  groups_id INTEGER REFERENCES groups(groups_id),\
                  module_id INTEGER REFERENCES module(module_id),\
                  staff_id INTEGER REFERENCES staff(staff_id),\
