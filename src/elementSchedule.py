@@ -199,6 +199,14 @@ def getFullDetailedList(courseList):
         [e.remove(k) for k in toRemove]
         toRemove.clear()
         e = checkEquals(e)
+        for k in e :
+            if ", " in k.groupContent :
+                toRemove.append(k)
+                for i in range(len(k.groupContent.split(', '))):
+                    e.append(Course(k.dayContent, k.timeContent, k.moduleContent, k.roomContent, k.profContent, (k.groupContent.split(", "))[i], k.weekContent, k.noteContent, k.colorContent))
+        [e.remove(k) for k in toRemove]
+        toRemove.clear()
+        e = checkEquals(e)
         n = len(e)
         for i in range(n):
             for j in range(0, n-i-1):

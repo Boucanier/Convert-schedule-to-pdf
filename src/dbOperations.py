@@ -112,7 +112,7 @@ def insertCourse(courseList, weekDesc):
     for k in courseList:
         for e in k :
             cur.execute("INSERT INTO course VALUES('" + weekDesc[e.weekContent] + "', '" + str(e.dayContent) + "', '" + e.timeContent[0] + "', '" + e.timeContent[1] + "', FALSE, '" +\
-                            elementList[0][e.profContent] + "', '" + elementList[1][e.roomContent] + "', '" + elementList[2][e.moduleContent] + "', '" + elementList[3][e.groupContent.split(',')[0]] + "', '" + e.noteContent + "')")
+                            elementList[0][e.profContent] + "', '" + elementList[1][e.roomContent] + "', '" + elementList[2][e.moduleContent] + "', '" + elementList[3][e.groupContent] + "', '" + e.noteContent + "')")
     
     conn.commit()
     cur.close()
