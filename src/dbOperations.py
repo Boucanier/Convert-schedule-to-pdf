@@ -33,12 +33,11 @@ def createDB(allCourse) -> None:
     cur.execute("CREATE TABLE room (room_id NUMBER(3) PRIMARY KEY, room_name VARCHAR(10))")
     cur.execute("CREATE TABLE course (first_day_week VARCHAR(10), week_day NUMBER(1), t_start VARCHAR(5) NOT NULL, t_end VARCHAR(5) NOT NULL,\
                  man_set BOOLEAN NOT NULL,\
-                 groups_id INTEGER REFERENCES groups(groups_id),\
-                 module_id INTEGER REFERENCES module(module_id),\
                  staff_id INTEGER REFERENCES staff(staff_id),\
                  room_id INTEGER REFERENCES room(room_id),\
-                 note TEXT,\
-                 PRIMARY KEY(first_day_week, week_day, t_start, t_end, groups_id, module_id))")
+                 module_id INTEGER REFERENCES module(module_id),\
+                 groups_id INTEGER REFERENCES groups(groups_id),\
+                 note TEXT)")
 
     for e in ELEMENTS :
         elementList = elementSchedule.getFullList(allCourse, e)
@@ -85,8 +84,24 @@ def getElements(tableName):
     conn = sqlite3.connect(FILE_PATH)
     cur = conn.cursor()
     data = cur.execute("SELECT * FROM " + tableName).fetchall()
-    elementDic = {e[1] : e[0] for e in data}
+    elementDic = {e[1] : str(e[0]) for e in data}
 
     cur.close()
     conn.close()
     return elementDic
+
+
+def insertCourse(courseList, weekDesc):
+    conn = sqlite3.connect("data/schedule.db")
+    cur = conn.cursor()
+
+    elementList = [getElements(e) for e in ELEMENTS]
+
+    for k in courseList:
+        for e in k :
+            cur.execute("INSERT INTO course VALUES('" + weekDesc[e.weekContent] + "', '" + str(e.dayContent) + "', '" + e.timeContent[0] + "', '" + e.timeContent[1] + "', FALSE, '" +\
+                            elementList[0][e.profContent] + "', '" + elementList[1][e.roomContent] + "', '" + elementList[2][e.moduleContent] + "', '" + elementList[3][e.groupContent.split(',')[0]] + "', '" + e.noteContent + "')")
+    
+    conn.commit()
+    cur.close()
+    conn.close()

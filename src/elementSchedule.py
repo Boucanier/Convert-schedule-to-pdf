@@ -2,6 +2,7 @@
     This code contains functions that will be used to fetch a specific schedule based on a room/professor
 """
 import scraper
+from course import *
 
 
 def getFullSchedule(urlList : list[str], titleList : list[str]) :
@@ -55,7 +56,8 @@ def getFullList(courseFullList, element : str):
                 if k.groupContent not in elementList :
                     elementList.append(k.groupContent)
 
-    elementList = clearElement(elementList)
+    if element != "module" :
+        elementList = clearElement(elementList)
         
     return elementList
 
@@ -173,4 +175,38 @@ def checkEquals(courseList) :
             if courseList[j].dayContent > courseList[j+1].dayContent :
                 courseList[j], courseList[j+1] = courseList[j+1], courseList[j]
 
+    return courseList
+
+
+def getFullDetailedList(courseList):
+
+    toRemove = []
+
+    for e in courseList :
+        for k in e :
+            if ", " in k.profContent :
+                toRemove.append(k)
+                for i in range(len(k.profContent.split(', '))):
+                    e.append(Course(k.dayContent, k.timeContent, k.moduleContent, k.roomContent, (k.profContent.split(", "))[i], k.groupContent, k.weekContent, k.noteContent, k.colorContent))
+        [e.remove(k) for k in toRemove]
+        toRemove.clear()
+        e = checkEquals(e)
+        for k in e :
+            if ", " in k.roomContent :
+                toRemove.append(k)
+                for i in range(len(k.roomContent.split(', '))):
+                    e.append(Course(k.dayContent, k.timeContent, k.moduleContent, (k.roomContent.split(", "))[i], k.profContent, k.groupContent, k.weekContent, k.noteContent, k.colorContent))
+        [e.remove(k) for k in toRemove]
+        toRemove.clear()
+        e = checkEquals(e)
+        n = len(e)
+        for i in range(n):
+            for j in range(0, n-i-1):
+                if e[j].dayContent > e[j+1].dayContent :
+                    e[j], e[j+1] = e[j+1], e[j]
+        for i in range(n):
+            for j in range(0, n-i-1):
+                if e[j].weekContent > e[j+1].weekContent :
+                    e[j], e[j+1] = e[j+1], e[j]
+    
     return courseList
