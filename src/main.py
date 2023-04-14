@@ -71,6 +71,9 @@ if __name__ == "__main__" :
             
             else :
                 dbOperations.updateDB(allCourse)
+                dbOperations.deleteByWeek(weekDesc)
+                detailedCourse = elementSchedule.getFullDetailedList(allCourse)
+                dbOperations.insertCourse(detailedCourse, weekDesc)
         
             choice = 0
         

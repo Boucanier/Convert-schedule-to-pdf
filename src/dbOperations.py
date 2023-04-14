@@ -91,6 +91,18 @@ def getElements(tableName):
     return elementDic
 
 
+def deleteByWeek(weekDesc):
+    conn = sqlite3.connect("data/schedule.db")
+    cur = conn.cursor()
+
+    for e in weekDesc :
+        cur.execute("DELETE FROM COURSE WHERE first_day_week LIKE '" + e + "'")
+    
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
 def insertCourse(courseList, weekDesc):
     conn = sqlite3.connect("data/schedule.db")
     cur = conn.cursor()
