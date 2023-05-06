@@ -339,8 +339,8 @@ def parseSchedule(response):
 
     resourceList = soup.find_all("event")
 
-    tWeek = soup.find_all("description")
-    tWeek = [(e.text)[-10:] for e in tWeek]
+    weekFull = soup.find_all("description")
+    tWeek = [(e.text)[-10:] for e in weekFull]
     weekDesc = []
     for e in tWeek:
         temp = ''
@@ -360,5 +360,16 @@ def parseSchedule(response):
     dayContent.reverse()
 
     courseList = getContent(dayContent, weekContent, resourceList)
+
+    offList = []
+    for i in range(len(weekFull)) :
+        if "congé" in clearText(weekFull[i]) :
+            offList.append(i)
+            weekDesc[i] += " - VACANCES"
+
+    for e in offList :
+        for k in courseList :
+            if k.weekContent >= e :
+                k.weekContent += 1
     
     return courseList, weekDesc
