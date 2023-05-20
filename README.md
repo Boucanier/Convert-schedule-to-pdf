@@ -18,7 +18,7 @@ To install all these requirements on a Linux distribution, you can run the scrip
 
 ## Description
 
-Run _main.py_, then enter the element you want your schedule based on (1 : group, 2 : staff, 3 : room), refresh the list of schedule (4 : refresh), create or reset the SQL database (5 : DB creation), update the SQL database (6 : DB update) or exit the program (7 : quit).
+Run _src/main.py_, then enter the element you want your schedule based on (1 : group, 2 : staff, 3 : room), refresh the list of schedule (4 : refresh), create or reset the SQL database (5 : DB creation), update the SQL database (6 : DB update) or exit the program (7 : quit).
 
 If you chose to get a schedule based on room or staff (option 3 or 4), the program will get the schedule of every group and then you will have to specify a room/professor. The program will filter every schedule with your choice and merge everything together. Once you have created a schedule based on a room/professor, the program will not refresh every schedule unless you refresh it with option 4 in the menu.
 
