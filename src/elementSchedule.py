@@ -98,13 +98,24 @@ def elementChoice(elementList : list[str]) -> str:
         - Returns :
             - (str)
     """
-    choice = -1
     elementList.sort()
     for i in range(len(elementList)) :
         print(i, elementList[i])
 
-    while not (0 <= choice <= len(elementList)) :
-        choice = int(input("\nChoix : "))
+    choice = input("\nChoix : ")
+    if choice.isdigit() and (0 <= int(choice) <= len(elementList)) :
+        choice = int(choice)
+    else :
+        print("Selectionner une option VALIDE\n")
+        choice = -1
+
+    while not (0 <= int(choice) <= len(elementList)) :
+        choice = input("Choix : ")
+        if choice.isdigit() and (0 <= int(choice) <= len(elementList)) :
+            choice = int(choice)
+        else :
+            print("Selectionner une option VALIDE\n")
+            choice = -1
     
     print(elementList[choice] + '\n')
 
