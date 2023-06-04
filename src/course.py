@@ -3,6 +3,20 @@ class Course :
         Class of a course containing day, time, "content", room, staff, group, week, duration, color parameters
     """
     def __init__(self, parDay : str, parTime : list[str], parModule : str, parRoom : str, parProf : str, parGroup : str, parWeek : int, parNote : str, parColor : str) -> None:
+        """
+            Constructor of the class
+
+            - Args :
+                - parDay (str)
+                - parTime (list[str])
+                - parModule (str)
+                - parRoom (str)
+                - parProf (str)
+                - parGroup (str)
+                - parWeek (int)
+                - parNote (str)
+                - parColor (str)
+        """
         self.dayContent = int(parDay)
         self.timeContent = parTime
         self.moduleContent = parModule
@@ -20,6 +34,12 @@ class Course :
         self.sameTime = []
 
     def __str__(self) -> str:
+        """
+            Display the course in a string
+
+            - Returns :
+                - display (str)
+        """
         st = ''
         for e in self.sameTime :
             st += ' ' + str(e)
@@ -88,6 +108,15 @@ class Course :
         return False
 
     def __eq__(self, course2) :
+        """
+            Check if the current course is equal to the parameter course
+
+            - Args :
+                - course2 (Course)
+
+            - Returns :
+                - (boolean)
+        """
         if self.groupContent == course2.groupContent :
             if self.moduleContent == course2.moduleContent :
                 if self.weekContent == course2.weekContent :
