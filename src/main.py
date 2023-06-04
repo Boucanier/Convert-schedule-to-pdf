@@ -24,7 +24,7 @@ if __name__ == "__main__" :
         if choice.isdigit() and (int(choice) in (1, 2, 3, 4, 5, 6, 7)) :
             choice = int(choice)
         else :
-            print("Select a valid option\n")
+            print("Selectionner une option VALIDE\n")
             choice = 0
 
         while choice not in (1, 2, 3, 4, 5, 6, 7) :
@@ -32,7 +32,7 @@ if __name__ == "__main__" :
             if choice.isdigit() and (int(choice) in (1, 2, 3, 4, 5, 6, 7)) :
                 choice = int(choice)
             else :
-                print("Select a valid option\n")
+                print("Selectionner une option VALIDE\n")
                 choice = 0
 
         if choice == 1 :
