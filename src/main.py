@@ -20,11 +20,19 @@ if __name__ == "__main__" :
         print("6 Mise à jour de la base de données")
         print("7 Quitter\n")
 
+        choice = input("Sélectionner une option : ")
+        if choice.isdigit() and (int(choice) in (1, 2, 3, 4, 5, 6, 7)) :
+            choice = int(choice)
+        else :
+            print("Select a valid option\n")
+            choice = 0
+
         while choice not in (1, 2, 3, 4, 5, 6, 7) :
             choice = input("Sélectionner une option : ")
-            if choice.isdigit() :
+            if choice.isdigit() and (int(choice) in (1, 2, 3, 4, 5, 6, 7)) :
                 choice = int(choice)
             else :
+                print("Select a valid option\n")
                 choice = 0
 
         if choice == 1 :
