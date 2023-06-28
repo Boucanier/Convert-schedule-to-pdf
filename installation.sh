@@ -1,13 +1,8 @@
 #!/bin/sh
 
 sudo apt update
-sudo apt install python3
-pip install requests
-pip install bs4
-pip install lxml
-pip istall xlsxwriter
-sudo apt install libreoffice-calc
-sudo apt install xdg-utils
+sudo apt install python3 libreoffice-calc xdg-utils
+pip install requests bs4 lxml xlsxwriter
 clear
 echo "Everything is installed"
 sleep 1
