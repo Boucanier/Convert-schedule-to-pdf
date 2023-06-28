@@ -14,9 +14,9 @@ To run the code, you need to have :
 - __xlsxwriter__ (_```pip install xlsxwriter```_)
 - __lxml parser__ (_```pip install lxml```_)
 - __LibreOffice 7.3__ or above (_```sudo apt install libreoffice```_)
-- __xdg-utils__ (_```sudo apt install xdg-utils```_) : _only for __Linux__ distribution_
+- __xdg-utils__ (_```sudo apt install xdg-utils```_) : _only for __Debian based__ distribution_
 
-To install all these requirements on a Linux distribution, you can run the script _installation.sh_
+To install all these requirements on a Debian based Linux distribution, you can run the script _installation.sh_
 
 ## Description
 
