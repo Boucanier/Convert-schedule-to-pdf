@@ -14,13 +14,13 @@ To run the code, you need to have :
 - __xlsxwriter__ (_```pip install xlsxwriter```_)
 - __lxml parser__ (_```pip install lxml```_)
 - __LibreOffice 7.3__ or above (_```sudo apt install libreoffice```_)
-- __xdg-utils__ (_```sudo apt install xdg-utils```_) : _only for __Debian based__ distribution_
+- __xdg-utils__ (_```sudo apt install xdg-utils```_) : _only for __Linux__ distribution_
 
-To install all these requirements on a Debian based Linux distribution, you can run the script _installation.sh_
+To install all these requirements on a Debian based Linux distribution, you can run the script [_installation.sh_](installation.sh)
 
 ## Description
 
-Run _src/main.py_, then enter the element you want your schedule based on (1 : group, 2 : staff, 3 : room), refresh the list of schedule (4 : refresh), create or reset the SQL database (5 : DB creation), update the SQL database (6 : DB update) or exit the program (7 : quit).
+Run [_src/main.py_](src/main.py), then enter the element you want your schedule based on (1 : group, 2 : staff, 3 : room), refresh the list of schedule (4 : refresh), create or reset the SQL database (5 : DB creation), update the SQL database (6 : DB update) or exit the program (7 : quit).
 
 If you chose to get a schedule based on room or staff (option 3 or 4), the program will get the schedule of every group and then you will have to specify a room/professor. The program will filter every schedule with your choice and merge everything together. Once you have created a schedule based on a room/professor, the program will not refresh every schedule unless you refresh it with option 4 in the menu.
 
