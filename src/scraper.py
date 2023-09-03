@@ -83,7 +83,7 @@ def menu(groupList : list, linkList : list[str], groupChoice = -1) -> tuple[str,
         while not (0 <= groupChoice <= len(groupList)):
             for i in range(len(groupList)):
                 print(i, groupList[i])
-            groupChoice = int(input('Group : '))
+            groupChoice = int(input('Groupe : '))
         print(groupList[groupChoice])
     return ("http://chronos.iut-velizy.uvsq.fr/EDT/" + linkList[groupChoice]), groupList[groupChoice]
 
