@@ -82,7 +82,7 @@ def menu(groupList : list, linkList : list[str], groupChoice = -1) -> tuple[str,
     for i in range(len(groupList)):
         print(i, groupList[i])
 
-    groupChoice = input('Groupe : ')
+    groupChoice = input('\nGroupe : ')
 
     if groupChoice.isdigit() and (int(groupChoice) in (range(len(groupList)))) :
         groupChoice = int(groupChoice)
