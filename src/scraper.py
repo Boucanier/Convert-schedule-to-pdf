@@ -79,12 +79,26 @@ def menu(groupList : list, linkList : list[str], groupChoice = -1) -> tuple[str,
         - Returns :
             - (tuple[str, str])
     """
-    if groupChoice == -1 :
-        while not (0 <= groupChoice <= len(groupList)):
-            for i in range(len(groupList)):
-                print(i, groupList[i])
-            groupChoice = int(input('Groupe : '))
-        print(groupList[groupChoice])
+    for i in range(len(groupList)):
+        print(i, groupList[i])
+
+    groupChoice = input('Groupe : ')
+
+    if groupChoice.isdigit() and (int(groupChoice) in (range(len(groupList)))) :
+        groupChoice = int(groupChoice)
+    else :
+        print("Selectionner un groupe VALIDE\n")
+        groupChoice = len(groupList) + 1
+
+    while groupChoice not in (range(len(groupList))) :
+        groupChoice = input("Groupe : ")
+        if groupChoice.isdigit() and (int(groupChoice) in (range(len(groupList)))) :
+            groupChoice = int(groupChoice)
+        else :
+            print("Selectionner une option VALIDE\n")
+            groupChoice = len(groupList) + 1
+
+    print(groupList[groupChoice])
     return ("http://chronos.iut-velizy.uvsq.fr/EDT/" + linkList[groupChoice]), groupList[groupChoice]
 
 
