@@ -92,6 +92,12 @@ def getElements(tableName):
 
 
 def deleteByWeek(weekDesc):
+    """
+        Delete every course of a given week from database
+
+        - Args :
+            - weekDesc (list[str])
+    """
     conn = sqlite3.connect("data/schedule.db")
     cur = conn.cursor()
 
