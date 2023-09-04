@@ -36,7 +36,7 @@ if __name__ == "__main__" :
                 choice = 0
 
         if choice == 1 :
-
+            
             url, title = scraper.getLink()
             response = scraper.getSchedule(url)
 
@@ -53,6 +53,7 @@ if __name__ == "__main__" :
         elif choice in (2, 3, 5, 6) :
 
             if firstReq :
+                # If it is the first request, get the list of all courses
                 urlList, titleList = scraper.getLink(True)
                 allCourse, weekDesc = elementSchedule.getFullSchedule(urlList, titleList)
                 firstReq = False
@@ -60,14 +61,16 @@ if __name__ == "__main__" :
             if choice in (2, 3) :
                 options = ("staff", "room")
 
+                # Get the list of all elements from the selected option
                 elementList = elementSchedule.getFullList(allCourse, options[choice - 2])
 
+                # Ask the user to select an element from the list
                 elementChoice = elementSchedule.elementChoice(elementList)
 
+                # Get the list of all courses of the selected element
                 courseList = elementSchedule.getCourseElement(elementChoice, allCourse, options[choice - 2])
 
                 courseList = elementSchedule.checkEquals(courseList)
-
                 courseList, overCourse = scraper.sortCourse(courseList)
 
                 toXLSX.createXlsx(courseList, overCourse, weekDesc, elementChoice)
@@ -78,8 +81,13 @@ if __name__ == "__main__" :
                 dbOperations.createDB(allCourse)
             
             else :
+                # Update rooms, staffs, modules and groups tables
                 dbOperations.updateDB(allCourse)
+
+                # Delete all courses of the 4 next weeks since it will be reinserted
                 dbOperations.deleteByWeek(weekDesc)
+
+                # Insert all courses of the 4 next weeks
                 detailedCourse = elementSchedule.getFullDetailedList(allCourse)
                 dbOperations.insertCourse(detailedCourse, weekDesc)
         
