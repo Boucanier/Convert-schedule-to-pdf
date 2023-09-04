@@ -80,7 +80,13 @@ def updateDB(allCourse) -> None:
     print("DataBase updated\n")
 
 
-def getElements(tableName):
+def getElements(tableName : str) -> dict[str, str]:
+    """
+        Get every element of a given table from database
+
+        - Args :
+            - tableName (str) : name of the table to get elements from
+    """
     conn = sqlite3.connect(FILE_PATH)
     cur = conn.cursor()
     data = cur.execute("SELECT * FROM " + tableName).fetchall()
@@ -91,12 +97,12 @@ def getElements(tableName):
     return elementDic
 
 
-def deleteByWeek(weekDesc):
+def deleteByWeek(weekDesc : list[str]) -> None:
     """
         Delete every course of a given week from database
 
         - Args :
-            - weekDesc (list[str])
+            - weekDesc (list[str]) : list of weeks' first days
     """
     conn = sqlite3.connect(FILE_PATH)
     cur = conn.cursor()
@@ -109,7 +115,15 @@ def deleteByWeek(weekDesc):
     conn.close()
 
 
-def insertCourse(courseList, weekDesc):
+def insertCourse(courseList, weekDesc) -> None:
+    """
+        Insert every course from courseList into database
+        Check if course is already in database before insertion and insert it only if it is not
+
+        - Args :
+            - courseList (list[list[Course]])
+            - weekDesc (list[str]) : list of weeks' first days
+    """
     conn = sqlite3.connect(FILE_PATH)
     cur = conn.cursor()
 
