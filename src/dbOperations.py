@@ -98,7 +98,7 @@ def deleteByWeek(weekDesc):
         - Args :
             - weekDesc (list[str])
     """
-    conn = sqlite3.connect("data/schedule.db")
+    conn = sqlite3.connect(FILE_PATH)
     cur = conn.cursor()
 
     for e in weekDesc :
@@ -110,7 +110,7 @@ def deleteByWeek(weekDesc):
 
 
 def insertCourse(courseList, weekDesc):
-    conn = sqlite3.connect("data/schedule.db")
+    conn = sqlite3.connect(FILE_PATH)
     cur = conn.cursor()
 
     elementList = [getElements(e) for e in ELEMENTS]
