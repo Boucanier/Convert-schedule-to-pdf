@@ -190,7 +190,15 @@ def checkEquals(courseList) :
 
 
 def getFullDetailedList(courseList):
+    """
+        Get every course of a schedule and split them if they are assigned to many elements except for modules (maybe there are commas in module names)
 
+        - Args :
+            - courseList (list[list[Course]])
+
+        - Returns :
+            - courseList (list[list[Course]]) : updated list of courses
+    """
     toRemove = []
 
     for e in courseList :
