@@ -99,7 +99,8 @@ def menu(groupList : list, linkList : list[str], groupChoice = -1) -> tuple[str,
                 print("Selectionner une option VALIDE\n")
                 groupChoice = len(groupList) + 1
 
-    print(groupList[groupChoice])
+        print(groupList[groupChoice])
+        
     return ("http://chronos.iut-velizy.uvsq.fr/EDT/" + linkList[groupChoice]), groupList[groupChoice]
 
 
