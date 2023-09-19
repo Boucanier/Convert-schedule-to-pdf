@@ -13,7 +13,7 @@ if __name__ == "__main__" :
     urlList, titleList = scraper.getLink(True)
     allCourse, weekDesc = elementSchedule.getFullSchedule(urlList, titleList)
 
-    while choice != 7 :
+    while choice != 5 :
 
         print("1 Emploi du temps de groupe")
         print("2 Emploi du temps par prof")
