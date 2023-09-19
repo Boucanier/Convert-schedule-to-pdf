@@ -13,6 +13,7 @@ if __name__ == "__main__" :
     # If the general school schedule is not found, get every schedule
     IUTurl, IUTtitle = scraper.getLink(True, "IUT")
     allCourse, weekDesc = elementSchedule.getFullSchedule(IUTurl, IUTtitle)
+    dbOperations.overwriteDB(allCourse, weekDesc)
 
     while choice != 5 :
 
@@ -73,14 +74,8 @@ if __name__ == "__main__" :
                 toPDF.convertToPdf("schedule.xlsx")
             
             else :
-                # Update rooms, staffs, modules and groups tables
-                dbOperations.updateDB(allCourse)
-
-                # Delete all courses of the 4 next weeks since it will be reinserted
-                dbOperations.deleteByWeek(weekDesc)
-
-                # Insert all courses of the 4 next weeks
-                detailedCourse = elementSchedule.getFullDetailedList(allCourse)
-                dbOperations.insertCourse(detailedCourse, weekDesc)
+                IUTurl, IUTtitle = scraper.getLink(True, "IUT")
+                allCourse, weekDesc = elementSchedule.getFullSchedule(IUTurl, IUTtitle)
+                dbOperations.overwriteDB(allCourse, weekDesc)
         
             choice = 0
