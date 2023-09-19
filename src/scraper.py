@@ -104,7 +104,7 @@ def menu(groupList : list, linkList : list[str], groupChoice = -1) -> tuple[str,
     return ("http://chronos.iut-velizy.uvsq.fr/EDT/" + linkList[groupChoice]), groupList[groupChoice]
 
 
-def getLink(fullList : bool = False):
+def getLink(fullList : bool = False, chosenGroupName : str = None):
     """
         Get the url for the requested schedule and title of it after calling menu
 
@@ -131,6 +131,12 @@ def getLink(fullList : bool = False):
 
     linkList = soup.findAll('link',  {"class": "xml"})
     linkList = [e['href'] for e in linkList]
+
+    # If the user has chosen a group name, return the link and the title of the schedule
+    if chosenGroupName != None :
+        for i in range(len(groupList)) :
+            if clearText(groupList[i]) == chosenGroupName :
+                return ("http://chronos.iut-velizy.uvsq.fr/EDT/" + linkList[i]), groupList[i]
     
     if not fullList :
         link, group = menu(groupList, linkList)
