@@ -141,3 +141,22 @@ def insertCourse(courseList, weekDesc) -> None:
     conn.commit()
     cur.close()
     conn.close()
+
+
+def overwriteDB(allCourse, weekDesc : list[str]) -> None:
+    """
+        Update and overwrite database with new data for the 4 next weeks
+
+        - Args :
+            - allCourse (list[list[Course]])
+            - weekDesc (list[str]) : list of weeks' first days
+    """
+    # Update rooms, staffs, modules and groups tables
+    updateDB(allCourse)
+
+    # Delete all courses of the 4 next weeks since it will be reinserted
+    deleteByWeek(weekDesc)
+
+    # Insert all courses of the 4 next weeks
+    detailedCourse = elementSchedule.getFullDetailedList(allCourse)
+    insertCourse(detailedCourse, weekDesc)
