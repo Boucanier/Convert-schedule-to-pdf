@@ -18,7 +18,7 @@ def clearText(txt : str) -> str :
             - txt (str)
     """
     txtLetters = list(txt)
-    if '\n' in txt :
+    if '\n' in txt or "'" in txt:
         txtLetters = list(txt)
         for i in range(len(txtLetters)) :
             if txtLetters[i] == '\n':
