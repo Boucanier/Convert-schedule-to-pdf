@@ -10,6 +10,7 @@ if __name__ == "__main__" :
     choice = 0
 
     # Get every course from the schedule
+    # If the general school schedule is not found, get every schedule
     IUTurl, IUTtitle = scraper.getLink(True, "IUT")
     allCourse, weekDesc = elementSchedule.getFullSchedule(IUTurl, IUTtitle)
 
