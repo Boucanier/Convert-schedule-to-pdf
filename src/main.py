@@ -7,8 +7,11 @@ import dbOperations
 
 if __name__ == "__main__" :
 
-    firstReq = True
     choice = 0
+
+    # Get every course from the schedule
+    urlList, titleList = scraper.getLink(True)
+    allCourse, weekDesc = elementSchedule.getFullSchedule(urlList, titleList)
 
     while choice != 7 :
 
@@ -49,13 +52,6 @@ if __name__ == "__main__" :
             choice = 0
         
         elif choice in (2, 3, 4) :
-
-            if firstReq :
-                # If it is the first request, get the list of all courses
-                urlList, titleList = scraper.getLink(True)
-                allCourse, weekDesc = elementSchedule.getFullSchedule(urlList, titleList)
-                firstReq = False
-
             if choice in (2, 3) :
                 options = ("staff", "room")
 
