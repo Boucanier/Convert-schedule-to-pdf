@@ -334,8 +334,10 @@ def checkMultiple(courseList : list) -> list:
         for j in range(len(courseList)):
             if (i != j):
                 if not courseList[i].isCompatible(courseList[j]):
-                    courseList[i].sameTime.append(j)
-                    courseList[i].sameTime.append(i)
+                    if j not in list(courseList[i].sameTime) :
+                        courseList[i].sameTime.append(j)
+                    if i not in list(courseList[i].sameTime) :
+                        courseList[i].sameTime.append(i)
     return courseList
 
 
