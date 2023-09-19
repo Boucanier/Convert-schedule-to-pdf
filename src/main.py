@@ -10,7 +10,7 @@ if __name__ == "__main__" :
     choice = 0
 
     # Get every course from the schedule
-    IUTurl, IUTtitle = scraper.getLink(False, "IUT")
+    IUTurl, IUTtitle = scraper.getLink(True, "IUT")
     allCourse, weekDesc = elementSchedule.getFullSchedule(IUTurl, IUTtitle)
 
     while choice != 5 :
