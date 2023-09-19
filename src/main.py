@@ -7,29 +7,32 @@ import dbOperations
 
 if __name__ == "__main__" :
 
-    firstReq = True
     choice = 0
 
-    while choice != 7 :
+    # Get every course from the schedule
+    # If the general school schedule is not found, get every schedule
+    IUTurl, IUTtitle = scraper.getLink(True, "IUT")
+    allCourse, weekDesc = elementSchedule.getFullSchedule(IUTurl, IUTtitle)
+    dbOperations.overwriteDB(allCourse, weekDesc)
+
+    while choice != 5 :
 
         print("1 Emploi du temps de groupe")
         print("2 Emploi du temps par prof")
         print("3 Emploi du temps par salle")
-        print("4 Mise à jour des emplois du temps")
-        print("5 Création de la base de données")
-        print("6 Mise à jour de la base de données")
-        print("7 Quitter\n")
+        print("4 Mise à jour de la base de données")
+        print("5 Quitter\n")
 
         choice = input("Sélectionner une option : ")
-        if choice.isdigit() and (int(choice) in (1, 2, 3, 4, 5, 6, 7)) :
+        if choice.isdigit() and (int(choice) in (1, 2, 3, 4, 5)) :
             choice = int(choice)
         else :
             print("Selectionner une option VALIDE\n")
             choice = 0
 
-        while choice not in (1, 2, 3, 4, 5, 6, 7) :
+        while choice not in (1, 2, 3, 4, 5) :
             choice = input("Sélectionner une option : ")
-            if choice.isdigit() and (int(choice) in (1, 2, 3, 4, 5, 6, 7)) :
+            if choice.isdigit() and (int(choice) in (1, 2, 3, 4, 5)) :
                 choice = int(choice)
             else :
                 print("Selectionner une option VALIDE\n")
@@ -50,14 +53,7 @@ if __name__ == "__main__" :
 
             choice = 0
         
-        elif choice in (2, 3, 5, 6) :
-
-            if firstReq :
-                # If it is the first request, get the list of all courses
-                urlList, titleList = scraper.getLink(True)
-                allCourse, weekDesc = elementSchedule.getFullSchedule(urlList, titleList)
-                firstReq = False
-
+        elif choice in (2, 3, 4) :
             if choice in (2, 3) :
                 options = ("staff", "room")
 
@@ -76,27 +72,10 @@ if __name__ == "__main__" :
                 toXLSX.createXlsx(courseList, overCourse, weekDesc, elementChoice)
 
                 toPDF.convertToPdf("schedule.xlsx")
-
-            elif choice == 5 :
-                dbOperations.createDB(allCourse)
             
             else :
-                # Update rooms, staffs, modules and groups tables
-                dbOperations.updateDB(allCourse)
-
-                # Delete all courses of the 4 next weeks since it will be reinserted
-                dbOperations.deleteByWeek(weekDesc)
-
-                # Insert all courses of the 4 next weeks
-                detailedCourse = elementSchedule.getFullDetailedList(allCourse)
-                dbOperations.insertCourse(detailedCourse, weekDesc)
+                IUTurl, IUTtitle = scraper.getLink(True, "IUT")
+                allCourse, weekDesc = elementSchedule.getFullSchedule(IUTurl, IUTtitle)
+                dbOperations.overwriteDB(allCourse, weekDesc)
         
-            choice = 0
-        
-        elif choice == 4 :
-
-            urlList, titleList = scraper.getLink(True)
-            allCourse, weekDesc = elementSchedule.getFullSchedule(urlList, titleList)
-
-            firstReq = False
             choice = 0
