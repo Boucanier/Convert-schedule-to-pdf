@@ -5,16 +5,14 @@ import scraper
 from course import *
 
 
-def getFullSchedule(urlList : list[str], titleList : list[str]) :
+def getFullSchedule(chosenUrl : str, titleList : str) :
     courseFullList = []
 
-    for i in range(len(urlList)):
-        response = scraper.getSchedule(urlList[i])
+    response = scraper.getSchedule(chosenUrl)
 
-        courseList, weekDesc = scraper.parseSchedule(response)
-        courseFullList.append(courseList)
-        print(i, titleList[i])
-    print()
+    courseList, weekDesc = scraper.parseSchedule(response)
+    courseFullList.append(courseList)
+    print(chosenUrl + " : " + titleList + " : " + str(len(courseList)) + " cours\n")
     
     return courseFullList, weekDesc
 
