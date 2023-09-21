@@ -109,11 +109,11 @@ def elementChoice(elementList : list[str]) -> str:
     choice = -1
 
     while not (0 <= int(choice) <= len(elementList) - 1) :
-        choice = input("Choix : ")
+        choice = input("\nChoix : ")
         if choice.isdigit() and (0 <= int(choice) <= len(elementList) - 1) :
             choice = int(choice)
         else :
-            print("Selectionner une option VALIDE\n")
+            print("Selectionner une option VALIDE")
             choice = -1
     
     print(elementList[choice] + '\n')
