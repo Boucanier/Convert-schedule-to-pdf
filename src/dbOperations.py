@@ -160,3 +160,4 @@ def overwriteDB(allCourse, weekDesc : list[str]) -> None:
     # Insert all courses of the 4 next weeks
     detailedCourse = elementSchedule.getFullDetailedList(allCourse)
     insertCourse(detailedCourse, weekDesc)
+    print("DataBase overwritten\n")
