@@ -384,16 +384,5 @@ def parseSchedule(response):
     dayContent.reverse()
 
     courseList = getContent(dayContent, weekContent, resourceList)
-
-    offList = []
-    for i in range(len(weekFull)) :
-        if "congé" in clearText(weekFull[i]) :
-            offList.append(i)
-            weekDesc[i] += " - VACANCES"
-
-    for e in offList :
-        for k in courseList :
-            if k.weekContent >= e :
-                k.weekContent += 1
     
     return courseList, weekDesc
