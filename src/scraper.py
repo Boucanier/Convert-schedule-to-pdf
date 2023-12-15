@@ -182,27 +182,17 @@ def sortCourse(courseList : list) -> tuple :
         - Returns :
             - tcourseList (list)
     """
-    courseW0 = []
-    courseW1 = []
-    courseW2 = []
-    courseW3 = []
+    courseW = [[] for i in range(len(courseList))]
 
     for e in courseList :
-        if e.weekContent == 0 :
-            courseW0.append(e)
-        elif e.weekContent == 1 :
-            courseW1.append(e)
-        elif e.weekContent == 2 :
-            courseW2.append(e)
-        elif e.weekContent == 3 :
-            courseW3.append(e)
+        courseW[e.weekContent].append(e)
     
-    courseList = [courseW0, courseW1, courseW2, courseW3]
+    courseList = courseW
     
     for e in courseList :
         e = checkMultiple(e)
     
-    overCourse = [[],[],[],[]]
+    overCourse = [[] for i in range(len(courseList))]
 
     for i in range(len(courseList)):
         res = multipleSort(courseList[i])
@@ -314,14 +304,8 @@ def getWeek(soup) -> list[int]:
         y = 0
         while e[y] != 'Y':
             y += 1
-        if y == min :
-            wContent.append(0)
-        elif y == (min+1) :
-            wContent.append(1)
-        elif y == (min+2) :
-            wContent.append(2)
-        elif y == max :
-            wContent.append(3)
+
+        wContent.append(y-min)
 
     return wContent
 
