@@ -4,3 +4,5 @@ schedule.pdf
 data/schedule.db
 token.txt
 temp.txt
+.vscode
+.idea
