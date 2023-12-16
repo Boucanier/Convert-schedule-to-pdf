@@ -15,7 +15,7 @@ intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 @tasks.loop(minutes=5)
-async def called_once_a_day():
+async def refresh_db():
     message_channel = bot.get_channel(defaultChannel)
     print(f"Got channel {message_channel}")
     IUTurl, IUTtitle = scraper.getLink(True, "IUT")
@@ -27,7 +27,7 @@ async def called_once_a_day():
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
-    called_once_a_day.start()
+    refresh_db.start()
 
 
 @bot.event
@@ -42,6 +42,11 @@ async def on_message(message):
             print(f'{message.author} asked a wrong request ({message.content}) at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
             await message.channel.send(content = f'Veuillez préciser le type de l\'élément (staff ou room) et l\'élément en question')
             return
+        
+        if message.content.split(' ')[1] not in ['staff', 'room'] :
+            print(f'{message.author} asked a wrong request ({message.content}) at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
+            await message.channel.send(content = f'Élément indisponible, veuillez choisir entre **staff** et **room**')
+            return
 
         type = message.content.split(' ')[1]
         element = message.content.split(' ')[2]
@@ -54,7 +59,11 @@ async def on_message(message):
         toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0].profContent)
         toPDF.convertToPdf("schedule.xlsx", False)
 
-        await message.channel.send(content = f'Voici l\'emploi du temps du groupe {precisedGroup} :', file = discord.File('schedule.pdf'))
+        if type == 'staff' :
+            await message.channel.send(content = f'Voici l\'emploi de {courseList[0].profContent} :', file = discord.File('schedule.pdf'))
+        
+        elif type == 'room' :
+            await message.channel.send(content = f'Voici l\'emploi de la salle {courseList[0].roomContent} :', file = discord.File('schedule.pdf'))
 
 
     elif message.content.startswith('!edt'):
@@ -69,6 +78,9 @@ async def on_message(message):
         toPDF.convertToPdf("schedule.xlsx", False)
 
         await message.channel.send(content = f'Voici l\'emploi du temps du groupe {precisedGroup} :', file = discord.File('schedule.pdf'))
+    
+    else :
+        await message.channel.send(content = f'***{message.author}***, tu racontes quoi mon reuf ?!')
 
 
 bot.run(token)
