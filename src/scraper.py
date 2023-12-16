@@ -5,6 +5,7 @@
 import requests
 from bs4 import BeautifulSoup
 from course import *
+from datetime import date, timedelta
 
 
 def clearText(txt : str) -> str :
@@ -331,6 +332,26 @@ def checkMultiple(courseList : list) -> list:
     return courseList
 
 
+def addMissingWeeks(weekDesc : list[str]) -> list[str]:
+    """
+        Add missing weeks in the list of week description
+        
+        - Args :
+            - weekDesc (list[str])
+        
+        - Returns :
+            - weekDesc (list[str])
+    """
+    for i in range(len(weekDesc)-1):
+        currDate = date(int(weekDesc[i][-4:]), int(weekDesc[i][3:5]), int(weekDesc[i][:2]))
+        nextDate = date(int(weekDesc[i+1][-4:]), int(weekDesc[i+1][3:5]), int(weekDesc[i+1][:2]))
+        if (nextDate - currDate).days > 7 :
+            for j in range(1, (nextDate - currDate).days // 7):
+                weekDesc.insert(i+j, (currDate + timedelta(days = 7*j)).strftime("%d_%m_%Y"))
+                
+    return weekDesc
+
+
 def parseSchedule(response):
     """
         Main function of the scrapper module
@@ -358,6 +379,8 @@ def parseSchedule(response):
             else :
                 temp += e[i]
         weekDesc.append(temp)
+    
+    weekDesc = addMissingWeeks(weekDesc)
 
     weekContent = getWeek(soup)
 
