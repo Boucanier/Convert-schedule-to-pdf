@@ -1,29 +1,66 @@
-import discord, scraper, toXLSX, toPDF
+import discord, scraper, toXLSX, toPDF, time, elementSchedule, dbOperations
+from discord.ext import tasks, commands
 
 with open('data/token.txt', 'r') as fl :
     token = fl.readline()
 
 toPing = '<@&1185252532717637682>'
-defaultGroup = 'INF2-FI-A'
+defaultGroup = 'IUT'
+precisedGroup = 'INF2-FI-A'
+defaultChannel = 1185252325170892891
 
 intents = discord.Intents.default()
 intents.message_content = True
 
-client = discord.Client(intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents)
 
-@client.event
+@tasks.loop(minutes=5)
+async def called_once_a_day():
+    message_channel = bot.get_channel(defaultChannel)
+    print(f"Got channel {message_channel}")
+    IUTurl, IUTtitle = scraper.getLink(True, "IUT")
+    allCourse, weekDesc = elementSchedule.getFullSchedule(IUTurl, IUTtitle)
+    dbOperations.overwriteDB(allCourse, weekDesc)
+    print(f'Got schedule {defaultGroup} at {time.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]", time.localtime())}\n')
+
+
+@bot.event
 async def on_ready():
-    print(f'We have logged in as {client.user}')
+    print(f'We have logged in as {bot.user}')
+    called_once_a_day.start()
 
-@client.event
+
+@bot.event
 async def on_message(message):
-    if message.author == client.user:
+    if message.author == bot.user:
         return
 
-    if message.content.startswith('!edt'):
+    if message.content.startswith('!edt '):
+        print(f'\n{message.author} asked for staff schedule at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
+
+        if len(message.content.split(' ')) != 3 :
+            print(f'{message.author} asked a wrong request ({message.content}) at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
+            await message.channel.send(content = f'Veuillez préciser le type de l\'élément (staff ou room) et l\'élément en question')
+            return
+
+        type = message.content.split(' ')[1]
+        element = message.content.split(' ')[2]
+
+        courseList, weekDesc = dbOperations.getCourseByElement(type, element)
+
+        courseList = elementSchedule.checkEquals(courseList)
+        courseList, overCourse = scraper.sortCourse(courseList)
+
+        toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0].profContent)
+        toPDF.convertToPdf("schedule.xlsx", False)
+
+        await message.channel.send(content = f'Voici l\'emploi du temps du groupe {precisedGroup} :', file = discord.File('schedule.pdf'))
+
+
+    elif message.content.startswith('!edt'):
         print(f'\n{message.author} asked for schedule at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
         
-        url, title = scraper.getLink(True, defaultGroup)
+        url, title = scraper.getLink(True, precisedGroup)
         response = scraper.getSchedule(url)
         courseList, weekDesc = scraper.parseSchedule(response)
         courseList, overCourse = scraper.sortCourse(courseList)
@@ -31,6 +68,7 @@ async def on_message(message):
         toXLSX.createXlsx(courseList, overCourse, weekDesc, title)
         toPDF.convertToPdf("schedule.xlsx", False)
 
-        await message.channel.send(content = f'{toPing}\nVoici l\'emploi du temps du groupe {defaultGroup} :', file = discord.File('schedule.pdf'))
+        await message.channel.send(content = f'Voici l\'emploi du temps du groupe {precisedGroup} :', file = discord.File('schedule.pdf'))
 
-client.run(token)
+
+bot.run(token)
