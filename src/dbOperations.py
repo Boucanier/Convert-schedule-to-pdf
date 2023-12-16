@@ -1,6 +1,5 @@
-import sqlite3
-import os
-import elementSchedule
+import sqlite3, os, elementSchedule
+from datetime import datetime, timedelta
 
 
 FILE_PATH = "data/schedule.db"
@@ -38,7 +37,8 @@ def createDB(allCourse) -> None:
                  module_id INTEGER REFERENCES module(module_id),\
                  groups_id INTEGER REFERENCES groups(groups_id),\
                  note TEXT,\
-                 first_day_week VARCHAR(10) NOT NULL)")
+                 first_day_week VARCHAR(10) NOT NULL,\
+                 color VARCHAR(10))")
 
     for e in ELEMENTS :
         elementList = elementSchedule.getFullList(allCourse, e)
@@ -137,7 +137,7 @@ def insertCourse(courseList, weekDesc) -> None:
             if e not in insertedList :
                 cur.execute("INSERT INTO course VALUES('" + str(e.dayContent) + "', '" + e.timeContent[0] + "', '" + e.timeContent[1] + "', FALSE, '" +\
                             elementList[0][e.profContent] + "', '" + elementList[1][e.roomContent] + "', '" + elementList[2][e.moduleContent] + "', '" +\
-                            elementList[3][e.groupContent] + "', '" + e.noteContent + "', '" + weekDesc[e.weekContent][6:10] + "_" + weekDesc[e.weekContent][3:5] + "_" + weekDesc[e.weekContent][0:2] + "')")
+                            elementList[3][e.groupContent] + "', '" + e.noteContent + "', '" + weekDesc[e.weekContent][6:10] + "_" + weekDesc[e.weekContent][3:5] + "_" + weekDesc[e.weekContent][0:2] + "', '" + e.colorContent + "')")
                 insertedList.append(e)
     
     conn.commit()
@@ -163,3 +163,36 @@ def overwriteDB(allCourse, weekDesc : list[str]) -> None:
     detailedCourse = elementSchedule.getFullDetailedList(allCourse)
     insertCourse(detailedCourse, weekDesc)
     print("DataBase overwritten\n")
+
+
+def getCourseByElement(type : str, element : str) -> tuple[list, list[str]]:
+    """
+        Get every course of a given element
+
+        - Args :
+            - type (str) : type of the element (staff, room, module or groups)
+            - element (str) : name of the element
+    """
+    type = type + "_name"
+    courseList = []
+    weekDesc = []
+    conn = sqlite3.connect(FILE_PATH)
+    cur = conn.cursor()
+
+    today = (datetime.today() - timedelta(days = 6)).strftime(r"%Y_%m_%d")
+
+    data = cur.execute("SELECT week_day, t_start, t_end, module_name, room_name, staff_name, group_name, first_day_week, note, color\
+                        FROM course, groups, module, room, staff WHERE course.module_id = module.module_id AND course.groups_id = groups.groups_id\
+                        AND course.module_id = module.module_id AND course.room_id = room.room_id AND course.staff_id = staff.staff_id\
+                        AND " + type + " LIKE '%" + element + "%' AND first_day_week >= '" + today + "' ORDER BY first_day_week;").fetchall()
+
+    for e in data :
+        if (e[7][8:10] + '_' + e[7][5:7] + '_' + e[7][0:4]) not in weekDesc :
+            weekDesc.append(e[7][8:10] + '_' + e[7][5:7] + '_' + e[7][0:4])
+
+    for e in data :
+        courseList.append(elementSchedule.Course(e[0], [e[1], e[2]], e[3], e[4], e[5], e[6], weekDesc.index(e[7][8:10] + '_' + e[7][5:7] + '_' + e[7][0:4]), e[8], e[9]))
+
+    cur.close()
+    conn.close()
+    return courseList, weekDesc
