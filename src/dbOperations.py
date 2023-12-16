@@ -31,13 +31,14 @@ def createDB(allCourse) -> None:
     cur.execute("CREATE TABLE module (module_id NUMBER(3) PRIMARY KEY, module_name TEXT)")
     cur.execute("CREATE TABLE groups (groups_id NUMBER(3) PRIMARY KEY, group_name VARCHAR(20))")
     cur.execute("CREATE TABLE room (room_id NUMBER(3) PRIMARY KEY, room_name VARCHAR(10))")
-    cur.execute("CREATE TABLE course (first_day_week VARCHAR(10), week_day NUMBER(1), t_start VARCHAR(5) NOT NULL, t_end VARCHAR(5) NOT NULL,\
+    cur.execute("CREATE TABLE course (week_day NUMBER(1), t_start VARCHAR(5) NOT NULL, t_end VARCHAR(5) NOT NULL,\
                  man_set BOOLEAN NOT NULL,\
                  staff_id INTEGER REFERENCES staff(staff_id),\
                  room_id INTEGER REFERENCES room(room_id),\
                  module_id INTEGER REFERENCES module(module_id),\
                  groups_id INTEGER REFERENCES groups(groups_id),\
-                 note TEXT)")
+                 note TEXT,\
+                 first_day_week VARCHAR(10) NOT NULL)")
 
     for e in ELEMENTS :
         elementList = elementSchedule.getFullList(allCourse, e)
@@ -108,7 +109,7 @@ def deleteByWeek(weekDesc : list[str]) -> None:
     cur = conn.cursor()
 
     for e in weekDesc :
-        cur.execute("DELETE FROM COURSE WHERE first_day_week LIKE '" + e + "'")
+        cur.execute("DELETE FROM COURSE WHERE first_day_week LIKE '" + e[6:9] + "_" + e[3:4] + "_" + e[0:1] + "'")
     
     conn.commit()
     cur.close()
@@ -134,8 +135,9 @@ def insertCourse(courseList, weekDesc) -> None:
     for k in courseList:
         for e in k :
             if e not in insertedList :
-                cur.execute("INSERT INTO course VALUES('" + weekDesc[e.weekContent] + "', '" + str(e.dayContent) + "', '" + e.timeContent[0] + "', '" + e.timeContent[1] + "', FALSE, '" +\
-                            elementList[0][e.profContent] + "', '" + elementList[1][e.roomContent] + "', '" + elementList[2][e.moduleContent] + "', '" + elementList[3][e.groupContent] + "', '" + e.noteContent + "')")
+                cur.execute("INSERT INTO course VALUES('" + str(e.dayContent) + "', '" + e.timeContent[0] + "', '" + e.timeContent[1] + "', FALSE, '" +\
+                            elementList[0][e.profContent] + "', '" + elementList[1][e.roomContent] + "', '" + elementList[2][e.moduleContent] + "', '" +\
+                            elementList[3][e.groupContent] + "', '" + e.noteContent + "', '" + weekDesc[e.weekContent][6:10] + "_" + weekDesc[e.weekContent][3:5] + "_" + weekDesc[e.weekContent][0:2] + "')")
                 insertedList.append(e)
     
     conn.commit()
