@@ -6,17 +6,20 @@ This project is a schedule scrapper that will convert it into a pdf file.
 
 ## Requirements
 
-To run the code, you need to have :
+To run the code, you need to have the following packages installed :
 
 - __Python 3.10__ or above (_```sudo apt install python3```_)
 - __requests__ module (_```pip install requests```_)
-- __BeautifulSoup__ (_```pip install bs4```_)
-- __xlsxwriter__ (_```pip install xlsxwriter```_)
-- __lxml parser__ (_```pip install lxml```_)
+- __BeautifulSoup__ module (_```pip install bs4```_)
+- __xlsxwriter__ module (_```pip install xlsxwriter```_)
+- __discord__ module (_```pip install discord```_) : _only for_ __discord bot__
+- __lxml parser__ module (_```pip install lxml```_)
 - __LibreOffice 7.3__ or above (_```sudo apt install libreoffice```_)
 - __xdg-utils__ (_```sudo apt install xdg-utils```_) : _only for __Linux__ distribution_
 
-To install all these requirements on a Debian based Linux distribution, you can run the script [_installation.sh_](installation.sh)
+To install all these requirements on a Debian based Linux distribution, you can run the script [_installation.sh_](installation.sh). If you are using another distribution or system, you can run the following command to install the __*python modules*__ :
+
+```pip install -r requirements.txt```
 
 ## Description
 
