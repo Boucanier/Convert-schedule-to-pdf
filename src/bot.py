@@ -56,14 +56,14 @@ async def on_message(message):
         courseList = elementSchedule.checkEquals(courseList)
         courseList, overCourse = scraper.sortCourse(courseList)
 
-        toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0].profContent)
+        toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent)
         toPDF.convertToPdf("schedule.xlsx", False)
 
         if type == 'staff' :
-            await message.channel.send(content = f'Voici l\'emploi de {courseList[0].profContent} :', file = discord.File('schedule.pdf'))
+            await message.channel.send(content = f'Voici l\'emploi de {courseList[0][0].profContent} :', file = discord.File('schedule.pdf'))
         
         elif type == 'room' :
-            await message.channel.send(content = f'Voici l\'emploi de la salle {courseList[0].roomContent} :', file = discord.File('schedule.pdf'))
+            await message.channel.send(content = f'Voici l\'emploi de la salle {courseList[0][0].roomContent} :', file = discord.File('schedule.pdf'))
 
 
     elif message.content.startswith('!edt'):
