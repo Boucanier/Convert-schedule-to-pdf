@@ -1,7 +1,15 @@
 #!/bin/sh
 
+packages_install () {
+    sed -i -e 's/^/python3-/' requirements.txt
+    xargs -a requirements.txt sudo apt install -y
+    cat requirements.txt | cut -c9- > temp.txt
+    cat temp.txt > requirements.txt
+    rm temp.txt
+}
+
 sudo apt update
 sudo apt install python3 libreoffice-calc xdg-utils
-pip install requests bs4 lxml xlsxwriter discord || sudo apt install python3-requests python3-bs4 python3-lxml python3-xlsxwriter python3-discord
+pip install -r requirements.txt || packages_install
 echo -e "\nInstallation completed !"
 exit 0
