@@ -138,6 +138,9 @@ def getLink(fullList : bool = False, chosenGroupName : str = None):
         for i in range(len(groupList)) :
             if clearText(groupList[i]) == chosenGroupName :
                 return ("http://chronos.iut-velizy.uvsq.fr/EDT/" + linkList[i]), groupList[i]
+        
+        # If the group name is not found, return None
+        return None, None
     
     if not fullList :
         link, group = menu(groupList, linkList)

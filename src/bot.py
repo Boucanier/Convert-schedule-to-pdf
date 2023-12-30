@@ -10,16 +10,25 @@ PRECISED_GROUP = 'INF2-FI-A'
 DEFAULT_CHANNEL = 1185252325170892891
 
 
-def byGroupSchedule(group):
+def byGroupSchedule(group, message):
+
+    print(f'\n{message.author} asked for schedule at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
     url, title = scraper.getLink(True, group)
-    response = scraper.getSchedule(url)
-    courseList, weekDesc = scraper.parseSchedule(response)
-    courseList, overCourse = scraper.sortCourse(courseList)
 
-    toXLSX.createXlsx(courseList, overCourse, weekDesc, title)
-    toPDF.convertToPdf("schedule.xlsx", False)
+    # If the group exist
+    if url != None and title != None :
+        response = scraper.getSchedule(url)
+        courseList, weekDesc = scraper.parseSchedule(response)
+        courseList, overCourse = scraper.sortCourse(courseList)
 
-    return group
+        toXLSX.createXlsx(courseList, overCourse, weekDesc, title)
+        toPDF.convertToPdf("schedule.xlsx", False)
+
+        return group
+    
+    else :
+        print(f'Group {group} not found')
+        return (url != None and title != None)
 
 
 intents = discord.Intents.default()
@@ -52,18 +61,25 @@ async def on_message(message):
         print(f'\n{message.author} asked for staff schedule at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
 
         if len(message.content.split(' ')) == 2 :
-            print(f'\n{message.author} asked for schedule at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
-            
             toFindGroup = message.content.split(' ')[1]
-            byGroupSchedule(toFindGroup)
+            
+            byGroupSchedule(toFindGroup, message)
+        
+            confGroup = byGroupSchedule(toFindGroup, message)
 
-            await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{toFindGroup}*** :', file = discord.File('schedule.pdf'))
+            if confGroup :
+                await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{toFindGroup}*** :', file = discord.File('schedule.pdf'))
+
+            else :
+                await message.channel.send(content = f'***{message.author.mention}*** : groupe **{toFindGroup}** introuvable')
+
 
         elif len(message.content.split(' ')) != 3 :
             print(f'{message.author} asked a wrong request ({message.content}) at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
             await message.channel.send(content = f'Veuillez préciser le type de l\'élément (staff ou room) et l\'élément en question')
             return
         
+
         elif message.content.split(' ')[1] not in ['staff', 'room'] :
             print(f'{message.author} asked a wrong request ({message.content}) at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
             await message.channel.send(content = f'Élément indisponible, veuillez choisir entre **staff** et **room**')
@@ -91,12 +107,17 @@ async def on_message(message):
     elif message.content.startswith('!edt'):
         print(f'\n{message.author} asked for schedule at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
         
-        byGroupSchedule(PRECISED_GROUP)
+        confGroup = byGroupSchedule(PRECISED_GROUP, message)
 
-        await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{PRECISED_GROUP}*** :', file = discord.File('schedule.pdf'))
+        if confGroup :
+            await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{PRECISED_GROUP}*** :', file = discord.File('schedule.pdf'))
+
+        else :
+            await message.channel.send(content = f'***@{message.author}*** : groupe **{PRECISED_GROUP}*** introuvable')
     
+
     else :
-        await message.channel.send(content = f'***{message.author}***, tu racontes quoi mon reuf ?!')
+        await message.channel.send(content = f'***{message.author.mention}***, tu racontes quoi mon reuf ?!')
 
 
 bot.run(token)
