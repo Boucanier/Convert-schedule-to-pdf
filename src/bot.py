@@ -74,7 +74,7 @@ async def on_message(message):
                 await message.channel.send(content = f'***{message.author.mention}*** : groupe **{toFindGroup}** introuvable')
 
 
-        elif len(message.content.split(' ')) != 3 :
+        elif (len(message.content.split(' ')) != 3) and not (message.content.split(' ')[1] == 'staff' and len(message.content.split(' ')) == 4) :
             print(f'{message.author} asked a wrong request ({message.content}) at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
             await message.channel.send(content = f'Veuillez préciser le type de l\'élément (staff ou room) et l\'élément en question')
             return
@@ -89,7 +89,13 @@ async def on_message(message):
             type = message.content.split(' ')[1]
             element = message.content.split(' ')[2]
 
+            if len(message.content.split(' ')) == 4 :
+                element += ' ' + message.content.split(' ')[3]
+
             courseList, weekDesc = dbOperations.getCourseByElement(type, element)
+            
+            if not courseList and len(message.content.split(' ')) == 4 :
+                courseList, weekDesc = dbOperations.getCourseByElement(type, element.split(' ')[1] + ' ' + element.split(' ')[0])
 
             if courseList :
                 courseList = elementSchedule.checkEquals(courseList)
