@@ -1,8 +1,8 @@
 __pycache__/
-schedule.xlsx
-schedule.pdf
 data/schedule.db
 token.txt
 temp.txt
 .vscode
 .idea
+*.pdf
+*.xlsx

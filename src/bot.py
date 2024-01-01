@@ -1,4 +1,4 @@
-import discord, scraper, toXLSX, toPDF, time, elementSchedule, dbOperations
+import discord, scraper, toXLSX, toPDF, time, elementSchedule, dbOperations, subprocess, platform
 from discord.ext import tasks, commands
 
 with open('data/token.txt', 'r') as fl :
@@ -8,6 +8,13 @@ TO_PING = '<@&1185252532717637682>'
 DEFAULT_GROUP = 'IUT'
 PRECISED_GROUP = 'INF2-FI-A'
 DEFAULT_CHANNEL = 1185252325170892891
+
+
+def clearFiles() :
+    if platform.system() == "Linux" :
+        subprocess.run('rm *.pdf *.xlsx', shell = True)
+    elif platform.system() == "Windows" :
+        subprocess.run('del *.pdf *.xlsx', shell = True)
 
 
 def byGroupSchedule(group, message):
@@ -20,6 +27,8 @@ def byGroupSchedule(group, message):
         response = scraper.getSchedule(url)
         courseList, weekDesc = scraper.parseSchedule(response)
         courseList, overCourse = scraper.sortCourse(courseList)
+
+        clearFiles()
 
         toXLSX.createXlsx(courseList, overCourse, weekDesc, title, group.replace(' ', '_'))
         toPDF.convertToPdf(group.replace(' ', '_') + '.xlsx', False)
@@ -100,6 +109,8 @@ async def on_message(message):
             if courseList :
                 courseList = elementSchedule.checkEquals(courseList)
                 courseList, overCourse = scraper.sortCourse(courseList)
+                
+                clearFiles()
 
                 toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent, element.replace(' ', '_'))
                 toPDF.convertToPdf(element.replace(' ', '_') + '.xlsx', False)
