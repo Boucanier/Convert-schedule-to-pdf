@@ -21,8 +21,8 @@ def byGroupSchedule(group, message):
         courseList, weekDesc = scraper.parseSchedule(response)
         courseList, overCourse = scraper.sortCourse(courseList)
 
-        toXLSX.createXlsx(courseList, overCourse, weekDesc, title)
-        toPDF.convertToPdf("schedule.xlsx", False)
+        toXLSX.createXlsx(courseList, overCourse, weekDesc, title, group.replace(' ', '_'))
+        toPDF.convertToPdf(group.replace(' ', '_') + '.xlsx', False)
 
         return group
     
@@ -68,7 +68,7 @@ async def on_message(message):
             confGroup = byGroupSchedule(toFindGroup, message)
 
             if confGroup :
-                await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{toFindGroup}*** :', file = discord.File('schedule.pdf'))
+                await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{toFindGroup}*** :', file = discord.File(toFindGroup + '.pdf'))
 
             else :
                 await message.channel.send(content = f'***{message.author.mention}*** : groupe **{toFindGroup}** introuvable')
@@ -101,14 +101,14 @@ async def on_message(message):
                 courseList = elementSchedule.checkEquals(courseList)
                 courseList, overCourse = scraper.sortCourse(courseList)
 
-                toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent)
-                toPDF.convertToPdf("schedule.xlsx", False)
+                toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent, element.replace(' ', '_'))
+                toPDF.convertToPdf(element.replace(' ', '_') + '.xlsx', False)
 
                 if type == 'staff' :
-                    await message.channel.send(content = f'Voici l\'emploi de ***{courseList[0][0].profContent}*** :', file = discord.File('schedule.pdf'))
+                    await message.channel.send(content = f'Voici l\'emploi de ***{courseList[0][0].profContent}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
                 
                 elif type == 'room' :
-                    await message.channel.send(content = f'Voici l\'emploi de la ***salle {courseList[0][0].roomContent}*** :', file = discord.File('schedule.pdf'))
+                    await message.channel.send(content = f'Voici l\'emploi de la ***salle {courseList[0][0].roomContent}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
             
             else :
                 print(f'Element {element} not found')
@@ -121,7 +121,7 @@ async def on_message(message):
         confGroup = byGroupSchedule(PRECISED_GROUP, message)
 
         if confGroup :
-            await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{PRECISED_GROUP}*** :', file = discord.File('schedule.pdf'))
+            await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{PRECISED_GROUP}*** :', file = discord.File(PRECISED_GROUP.replace(' ', '_') + '.pdf'))
 
         else :
             await message.channel.send(content = f'***@{message.author}*** : groupe **{PRECISED_GROUP}*** introuvable')

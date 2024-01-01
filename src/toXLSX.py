@@ -375,7 +375,7 @@ def statList(totalCourse : list, worksheet, bigfmt, fmt, totalLetters : tuple[st
     worksheet.print_area('A1:' + str(totalLetters[-1]) + str(newLine))
 
 
-def createXlsx(courseList : tuple, overCourse : list, weekDesc : list[str], title : str) -> None:
+def createXlsx(courseList : tuple, overCourse : list, weekDesc : list[str], title : str, name : str) -> None:
     """
         Create a xlsx file from course list of 4 weeks and then convert it to a pdf file
         
@@ -384,7 +384,7 @@ def createXlsx(courseList : tuple, overCourse : list, weekDesc : list[str], titl
             - weekDesc (list[str])
             - title (str)
     """
-    workbook = xlsxwriter.Workbook('schedule.xlsx')
+    workbook = xlsxwriter.Workbook(name + '.xlsx')
 
     cpt = 1
     for i in range (len(weekDesc)):
