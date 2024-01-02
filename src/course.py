@@ -126,3 +126,19 @@ class Course :
                                 if self.roomContent == course2.roomContent :
                                     return True
         return False
+    
+    def merge(self, course2) -> None :
+        """
+            Merge the current course with the parameter course
+
+            - Args :
+                - course2 (Course)
+        """
+        if course2.profContent not in self.profContent :
+            self.profContent += ', ' + course2.profContent
+        if course2.roomContent not in self.roomContent :
+            self.roomContent += ', ' + course2.roomContent
+        if course2.groupContent not in self.groupContent :
+            self.groupContent += ', ' + course2.groupContent
+        if course2.noteContent not in self.noteContent and course2.noteContent != '- - -' :
+            self.noteContent += ' -- ' + course2.noteContent
