@@ -11,6 +11,9 @@ DEFAULT_CHANNEL = 1185252325170892891
 
 
 def clearFiles() :
+    """
+        Delete every .pdf and .xlsx files in the current directory in order to avoid file overload
+    """
     if platform.system() == "Linux" :
         subprocess.run('rm *.pdf *.xlsx', shell = True)
     elif platform.system() == "Windows" :
@@ -18,7 +21,16 @@ def clearFiles() :
 
 
 def byGroupSchedule(group, message):
+    """
+        Get the schedule of a given group if it exists
 
+        - Args :
+            - group (str) : name of the group to get schedule from
+            - message (discord.Message) : message that triggered the function
+
+        - Returns :
+            - group (str) : name of the group to get schedule from (None if group does not exist)
+    """
     print(f'\n{message.author} asked for schedule at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
     url, title = scraper.getLink(True, group)
 
@@ -37,7 +49,9 @@ def byGroupSchedule(group, message):
     
     else :
         print(f'Group {group} not found')
-        return (url != None and title != None)
+        group = None
+    
+    return group
 
 
 intents = discord.Intents.default()
@@ -47,6 +61,9 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 @tasks.loop(minutes=5)
 async def refresh_db():
+    """
+        Refresh the database every 5 minutes
+    """
     message_channel = bot.get_channel(DEFAULT_CHANNEL)
     print(f"Got channel {message_channel}")
     IUTurl, IUTtitle = scraper.getLink(True, "IUT")
@@ -156,7 +173,7 @@ async def on_message(message):
                         await message.channel.send(content = f'Voici l\'emploi de la ***salle {courseList[0][0].roomContent}*** :', file = discord.File(element + '.pdf'))
 
                 else :
-                    await message.channel.send(content = f'***{message.author.mention}*** : groupe **{element}** introuvable')
+                    await message.channel.send(content = f'***{message.author.mention}*** : élément **{element}** introuvable')
 
 
     else :
