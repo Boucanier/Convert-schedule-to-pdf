@@ -66,7 +66,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    if message.content.startswith('!edt') and len(message.content) >= 4 :
+    if message.content.startswith('!edt') and len(message.content) >= 4 and len(message.content.split(' ')) <= 3 :
 
         # Default group schedule
         if message.content == '!edt':
