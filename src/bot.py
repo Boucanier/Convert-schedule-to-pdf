@@ -124,12 +124,12 @@ async def on_message(message):
                 if type[cpt] == 'staff' :
                     toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent, element.replace(' ', '_'))
                     toPDF.convertToPdf(element.replace(' ', '_') + '.xlsx', False)
-                    await message.channel.send(content = f'Voici l\'emploi de ***{courseList[0][0].profContent}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
+                    await message.channel.send(content = f'Voici l\'emploi du temps de ***{courseList[0][0].profContent}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
                 
                 elif type[cpt] == 'room' :
                     toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].roomContent, element.replace(' ', '_'))
                     toPDF.convertToPdf(element.replace(' ', '_') + '.xlsx', False)
-                    await message.channel.send(content = f'Voici l\'emploi de la ***salle {courseList[0][0].roomContent}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
+                    await message.channel.send(content = f'Voici l\'emploi du temps de la ***salle {courseList[0][0].roomContent}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
             
             else :
                 print(f'Element {element} not found')
@@ -165,12 +165,12 @@ async def on_message(message):
                     if type[cpt] == 'staff' :
                         toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent, element)
                         toPDF.convertToPdf(element + '.xlsx', False)
-                        await message.channel.send(content = f'Voici l\'emploi de ***{courseList[0][0].profContent}*** :', file = discord.File(element + '.pdf'))
+                        await message.channel.send(content = f'Voici l\'emploi du temps de ***{courseList[0][0].profContent}*** :', file = discord.File(element + '.pdf'))
 
                     elif type[cpt] == 'room' :
                         toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].roomContent, element)
                         toPDF.convertToPdf(element + '.xlsx', False)
-                        await message.channel.send(content = f'Voici l\'emploi de la ***salle {courseList[0][0].roomContent}*** :', file = discord.File(element + '.pdf'))
+                        await message.channel.send(content = f'Voici l\'emploi du temps de la ***salle {courseList[0][0].roomContent}*** :', file = discord.File(element + '.pdf'))
 
                 else :
                     await message.channel.send(content = f'***{message.author.mention}*** : élément **{element}** introuvable')
