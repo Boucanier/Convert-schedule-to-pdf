@@ -109,7 +109,7 @@ def deleteByWeek(weekDesc : list[str]) -> None:
     cur = conn.cursor()
 
     for e in weekDesc :
-        cur.execute("DELETE FROM COURSE WHERE first_day_week LIKE '" + e[6:9] + "_" + e[3:4] + "_" + e[0:1] + "'")
+        cur.execute("DELETE FROM COURSE WHERE first_day_week LIKE '" + e[6:10] + "_" + e[3:5] + "_" + e[0:2] + "'")
     
     conn.commit()
     cur.close()
