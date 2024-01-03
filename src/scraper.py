@@ -2,7 +2,7 @@
     This code will scrap the schedule data with requests\n
     It will parse it using beauriful soup in objects of a "Course" class
 """
-import requests
+import requests, subprocess, platform
 from bs4 import BeautifulSoup
 from course import *
 from datetime import date, timedelta
@@ -35,6 +35,16 @@ def clearText(txt : str) -> str :
         txtLetters[-1] = ''
     txt = ''.join(txtLetters)
     return txt
+
+
+def clearFiles() :
+    """
+        Delete every .pdf and .xlsx files in the current directory in order to avoid file overload
+    """
+    if platform.system() == "Linux" :
+        subprocess.run('rm *.pdf *.xlsx', shell = True)
+    elif platform.system() == "Windows" :
+        subprocess.run('del *.pdf *.xlsx', shell = True)
 
 
 def getContent(dayContent : list[str], weekContent : list[int], resourceList : list) -> list :

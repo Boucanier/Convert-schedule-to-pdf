@@ -1,4 +1,4 @@
-import discord, scraper, toXLSX, toPDF, time, elementSchedule, dbOperations, subprocess, platform
+import discord, scraper, toXLSX, toPDF, time, elementSchedule, dbOperations
 from discord.ext import tasks, commands
 
 with open('data/token.txt', 'r') as fl :
@@ -8,16 +8,6 @@ TO_PING = '<@&1185252532717637682>'
 DEFAULT_GROUP = 'IUT'
 PRECISED_GROUP = 'INF2-FI-A'
 DEFAULT_CHANNEL = 1185252325170892891
-
-
-def clearFiles() :
-    """
-        Delete every .pdf and .xlsx files in the current directory in order to avoid file overload
-    """
-    if platform.system() == "Linux" :
-        subprocess.run('rm *.pdf *.xlsx', shell = True)
-    elif platform.system() == "Windows" :
-        subprocess.run('del *.pdf *.xlsx', shell = True)
 
 
 def byGroupSchedule(group, message):
@@ -34,13 +24,13 @@ def byGroupSchedule(group, message):
     print(f'\n{message.author} asked for schedule at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
     url, title = scraper.getLink(True, group)
 
-    # If the group exist
+    # If the group exists
     if url != None and title != None :
         response = scraper.getSchedule(url)
         courseList, weekDesc = scraper.parseSchedule(response)
         courseList, overCourse = scraper.sortCourse(courseList)
 
-        clearFiles()
+        scraper.clearFiles()
 
         toXLSX.createXlsx(courseList, overCourse, weekDesc, title, group.replace(' ', '_'))
         toPDF.convertToPdf(group.replace(' ', '_') + '.xlsx', False)
@@ -119,7 +109,7 @@ async def on_message(message):
                 courseList = elementSchedule.checkEquals(courseList)
                 courseList, overCourse = scraper.sortCourse(courseList)
                 
-                clearFiles()
+                scraper.clearFiles()
 
                 if type[cpt] == 'staff' :
                     toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent, element.replace(' ', '_'))
@@ -160,7 +150,7 @@ async def on_message(message):
                     courseList = elementSchedule.checkEquals(courseList)
                     courseList, overCourse = scraper.sortCourse(courseList)
 
-                    clearFiles()
+                    scraper.clearFiles()
 
                     if type[cpt] == 'staff' :
                         toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent, element)

@@ -40,9 +40,9 @@ if __name__ == "__main__" :
 
             courseList, overCourse = scraper.sortCourse(courseList)
 
-            toXLSX.createXlsx(courseList, overCourse, weekDesc, title, title.replace(' ', '_'))
-
-            toPDF.convertToPdf(title.replace(' ', '_') + ".xlsx")
+            scraper.clearFiles()
+            toXLSX.createXlsx(courseList, overCourse, weekDesc, title, title[18:].replace(' ', '_'))
+            toPDF.convertToPdf(title[18:].replace(' ', '_') + ".xlsx")
 
             choice = 0
         
@@ -63,8 +63,8 @@ if __name__ == "__main__" :
                 courseList = elementSchedule.mergeCourse(courseList)
                 courseList, overCourse = scraper.sortCourse(courseList)
 
+                scraper.clearFiles()
                 toXLSX.createXlsx(courseList, overCourse, weekDesc, elementChoice, elementChoice.replace(' ', '_'))
-
                 toPDF.convertToPdf(elementChoice.replace(' ', '_') + ".xlsx")
             
             else :
