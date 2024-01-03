@@ -117,16 +117,18 @@ def menu(groupList : list, linkList : list[str], groupChoice = -1) -> tuple[str,
 
 def getLink(fullList : bool = False, chosenGroupName : str = None):
     """
-        Get the url for the requested schedule and title of it after calling menu
+        Get the url for the requested schedule and its name after calling menu
 
         - Args :
-            - fullList (boolean) : Default value = False, if True, get every available course in a list with titles using a loop and function menu()
+            - fullList (boolean) : Default value = False, if True, get every available course in a list with group name using a loop and function menu()
+            - chosenGroupName (str) : Default value = None, if not None, get the url and the group name of the schedule with the specified name
         
         - Returns :
-            - link (str) : if not fullList
-            - title (str) : if not fullList
+            - link (str) : (if not fullList) schedule url
+            - group (str) : (if not fullList) group name
 
-            - fullLinkTitle (list[str]) : if fullList, list containing list of schedule link and ist of schedule title
+            - linkFullList (list[str]) : (if fullList) list containing schedule links
+            - groupList (list[str]) : (if fullList) list containing group names
     """
     url = "http://chronos.iut-velizy.uvsq.fr/EDT/finder.xml"
 
@@ -143,7 +145,7 @@ def getLink(fullList : bool = False, chosenGroupName : str = None):
     linkList = soup.findAll('link',  {"class": "xml"})
     linkList = [e['href'] for e in linkList]
 
-    # If the user has chosen a group name, return the link and the title of the schedule
+    # If the user has chosen a group name, return the link and the group name of the schedule
     if chosenGroupName != None :
         for i in range(len(groupList)) :
             if clearText(groupList[i]) == chosenGroupName :
@@ -154,10 +156,8 @@ def getLink(fullList : bool = False, chosenGroupName : str = None):
     
     if not fullList :
         link, group = menu(groupList, linkList)
-
-        title = 'Emploi du temps - ' + group
         
-        return link, title
+        return link, group
     
     else :
         linkFullList = []

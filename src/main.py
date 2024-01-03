@@ -41,8 +41,8 @@ if __name__ == "__main__" :
             courseList, overCourse = scraper.sortCourse(courseList)
 
             scraper.clearFiles()
-            toXLSX.createXlsx(courseList, overCourse, weekDesc, title, title[18:].replace(' ', '_'))
-            toPDF.convertToPdf(title[18:].replace(' ', '_') + ".xlsx")
+            toXLSX.createXlsx(courseList, overCourse, weekDesc, title, title.replace(' ', '_'))
+            toPDF.convertToPdf(title.replace(' ', '_') + ".xlsx")
 
             choice = 0
         
