@@ -21,7 +21,7 @@ def byGroupSchedule(group, message):
         - Returns :
             - group (str) : name of the group to get schedule from (None if group does not exist)
     """
-    url, title = scraper.getLink(True, group)
+    url, title = scraper.getLink(True, group.upper())
 
     # If the group exists
     if url != None and title != None :
