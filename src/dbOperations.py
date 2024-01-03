@@ -1,4 +1,4 @@
-import sqlite3, os, elementSchedule
+import sqlite3, os, elementSchedule, scraper
 from datetime import datetime, timedelta
 
 
@@ -165,52 +165,6 @@ def overwriteDB(allCourse, weekDesc : list[str]) -> None:
     print("DataBase overwritten\n")
 
 
-def mergeCourse(courseList) :
-    """
-        Merge course with same module and time content into one course
-
-        - Args :
-            - courseList (list[Course])
-
-        - Returns :
-            - courseList (list[Course]) : list of courses with merged courses
-    """
-    mergedCourse = []
-    multiple_id = []
-    first_id = []
-    for i in range(len(courseList) - 1) :
-        cpt = 0
-        temp_id = []
-        stop = False
-        for j in range(len(multiple_id)) :
-            if i in multiple_id[j] :
-                stop = True
-        
-        if not stop :
-            while (i + cpt + 1 < len(courseList)) and (courseList[i].moduleContent == courseList[i + cpt + 1].moduleContent) and (courseList[i].timeContent == courseList[i + cpt + 1].timeContent) and (courseList[i].dayContent == courseList[i + cpt + 1].dayContent) :
-                temp_id.append(i + cpt + 1)
-                cpt += 1
-
-            if cpt > 0 :
-                first_id.append(i)
-                multiple_id.append(temp_id)
-                mergedCourse.append(courseList[i])
-
-    for i in range(len(first_id)) :
-        for j in range(len(multiple_id[i])) :
-            mergedCourse[i].merge(courseList[multiple_id[i][j]])
-        
-        courseList[first_id[i]] = mergedCourse[i]
-    
-    cpt = 0
-    for i in range(len(multiple_id)) :
-        for j in range(len(multiple_id[i])) :
-            courseList.pop(multiple_id[i][j] - cpt)
-            cpt += 1
-
-    return courseList
-
-
 def getCourseByElement(type : str, element : str) -> tuple[list, list[str]]:
     """
         Get every course of a given element
@@ -242,6 +196,6 @@ def getCourseByElement(type : str, element : str) -> tuple[list, list[str]]:
     cur.close()
     conn.close()
 
-    courseList = mergeCourse(courseList)
+    courseList = elementSchedule.mergeCourse(courseList)
     
     return courseList, weekDesc

@@ -40,9 +40,9 @@ if __name__ == "__main__" :
 
             courseList, overCourse = scraper.sortCourse(courseList)
 
-            toXLSX.createXlsx(courseList, overCourse, weekDesc, title)
+            toXLSX.createXlsx(courseList, overCourse, weekDesc, title, title.replace(' ', '_'))
 
-            toPDF.convertToPdf("schedule.xlsx")
+            toPDF.convertToPdf(title.replace(' ', '_') + ".xlsx")
 
             choice = 0
         
@@ -60,11 +60,12 @@ if __name__ == "__main__" :
                 courseList = elementSchedule.getCourseElement(elementChoice, allCourse, options[choice - 2])
 
                 courseList = elementSchedule.checkEquals(courseList)
+                courseList = elementSchedule.mergeCourse(courseList)
                 courseList, overCourse = scraper.sortCourse(courseList)
 
-                toXLSX.createXlsx(courseList, overCourse, weekDesc, elementChoice)
+                toXLSX.createXlsx(courseList, overCourse, weekDesc, elementChoice, elementChoice.replace(' ', '_'))
 
-                toPDF.convertToPdf("schedule.xlsx")
+                toPDF.convertToPdf(elementChoice.replace(' ', '_') + ".xlsx")
             
             else :
                 IUTurl, IUTtitle = scraper.getLink(True, "IUT")
