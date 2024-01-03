@@ -21,7 +21,6 @@ def byGroupSchedule(group, message):
         - Returns :
             - group (str) : name of the group to get schedule from (None if group does not exist)
     """
-    print(f'\n{message.author} asked for schedule at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
     url, title = scraper.getLink(True, group)
 
     # If the group exists
@@ -31,7 +30,7 @@ def byGroupSchedule(group, message):
         courseList, overCourse = scraper.sortCourse(courseList)
 
         scraper.clearFiles()
-
+        print(f'Found {group} as group') 
         toXLSX.createXlsx(courseList, overCourse, weekDesc, title, group.replace(' ', '_'))
         toPDF.convertToPdf(group.replace(' ', '_') + '.xlsx', False)
 
@@ -75,21 +74,12 @@ async def on_message(message):
 
     if message.content.startswith('!edt') and len(message.content) >= 4 and len(message.content.split(' ')) <= 3 :
 
-        # Default group schedule
-        if message.content == '!edt':        
-            confGroup = byGroupSchedule(PRECISED_GROUP, message)
-
-            if confGroup :
-                await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{PRECISED_GROUP}*** :', file = discord.File(PRECISED_GROUP.replace(' ', '_') + '.pdf'))
-
-            else :
-                await message.channel.send(content = f'***@{message.author}*** : groupe **{PRECISED_GROUP}*** introuvable')
-
-
         # Staff or room schedule with 1 space in the name
-        elif len(message.content.split(' ')) == 3 :
+        if len(message.content.split(' ')) == 3 :
             type = ['staff', 'staff', 'room', 'room']
             element = message.content.split(' ')[1] + ' ' + message.content.split(' ')[2]
+            
+            print(f'\n{message.author} asked for schedule ({element.replace(" ", "_")}) at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
 
             cpt = 0
             courseList = None
@@ -104,6 +94,9 @@ async def on_message(message):
                         print(f'Staff {element} not found')
                     elif cpt == 4 :
                         print(f'Room {element} not found')
+                else :
+                    print(f'Found {element} as {type[cpt]}')                
+
 
             if courseList :
                 courseList = elementSchedule.checkEquals(courseList)
@@ -112,13 +105,11 @@ async def on_message(message):
                 scraper.clearFiles()
 
                 if type[cpt] == 'staff' :
-                    print(f'\n{message.author} asked for staff schedule ({element.replace(" ", "_")}) at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
                     toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent, element.replace(' ', '_'))
                     toPDF.convertToPdf(element.replace(' ', '_') + '.xlsx', False)
                     await message.channel.send(content = f'Voici l\'emploi du temps de ***{courseList[0][0].profContent}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
                 
                 elif type[cpt] == 'room' :
-                    print(f'\n{message.author} asked for room schedule ({element.replace(" ", "_")}) at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
                     toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].roomContent, element.replace(' ', '_'))
                     toPDF.convertToPdf(element.replace(' ', '_') + '.xlsx', False)
                     await message.channel.send(content = f'Voici l\'emploi du temps de la ***salle {courseList[0][0].roomContent}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
@@ -129,8 +120,13 @@ async def on_message(message):
 
 
         # Group, staff or room schedule with no space in the name
-        elif len(message.content.split(' ')) == 2 :
-            element = message.content.split(' ')[1]
+        elif len(message.content.split(' ')) in (1, 2) :
+            if message.content == '!edt' :
+                element = PRECISED_GROUP
+            else :
+                element = message.content.split(' ')[1]
+
+            print(f'\n{message.author} asked for schedule ({element.replace(" ", "_")}) at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
             
             confGroup = byGroupSchedule(element, message)
 
@@ -151,6 +147,8 @@ async def on_message(message):
                             print(f'Staff {element} not found')
                         elif cpt == 2 :
                             print(f'Room {element} not found')
+                    else :
+                        print(f'Found {element} as {type[cpt]}') 
 
                 if courseList :
                     courseList = elementSchedule.checkEquals(courseList)
