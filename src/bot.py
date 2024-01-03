@@ -76,9 +76,7 @@ async def on_message(message):
     if message.content.startswith('!edt') and len(message.content) >= 4 and len(message.content.split(' ')) <= 3 :
 
         # Default group schedule
-        if message.content == '!edt':
-            print(f'\n{message.author} asked for schedule at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
-        
+        if message.content == '!edt':        
             confGroup = byGroupSchedule(PRECISED_GROUP, message)
 
             if confGroup :
@@ -90,8 +88,6 @@ async def on_message(message):
 
         # Staff or room schedule with 1 space in the name
         elif len(message.content.split(' ')) == 3 :
-            print(f'\n{message.author} asked for staff schedule at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
-
             type = ['staff', 'staff', 'room', 'room']
             element = message.content.split(' ')[1] + ' ' + message.content.split(' ')[2]
 
@@ -104,6 +100,10 @@ async def on_message(message):
                 if not courseList :
                     element = element.split(' ')[1] + ' ' + element.split(' ')[0]
                     cpt += 1
+                    if cpt == 2 :
+                        print(f'Staff {element} not found')
+                    elif cpt == 4 :
+                        print(f'Room {element} not found')
 
             if courseList :
                 courseList = elementSchedule.checkEquals(courseList)
@@ -112,11 +112,13 @@ async def on_message(message):
                 scraper.clearFiles()
 
                 if type[cpt] == 'staff' :
+                    print(f'\n{message.author} asked for staff schedule ({element.replace(" ", "_")}) at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
                     toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent, element.replace(' ', '_'))
                     toPDF.convertToPdf(element.replace(' ', '_') + '.xlsx', False)
                     await message.channel.send(content = f'Voici l\'emploi du temps de ***{courseList[0][0].profContent}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
                 
                 elif type[cpt] == 'room' :
+                    print(f'\n{message.author} asked for room schedule ({element.replace(" ", "_")}) at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
                     toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].roomContent, element.replace(' ', '_'))
                     toPDF.convertToPdf(element.replace(' ', '_') + '.xlsx', False)
                     await message.channel.send(content = f'Voici l\'emploi du temps de la ***salle {courseList[0][0].roomContent}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
@@ -145,6 +147,10 @@ async def on_message(message):
                     
                     if not courseList :
                         cpt += 1
+                        if cpt == 1 :
+                            print(f'Staff {element} not found')
+                        elif cpt == 2 :
+                            print(f'Room {element} not found')
 
                 if courseList :
                     courseList = elementSchedule.checkEquals(courseList)
