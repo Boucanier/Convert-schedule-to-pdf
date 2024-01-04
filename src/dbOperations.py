@@ -1,3 +1,4 @@
+from itertools import count
 import sqlite3, os, elementSchedule
 from course import *
 from datetime import datetime, timedelta
@@ -252,3 +253,25 @@ def getCourseByElement(type : str, element : str) -> tuple[list[Course], list[st
     courseList = elementSchedule.mergeCourse(courseList)
     
     return courseList, weekDesc
+
+
+def countElement(type : str, element : str) -> int :
+    """
+        Count the number of row containing a given element in a given table
+
+        - Args :
+            - type (str) : type of the element (staff, room, module or groups)
+            - element (str) : name of the element
+
+        - Returns :
+            - count (int) : number of row containing the element
+    """
+    conn = sqlite3.connect(FILE_PATH)
+    cur = conn.cursor()
+
+    request = "SELECT COUNT(DISTINCT " + type + "_name) FROM " + type + " WHERE " + type + "_name LIKE '%" + element + "%';"
+    count = cur.execute(request).fetchone()[0]
+
+    cur.close()
+    conn.close()
+    return count
