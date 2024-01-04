@@ -13,10 +13,10 @@ def clearText(txt : str) -> str :
         Clean a text : Remove all unnecessary blank and new line characters
         
         - Args :
-            - txt (str)
+            - txt (str) : text to clean
             
         - Returns :
-            - txt (str)
+            - txt (str) : cleaned text
     """
     txtLetters = list(txt)
     if '\n' in txt or "'" in txt:
@@ -37,9 +37,15 @@ def clearText(txt : str) -> str :
     return txt
 
 
-def clearFiles() :
+def clearFiles() -> None :
     """
         Delete every .pdf and .xlsx files in the current directory in order to avoid file overload
+
+        - Args :
+            - None
+
+        - Returns :
+            - None
     """
     if platform.system() == "Linux" :
         subprocess.run('rm *.pdf *.xlsx', shell = True)
@@ -47,7 +53,7 @@ def clearFiles() :
         subprocess.run('del *.pdf *.xlsx', shell = True)
 
 
-def getContent(dayContent : list[str], weekContent : list[int], resourceList : list) -> list :
+def getContent(dayContent : list[str], weekContent : list[int], resourceList : list) -> list[Course] :
     """
         Collect all the content of a type for every resource in the xml file and create every Course with it
         
@@ -78,7 +84,7 @@ def getContent(dayContent : list[str], weekContent : list[int], resourceList : l
     return courseList
 
 
-def menu(groupList : list, linkList : list[str], groupChoice = -1) -> tuple[str, str]:
+def menu(groupList : list[str], linkList : list[str], groupChoice = -1) -> tuple[str, str]:
     """
         Display the list of all group and ask the user the one he wants if groupChoice == -1, if not, do not display the menu
         
@@ -115,7 +121,7 @@ def menu(groupList : list, linkList : list[str], groupChoice = -1) -> tuple[str,
     return ("http://chronos.iut-velizy.uvsq.fr/EDT/" + linkList[groupChoice]), groupList[groupChoice]
 
 
-def getLink(fullList : bool = False, chosenGroupName : str = None):
+def getLink(fullList : bool = False, chosenGroupName = None) -> tuple :
     """
         Get the url for the requested schedule and its name after calling menu
 
@@ -168,7 +174,7 @@ def getLink(fullList : bool = False, chosenGroupName : str = None):
         return linkFullList, groupList
 
 
-def getSchedule(url : str):
+def getSchedule(url : str) -> requests.models.Response :
     """
         Get response of the requested schedule
         
@@ -186,48 +192,45 @@ def getSchedule(url : str):
     return response
 
 
-def sortCourse(courseList : list) -> tuple :
+def sortCourse(courseList : list[Course]) -> tuple[list[list[Course]], list[list[Course]]] :
     """
         Check overlapping courses and divide all courses into 4 lists (2 per week) of normal courses and overlapping courses
         
         - Args :
-            - courseList (list)
+            - courseList (list[Course]) : list of courses
         
         - Returns :
-            - tcourseList (list)
+            - tcourseList (list) : list of normal courses
+            - overCourse (list[Course]) : list of overlapping courses
     """
-    courseW = [[] for i in range(len(courseList))]
+    courseW = [[] for _ in range(len(courseList))]
 
     for e in courseList :
         courseW[e.weekContent].append(e)
     
-    courseList = courseW
-    
-    for e in courseList :
+    for e in courseW :
         e = checkMultiple(e)
     
     overCourse = [[] for i in range(len(courseList))]
 
     for i in range(len(courseList)):
-        res = multipleSort(courseList[i])
-        courseList[i] = res[0]
+        res = multipleSort(courseW[i])
+        courseW[i] = res[0]
         overCourse[i] = res[1]
 
-    tCourseList = tuple(courseList)
-
-    return tCourseList, overCourse
+    return courseW, overCourse
 
 
-def multipleSort(courseList : list) :
+def multipleSort(courseList : list[Course]) -> tuple[list[Course], list[Course]] :
     """
-        Check which courses are overlapping and parse split into multiple list
+        Check which courses are overlapping and parse split into multiple lists
         
         - Args :
-            - courseList (list)
+            - courseList (list[Course]) : list of courses
         
         - Returns :
-            - gComp (list) : Courses that are not overlapping
-            - nComp (list) : Coures that are overlapping
+            - gComp (list[Course]) : Courses that are not overlapping
+            - nComp (list[Course]) : Courses that are overlapping
     """
     tempindex = []
     temp2index = []
@@ -237,34 +240,42 @@ def multipleSort(courseList : list) :
     for e in courseList :
         if len(e.sameTime) > 0 :
             tempindex.append(e.sameTime)
+
     for e in tempindex:
         e.sort()
         for l in e :
             if e.count(l) > 1 :
                 e.remove(l)
+
     for e in tempindex :
         if tempindex.count(e) > 1 :
             tempindex.remove(e)
+
     if (len(tempindex) > 1) :
         for i in range(len(tempindex)):
             for j in range(len(tempindex)):
                 if (i != j) and all(e in tempindex[i] for e in tempindex[j]) and tempindex[i]!=tempindex[j]:
                     temp2index.append(tempindex[j])
+
         tempindex = [e for e in tempindex if e not in temp2index]
         for i in range(len(tempindex)):
             for j in range(len(tempindex[i])):
                 for k in range(len(tempindex)):
                     if (i!=k) and tempindex[i][j] in tempindex[k]:
                         [tempindex[k].append(e) for e in tempindex[i] if e not in tempindex[k]]
+
         for e in tempindex :
             for k in e :
                 if e.count(k) != 1:
                     e.remove(k)
+
         for e in tempindex :
             e.sort()
+
         for e in tempindex :
             if tempindex.count(e) != 1 :
                 tempindex.remove(e)
+
     for e in tempindex :
         tempstart = 1140
         tempend = 0
@@ -277,6 +288,7 @@ def multipleSort(courseList : list) :
             if courseList[k].endMinutes > tempend :
                 tempend = courseList[k].endMinutes
                 hend = courseList[k].timeContent[1]
+
         replaceCourse.append(Course(courseList[e[0]].dayContent, [hstart,hend], "COURS", "- - -", "MULTIPLES", "- - -", courseList[e[0]].weekContent, "- - -", '#7BEBFF'))
 
     for e in courseList:
@@ -284,10 +296,11 @@ def multipleSort(courseList : list) :
             nComp.append(e)
     gComp = [e for e in courseList if e not in nComp]
     [gComp.append(e) for e in replaceCourse]
+
     return gComp, nComp
 
 
-def getWeek(soup) -> list[int]:
+def getWeek(soup : BeautifulSoup) -> list[int]:
     """
         Get in which week is a course in the next 4 weeks
         
@@ -324,15 +337,15 @@ def getWeek(soup) -> list[int]:
     return wContent
 
 
-def checkMultiple(courseList : list) -> list:
+def checkMultiple(courseList : list[Course]) -> list[Course]:
     """
-        Check if several courses overlap themselves
+        Check if several courses overlap themselves and add them to the sameTime list of each course
         
         - Args :
-            - courseList (list)
+            - courseList (list[Course])
         
         - Returns :
-            - courseList (list)
+            - courseList (list[Course])
     """
     for i in range(len(courseList)):
         for j in range(len(courseList)):
@@ -365,7 +378,7 @@ def addMissingWeeks(weekDesc : list[str]) -> list[str]:
     return weekDesc
 
 
-def parseSchedule(response):
+def parseSchedule(response : requests.models.Response) -> tuple[list[Course], list[str]]:
     """
         Main function of the scrapper module
         

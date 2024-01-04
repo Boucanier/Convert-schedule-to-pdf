@@ -2,13 +2,14 @@
     This module will convert the data scrapped with the scrapper into a xlsx file
 """
 import xlsxwriter
+from course import *
 
 
 ROW = 27
 COL = 133 #EC
 
 
-def setFormatWS(workbook):
+def setFormatWS(workbook : xlsxwriter.Workbook) -> tuple[xlsxwriter.workbook.Format, xlsxwriter.workbook.Format, xlsxwriter.workbook.Format, xlsxwriter.workbook.Format]:
     '''
         Create formats used to set the sheet of the schedule in the xlsx document
 
@@ -19,7 +20,7 @@ def setFormatWS(workbook):
             - dayFormat (xlsxwriter format) : format for the days cells and more
             - underFormat (xlsxwriter format) : format used to create the bottom border of the schedule
             - rightFormat (xlsxwriter format) : format used to create the right border of the schedule
-            - cornerFormat (xlsxwriter format) : format used to create the right bottom hand corner border of the schedule
+            - cornerFormat (xlsxwriter format) : format used to create corner border of the schedule
     '''
     dayFormat = workbook.add_format()
     dayFormat.set_align('center')
@@ -43,23 +44,27 @@ def setFormatWS(workbook):
     return dayFormat, underFormat, rightFormat, cornerFormat
 
 
-def initWS(worksheet) -> tuple[str]:
+def initWS(worksheet) -> tuple:
     """
-        Initialize the worksheet
+        Initialize the worksheet by setting the size of the cells and the columns
+
+        - Args :
+            - worksheet (xlsx worksheet) : worksheet to initialize
 
         - Returns :
-            - totalLetters (tuple[str])
+            - totalLetters (tuple[str]) : tuple containing the letters of the columns (A, B, C, ..., AA, AB, ..., BA, BB, ...)
     """
     worksheet.set_landscape()
     worksheet.set_margins(left = 0.15, right = 0.15, top = 0.15, bottom = 0.15)
     worksheet.center_horizontally()
     letters = ('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z')
-    totalLetters = []
+    totalLetters = list()
     for i in range(COL):
         if i < 26 :
             totalLetters.append(letters[i%26])
         else :
             totalLetters.append(totalLetters[(i//26)-1] + letters[i%26])
+
     worksheet.set_column('B:' + str(totalLetters[-1]), 0.8)
     worksheet.set_column('A:A', 12)
     for i in range(ROW):
@@ -67,6 +72,7 @@ def initWS(worksheet) -> tuple[str]:
     for i in range(5):
         worksheet.set_row(5 + 5*i, 25)
         worksheet.set_row(4 + 5*i, 25)
+
     worksheet.set_row(1,20)
     worksheet.print_area('A1:' + str(totalLetters[-1]) + str(ROW))
     worksheet.set_paper(9)
@@ -75,18 +81,21 @@ def initWS(worksheet) -> tuple[str]:
     return totalLetters
     
 
-def formatWS(worksheet, dayFormat, totalLetters : tuple[str], underFormat, rightFormat, cornerFormat, title : str, week : str) -> None:
+def formatWS(worksheet, dayFormat : xlsxwriter.workbook.Format, totalLetters : tuple, underFormat : xlsxwriter.workbook.Format, rightFormat : xlsxwriter.workbook.Format, cornerFormat : xlsxwriter.workbook.Format, title : str, week : str) -> None:
     """
         Set the frame for the schedule with days and times
 
         - Args :
-            - worksheet
-            - dayFormat
+            - worksheet (xlsx worksheet) : worksheet in which the formats will be applied
+            - dayFormat (xlsxwriter format) : format for the days cells
             - totalLetters (tuple[str])
-            - underFormat
-            - rightFormat
-            - cornerFormat
-            - title (str)
+            - underFormat (xlsxwriter format) : format used to create the bottom border of the schedule
+            - rightFormat (xlsxwriter format) : format used to create the right border of the schedule
+            - cornerFormat (xlsxwriter format) : format used to create corner border of the schedule
+            - title (str) : title of the schedule
+
+        - Returns :
+            - None
     """
     weekDays = ('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi')
     for i in range(0,ROW - 2,5):
@@ -107,15 +116,15 @@ def formatWS(worksheet, dayFormat, totalLetters : tuple[str], underFormat, right
     worksheet.write_blank(str(totalLetters[-1]) + str(ROW), None, cornerFormat)
 
 
-def setToColumn(courseList : list, totalLetters : tuple[str]) -> list[list[list[str]]] :
+def setToColumn(courseList : list[Course], totalLetters : tuple) -> list[list[list[str]]] :
     """
         Get the range of column at the xlsx format for every course
 
-        Args :
+        - Args :
             - courseList (list[Course])
             - totalLetters (tuple[str])
         
-        Returns :
+        - Returns :
             - timeColumn (list[list[list[str]]])
     """
     timeColumn = []
@@ -129,7 +138,7 @@ def setToColumn(courseList : list, totalLetters : tuple[str]) -> list[list[list[
     return timeColumn
 
 
-def addCourse(worksheet, columnTime : list, courseList : list, workbook) -> None:
+def addCourse(worksheet, columnTime : list, courseList : list, workbook : xlsxwriter.Workbook) -> None:
     """
         Create formats used to add course\n
         Add a course to the xlsx file
@@ -188,16 +197,21 @@ def addCourse(worksheet, columnTime : list, courseList : list, workbook) -> None
         worksheet.merge_range(columnTime[i][0] + str(rowNbr + 4) + ':' + columnTime[i][1] + str(rowNbr + 4), courseList[i].roomContent, fmtList[2][i])
 
 
-def writeToList(workbook, worksheet, overCourse : list, courseList : list, week : str, totalLetters : tuple[str]):
+def writeToList(workbook : xlsxwriter.Workbook, worksheet, overCourse : list, courseList : list, week : str, totalLetters : tuple) -> tuple[list[Course], xlsxwriter.workbook.Format, xlsxwriter.workbook.Format]:
     """
         Write a list of every courses
 
-        Args :
-            - workbook
-            - worksheet
-            - overCourse (list[Course])
-            - week (str)
+        - Args :
+            - workbook (xlsx workbook) : workbook containing the schedule
+            - worksheet (xlsx worksheet) : worksheet to write on
+            - overCourse (list[Course]) : list of overlapping courses
+            - week (str) : week of the schedule
             - totalLetters (tuple[str])
+
+        - Returns :
+            - totalCourse (list[Course])
+            - bigfmt (xlsxwriter format)
+            - fmt (xlsxwriter format)
     """
     weekDays = ('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi')
 
@@ -276,10 +290,10 @@ def avgTimeToStr(timeList : list[int]) -> str :
         Get the average time from a list of times in minutes and return a str
 
         - Args :
-            - timeList (list[int])
+            - timeList (list[int]) : list of times in minutes
         
         - Returns :
-            - (str)
+            - (str) : average time
     """
     rTime = sum(timeList) / len(timeList)
     hTime = 0
@@ -296,17 +310,20 @@ def avgTimeToStr(timeList : list[int]) -> str :
     return hTime + ':' + mTime
 
 
-def statList(totalCourse : list, worksheet, bigfmt, fmt, totalLetters : tuple[str], week : str) -> None :
+def statList(totalCourse : list[Course], worksheet, bigfmt : xlsxwriter.workbook.Format, fmt : xlsxwriter.workbook.Format, totalLetters : tuple, week : str) -> None :
     """
         Create and display some statistical data from a list of courses in a new page
 
         - Args :
-            - totalCourse (list[Course])
-            - worksheet
-            - bigfmt
-            - fmt
-            - totalLetters (tuple[str])
-            - week (str)
+            - totalCourse (list[Course]) : list of courses
+            - worksheet (xlsx worksheet) : worksheet to write on
+            - bigfmt (xlsxwriter format) : format for the big cells
+            - fmt (xlsxwriter format) : format for the normal cells
+            - totalLetters (tuple[str]) 
+            - week (str) : week of the schedule
+
+        - Returns :
+            - None
     """
     moduleDic = {}
     for e in totalCourse :
@@ -375,14 +392,19 @@ def statList(totalCourse : list, worksheet, bigfmt, fmt, totalLetters : tuple[st
     worksheet.print_area('A1:' + str(totalLetters[-1]) + str(newLine))
 
 
-def createXlsx(courseList : tuple, overCourse : list, weekDesc : list[str], title : str, name : str) -> None:
+def createXlsx(courseList : list[list[Course]], overCourse : list[list[Course]], weekDesc : list[str], title : str, name : str) -> None:
     """
-        Create a xlsx file from course list of 4 weeks and then convert it to a pdf file
+        Create a xlsx file from course list
         
         - Args :
-            - courseList (tuple[list[Course]])
-            - weekDesc (list[str])
-            - title (str)
+            - courseList (tuple[list[Course]]) : list of courses
+            - overCourse (list[list[Course]]) : list of overlapping courses
+            - weekDesc (list[str]) : list of weeks' first days
+            - title (str) : title of the schedule
+            - name (str) : name of the output file
+
+        - Returns :
+            - None
     """
     workbook = xlsxwriter.Workbook(name + '.xlsx')
 

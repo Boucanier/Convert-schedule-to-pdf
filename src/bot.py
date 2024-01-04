@@ -10,12 +10,11 @@ PRECISED_GROUP = 'INF2-FI-A'
 DEFAULT_CHANNEL = 1185252325170892891
 
 
-def byGroupSchedule(group, message):
+def byGroupSchedule(group : str) :
     """
         Get the schedule of a given group if it exists
 
         - Args :
-            - group (str) : name of the group to get schedule from
             - message (discord.Message) : message that triggered the function
 
         - Returns :
@@ -38,9 +37,9 @@ def byGroupSchedule(group, message):
     
     else :
         print(f'Group {group} not found')
-        group = None
+        NoGroup = None
     
-    return group
+    return NoGroup
 
 
 intents = discord.Intents.default()
@@ -49,9 +48,15 @@ intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 @tasks.loop(minutes=5)
-async def refresh_db():
+async def refresh_db() -> None:
     """
         Refresh the database every 5 minutes
+
+        - Args :
+            - None
+
+        - Returns :
+            - None
     """
     message_channel = bot.get_channel(DEFAULT_CHANNEL)
     print(f"Got channel {message_channel}")
@@ -68,11 +73,21 @@ async def on_ready():
 
 
 @bot.event
-async def on_message(message):
+async def on_message(message : discord.Message) -> None :
+    """
+        Triggered when a message is sent in a channel
+
+        - Args :
+            - message (discord.Message) : message that triggered the function
+
+        - Returns :
+            - None
+    """
     if message.author == bot.user:
         return
 
     if message.content.startswith('!edt') and len(message.content) >= 4 and len(message.content.split(' ')) <= 3 :
+        weekDesc = list()
 
         # Staff or room schedule with 1 space in the name
         if len(message.content.split(' ')) == 3 :
@@ -128,7 +143,7 @@ async def on_message(message):
 
             print(f'\n{message.author} asked for schedule ({element.replace(" ", "_")}) at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
             
-            confGroup = byGroupSchedule(element, message)
+            confGroup = byGroupSchedule(element)
 
             if confGroup :
                 await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{element}*** :', file = discord.File(element + '.pdf'))

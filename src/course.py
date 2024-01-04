@@ -16,6 +16,9 @@ class Course :
                 - parWeek (int)
                 - parNote (str)
                 - parColor (str)
+
+            - Returns :
+                - None
         """
         self.dayContent = int(parDay)
         self.timeContent = parTime
@@ -36,6 +39,9 @@ class Course :
     def __str__(self) -> str:
         """
             Display the course in a string
+            
+            - Args :
+                - None
 
             - Returns :
                 - display (str)
@@ -53,6 +59,9 @@ class Course :
         """
             Calculate the duration of the course
             
+            - Args :
+                - None
+
             - Returns :
                 - dt (int)
         """
@@ -66,6 +75,9 @@ class Course :
         """
             Convert time content in minutes
             
+            - Args :
+                - None
+
             - Returns :
                 - (int)
         """
@@ -107,7 +119,7 @@ class Course :
             return True
         return False
 
-    def __eq__(self, course2) :
+    def __eq__(self, course2) -> bool :
         """
             Check if the current course is equal to the parameter course
 
@@ -133,6 +145,9 @@ class Course :
 
             - Args :
                 - course2 (Course)
+
+            - Returns :
+                - None
         """
         if course2.profContent not in self.profContent :
             self.profContent += ', ' + course2.profContent

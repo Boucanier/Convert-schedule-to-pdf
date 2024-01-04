@@ -5,12 +5,26 @@ import scraper
 from course import *
 
 
-def getFullSchedule(urlList : str, titleList : str) :
+def getFullSchedule(urlList :list[str], titleList : list[str]) -> tuple[list[list[Course]], list[str]] :
+    """
+        Get every available schedule from a list of url and title, parse them and return a list with every schedule
+
+        - Args :
+            - urlList (list[str]) : list of schedules' urls
+            - titleList (list[str]) : list of schedules' titles
+
+        - Returns :
+            - courseFullList (list[list[Course]]) : list containing list of every schedule
+            - weekDesc (list[str]) : list of weeks' first days
+    """
     courseFullList = []
+    weekDesc = []
 
     # If the url is a string, convert url and title to a list for the further loop
     if type(urlList) == str :
         urlList = [urlList]
+    
+    if type(titleList) == str :
         titleList = [titleList]
 
     for i in range(len(urlList)):
@@ -23,7 +37,7 @@ def getFullSchedule(urlList : str, titleList : str) :
     return courseFullList, weekDesc
 
 
-def getFullList(courseFullList, element : str):
+def getFullList(courseFullList : list[list[Course]], element : str) -> list[str] :
     """
         Get every schedule available, then extract the list of every different element using function clearElement()
 
@@ -31,7 +45,7 @@ def getFullList(courseFullList, element : str):
             - courseFullList (list[list[Course]]) : list containing list of schedule link and ist of schedule title
         
         - Returns :
-            - elementList (list[str])
+            - elementList (list[str]) : list of every different element
     """
 
     elementList = []
@@ -68,7 +82,7 @@ def getFullList(courseFullList, element : str):
 
 def clearElement(elementList : list[str]) -> list[str] :
     """
-        Check if many elements are assigned to a same course and add them to the main element list if they are not already in it
+        Check if many elements are assigned to a single course and add them to the main element list if they are not already in it
 
         - Args :
             - elementList (list[str])
@@ -121,13 +135,13 @@ def elementChoice(elementList : list[str]) -> str:
     return elementList[choice]
 
 
-def getCourseElement(elementChoice : str, courseList, element : str) :
+def getCourseElement(elementChoice : str, courseList : list[list[Course]], element : str) :
     """
         Merge every course of a specified element from every schedule in a single schedule
 
         - Args :
             - elementChoice (str)
-            - courseList (list[Course])
+            - courseList (list[list[Course]])
 
         - Returns :
             - courseFullList (list[Course])
@@ -153,7 +167,7 @@ def getCourseElement(elementChoice : str, courseList, element : str) :
     return courseFullList
 
 
-def checkEquals(courseList) :
+def checkEquals(courseList : list[Course]) -> list[Course]:
     """
         Check if many courses are similar and keep only one in the list
 
@@ -188,7 +202,7 @@ def checkEquals(courseList) :
     return courseList
 
 
-def getFullDetailedList(courseList):
+def getFullDetailedList(courseList : list[list[Course]]) -> list[list[Course]] :
     """
         Get every course of a schedule and split them if they are assigned to many elements except for modules (maybe there are commas in module names)
 
@@ -205,7 +219,7 @@ def getFullDetailedList(courseList):
             if ", " in k.profContent :
                 toRemove.append(k)
                 for i in range(len(k.profContent.split(', '))):
-                    e.append(Course(k.dayContent, k.timeContent, k.moduleContent, k.roomContent, (k.profContent.split(", "))[i], k.groupContent, k.weekContent, k.noteContent, k.colorContent))
+                    e.append(Course(str(k.dayContent), k.timeContent, k.moduleContent, k.roomContent, (k.profContent.split(", "))[i], k.groupContent, k.weekContent, k.noteContent, k.colorContent))
         [e.remove(k) for k in toRemove]
         toRemove.clear()
         e = checkEquals(e)
@@ -213,7 +227,7 @@ def getFullDetailedList(courseList):
             if ", " in k.roomContent :
                 toRemove.append(k)
                 for i in range(len(k.roomContent.split(', '))):
-                    e.append(Course(k.dayContent, k.timeContent, k.moduleContent, (k.roomContent.split(", "))[i], k.profContent, k.groupContent, k.weekContent, k.noteContent, k.colorContent))
+                    e.append(Course(str(k.dayContent), k.timeContent, k.moduleContent, (k.roomContent.split(", "))[i], k.profContent, k.groupContent, k.weekContent, k.noteContent, k.colorContent))
         [e.remove(k) for k in toRemove]
         toRemove.clear()
         e = checkEquals(e)
@@ -221,7 +235,7 @@ def getFullDetailedList(courseList):
             if ", " in k.groupContent :
                 toRemove.append(k)
                 for i in range(len(k.groupContent.split(', '))):
-                    e.append(Course(k.dayContent, k.timeContent, k.moduleContent, k.roomContent, k.profContent, (k.groupContent.split(", "))[i], k.weekContent, k.noteContent, k.colorContent))
+                    e.append(Course(str(k.dayContent), k.timeContent, k.moduleContent, k.roomContent, k.profContent, (k.groupContent.split(", "))[i], k.weekContent, k.noteContent, k.colorContent))
         [e.remove(k) for k in toRemove]
         toRemove.clear()
         e = checkEquals(e)
@@ -238,7 +252,7 @@ def getFullDetailedList(courseList):
     return courseList
 
 
-def mergeCourse(courseList) :
+def mergeCourse(courseList : list[Course]) -> list[Course] :
     """
         Merge course with same module and time content into one course
 
