@@ -200,11 +200,44 @@ def getCourseByElement(type : str, element : str) -> tuple[list[Course], list[st
     cur = conn.cursor()
 
     today = (datetime.today() - timedelta(days = 6)).strftime(r"%Y_%m_%d")
+    request = str()
 
-    data = cur.execute("SELECT week_day, t_start, t_end, module_name, room_name, staff_name, group_name, first_day_week, note, color\
-                        FROM course, groups, module, room, staff WHERE course.module_id = module.module_id AND course.groups_id = groups.groups_id\
-                        AND course.module_id = module.module_id AND course.room_id = room.room_id AND course.staff_id = staff.staff_id\
-                        AND " + type + " LIKE '%" + element + "%' AND first_day_week >= '" + today + "' ORDER BY first_day_week;").fetchall()
+    if type == "staff_name" :
+        request = "SELECT DISTINCT c1.week_day, c1.t_start, c1.t_end, module_name, room_name, s2.staff_name, group_name, c1.first_day_week, c1.note, c1.color\
+                    FROM course c1, course c2, groups g, module m, room r, staff s1, staff s2\
+                    WHERE c1.module_id = c2.module_id\
+                    AND c1.first_day_week = c2.first_day_week\
+                    AND c1.week_day = c2.week_day\
+                    AND c1.t_start = c2.t_start\
+                    AND c1.t_end = c2.t_end\
+                    AND c1.module_id = m.module_id\
+                    AND c1.groups_id = g.groups_id\
+                    AND c1.room_id = r.room_id\
+                    AND c1.staff_id = s1.staff_id\
+                    AND c2.staff_id = s2.staff_id\
+                    AND s1." + type + " LIKE '%" + element + "%'\
+                    AND c1.first_day_week >= '" + today +"'\
+                    ORDER BY c1.first_day_week;"
+    
+    elif type == "room_name" :
+        request = "SELECT DISTINCT c1.week_day, c1.t_start, c1.t_end, module_name, r2.room_name, s.staff_name, group_name, c1.first_day_week, c1.note, c1.color\
+                    FROM course c1, course c2, groups g, module m, room r1, room r2, staff s\
+                    WHERE c1.module_id = c2.module_id\
+                    AND c1.first_day_week = c2.first_day_week\
+                    AND c1.week_day = c2.week_day\
+                    AND c1.t_start = c2.t_start\
+                    AND c1.t_end = c2.t_end\
+                    AND c1.module_id = m.module_id\
+                    AND c1.groups_id = g.groups_id\
+                    AND c1.room_id = r1.room_id\
+                    AND c2.room_id = r2.room_id\
+                    AND c1.staff_id = s.staff_id\
+                    AND r1." + type + " LIKE '%" + element + "%'\
+                    AND c1.first_day_week >= '" + today +"'\
+                    ORDER BY c1.first_day_week;"
+
+
+    data = cur.execute(request).fetchall()
 
     for e in data :
         if (e[7][8:10] + '_' + e[7][5:7] + '_' + e[7][0:4]) not in weekDesc :
