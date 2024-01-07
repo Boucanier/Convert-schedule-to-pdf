@@ -86,7 +86,7 @@ async def on_message(message : discord.Message) -> None :
     if message.author == bot.user:
         return
 
-    if message.content.startswith('!edt') and len(message.content) >= 4 and len(message.content.split(' ')) <= 3 :
+    if message.content.startswith('!edt') and len(message.content) >= 4 and len(message.content.split(' ')) <= 3 and message.content.split(' ')[0] == '!edt':
         weekDesc = list()
         courseList = None
         type = ['staff', 'staff', 'room', 'room']
