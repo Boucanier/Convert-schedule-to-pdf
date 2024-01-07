@@ -88,16 +88,15 @@ async def on_message(message : discord.Message) -> None :
 
     if message.content.startswith('!edt') and len(message.content) >= 4 and len(message.content.split(' ')) <= 3 :
         weekDesc = list()
+        courseList = None
+        type = ['staff', 'staff', 'room', 'room']
+        cpt = 0
+        confGroup = False
 
-        # Staff or room schedule with 1 space in the name
         if len(message.content.split(' ')) == 3 :
-            type = ['staff', 'staff', 'room', 'room']
             element = message.content.split(' ')[1] + ' ' + message.content.split(' ')[2]
             
             print(f'\n{message.author} asked for schedule ({element.replace(" ", "_")}) at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
-
-            cpt = 0
-            courseList = None
 
             while (not courseList) and (cpt < 4) :
                 courseList, weekDesc = dbOperations.getCourseByElement(type[cpt], element)
@@ -111,42 +110,8 @@ async def on_message(message : discord.Message) -> None :
                         print(f'Room {element} not found')
                 else :
                     print(f'Found {element} as {type[cpt]}')                
-
-
-            if courseList :
-                courseList = elementSchedule.checkEquals(courseList)
-                courseList, overCourse = scraper.sortCourse(courseList)
-                
-                scraper.clearFiles()
-
-                if type[cpt] == 'staff' :
-                    if dbOperations.countElement('staff', element) > 1 :
-                        toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent.split(" ")[0], element.replace(' ', '_'))
-                        toPDF.convertToPdf(element.replace(' ', '_') + '.xlsx', False)
-                        await message.channel.send(content = f'Voici l\'emploi du temps des ***{element}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
-                    else :
-                        toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent, element.replace(' ', '_'))
-                        toPDF.convertToPdf(element.replace(' ', '_') + '.xlsx', False)
-                        await message.channel.send(content = f'Voici l\'emploi du temps de ***{courseList[0][0].profContent}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
-                
-                elif type[cpt] == 'room' :
-                    if dbOperations.countElement('room', element) > 1 :
-                        toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].roomContent.split(" ")[0], element.replace(' ', '_'))
-                        toPDF.convertToPdf(element.replace(' ', '_') + '.xlsx', False)
-                        await message.channel.send(content = f'Voici l\'emploi du temps des ***salles {element}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
-                    else :
-                        toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].roomContent, element.replace(' ', '_'))
-                        toPDF.convertToPdf(element.replace(' ', '_') + '.xlsx', False)
-                        await message.channel.send(content = f'Voici l\'emploi du temps de la ***salle {courseList[0][0].roomContent}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
-
-            
-            else :
-                print(f'Element {element} not found')
-                await message.channel.send(content = f'***{message.author.mention}*** : élément **{element}** introuvable')
-
-
-        # Group, staff or room schedule with no space in the name
-        elif len(message.content.split(' ')) in (1, 2) :
+        
+        else :
             if message.content == '!edt' :
                 element = PRECISED_GROUP
             else :
@@ -160,12 +125,8 @@ async def on_message(message : discord.Message) -> None :
                 await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{element}*** :', file = discord.File(element + '.pdf'))
 
             else :
-                type = ['staff', 'room']
-                courseList = None
-                
-                cpt = 0
                 while (not courseList) and (cpt < 2) :
-                    courseList, weekDesc = dbOperations.getCourseByElement(type[cpt], element)
+                    courseList, weekDesc = dbOperations.getCourseByElement(type[cpt * 2], element)
                     
                     if not courseList :
                         cpt += 1
@@ -174,36 +135,38 @@ async def on_message(message : discord.Message) -> None :
                         elif cpt == 2 :
                             print(f'Room {element} not found')
                     else :
-                        print(f'Found {element} as {type[cpt]}') 
+                        print(f'Found {element} as {type[cpt]}')
+                        cpt *= 2
 
-                if courseList :
-                    courseList = elementSchedule.checkEquals(courseList)
-                    courseList, overCourse = scraper.sortCourse(courseList)
+        if courseList :
+            toSendMsg = None
+            courseList = elementSchedule.checkEquals(courseList)
+            courseList, overCourse = scraper.sortCourse(courseList)
+            
+            scraper.clearFiles()
 
-                    scraper.clearFiles()
-
-                    if type[cpt] == 'staff' :
-                        if dbOperations.countElement('staff', element) > 1 :
-                            toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent.split(" ")[0], element.replace(' ', '_'))
-                            toPDF.convertToPdf(element.replace(' ', '_') + '.xlsx', False)
-                            await message.channel.send(content = f'Voici l\'emploi du temps des ***{element}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
-                        else :
-                            toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent, element.replace(' ', '_'))
-                            toPDF.convertToPdf(element.replace(' ', '_') + '.xlsx', False)
-                            await message.channel.send(content = f'Voici l\'emploi du temps de ***{courseList[0][0].profContent}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
-
-                    elif type[cpt] == 'room' :
-                        if dbOperations.countElement('room', element) > 1 :
-                            toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].roomContent.split(" ")[0], element)
-                            toPDF.convertToPdf(element + '.xlsx', False)
-                            await message.channel.send(content = f'Voici l\'emploi du temps des ***salles {element}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
-                        else :
-                            toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].roomContent, element)
-                            toPDF.convertToPdf(element + '.xlsx', False)
-                            await message.channel.send(content = f'Voici l\'emploi du temps de la ***salle {courseList[0][0].roomContent}*** :', file = discord.File(element.replace(' ', '_') + '.pdf'))
-
+            if type[cpt] == 'staff' :
+                if dbOperations.countElement('staff', element) > 1 :
+                    toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent.split(" ")[0], element.replace(' ', '_'))
+                    toSendMsg = f'Voici l\'emploi du temps des ***{element}*** :'
                 else :
-                    await message.channel.send(content = f'***{message.author.mention}*** : élément **{element}** introuvable')
+                    toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent, element.replace(' ', '_'))
+                    toSendMsg = f'Voici l\'emploi du temps de ***{courseList[0][0].profContent}*** :'
+            
+            elif type[cpt] == 'room' :
+                if dbOperations.countElement('room', element) > 1 :
+                    toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].roomContent.split(" ")[0], element.replace(' ', '_'))
+                    toSendMsg = f'Voici l\'emploi du temps des ***salles {element}*** :'
+                else :
+                    toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].roomContent, element.replace(' ', '_'))
+                    toSendMsg = f'Voici l\'emploi du temps de la ***salle {courseList[0][0].roomContent}*** :'
+
+            toPDF.convertToPdf(element.replace(' ', '_') + '.xlsx', False)
+            await message.channel.send(content = toSendMsg, file = discord.File(element.replace(' ', '_') + '.pdf'))
+        
+        elif not confGroup and not courseList :
+            print(f'Element {element} not found')
+            await message.channel.send(content = f'***{message.author.mention}*** : élément **{element}** introuvable')
 
 
     else :
