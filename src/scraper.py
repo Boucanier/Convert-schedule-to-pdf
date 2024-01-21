@@ -19,21 +19,23 @@ def clearText(txt : str) -> str :
             - txt (str) : cleaned text
     """
     txtLetters = list(txt)
-    if '\n' in txt or "'" in txt:
-        txtLetters = list(txt)
-        for i in range(len(txtLetters)) :
-            if txtLetters[i] == '\n':
-                if i == 0 :
-                    txtLetters[i] = ''
-                else :
-                    txtLetters[i] = ', '
-            if txtLetters[i] == "'" :
-                txtLetters[i] = "`"
-    if txtLetters[0] == ' ':
-        txtLetters[0] = ''
-    if txtLetters[-1] == ' ':
-        txtLetters[-1] = ''
-    txt = ''.join(txtLetters)
+
+    if txt :
+        if '\n' in txt or "'" in txt:
+            txtLetters = list(txt)
+            for i in range(len(txtLetters)) :
+                if txtLetters[i] == '\n':
+                    if i == 0 :
+                        txtLetters[i] = ''
+                    else :
+                        txtLetters[i] = ', '
+                if txtLetters[i] == "'" :
+                    txtLetters[i] = "`"
+        if txtLetters[0] == ' ':
+            txtLetters[0] = ''
+        if txtLetters[-1] == ' ':
+            txtLetters[-1] = ''
+        txt = ''.join(txtLetters)
     return txt
 
 
