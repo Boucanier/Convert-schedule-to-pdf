@@ -96,6 +96,9 @@ async def on_message(message : discord.Message) -> None :
 
             if len(message.content.split(' ')) == 3 :
                 element = message.content.split(' ')[1] + ' ' + message.content.split(' ')[2]
+
+                if element.upper() == 'AMPHI A' :
+                    element = 'Amphi  A'
                 
                 print(f'\n{message.author} asked for schedule ({element.replace(" ", "_")}) at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
 
