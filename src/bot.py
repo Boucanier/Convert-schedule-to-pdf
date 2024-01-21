@@ -152,7 +152,7 @@ async def on_message(message : discord.Message) -> None :
                         toSendMsg = f'Voici l\'emploi du temps des ***{element}*** :'
                     else :
                         toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent, element.replace(' ', '_'))
-                        toSendMsg = f'Voici l\'emploi du temps de ***{courseList[0][0].profContent}*** :'
+                        toSendMsg = f'Voici l\'emploi du temps de ***{courseList[0][0].profContent.split(",")[0]}*** :'
                 
                 elif type[cpt] == 'room' :
                     if dbOperations.countElement('room', element) > 1 :
@@ -160,7 +160,7 @@ async def on_message(message : discord.Message) -> None :
                         toSendMsg = f'Voici l\'emploi du temps des ***salles {element}*** :'
                     else :
                         toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].roomContent, element.replace(' ', '_'))
-                        toSendMsg = f'Voici l\'emploi du temps de la ***salle {courseList[0][0].roomContent}*** :'
+                        toSendMsg = f'Voici l\'emploi du temps de la ***salle {courseList[0][0].roomContent.split(",")[0]}*** :'
 
                 toPDF.convertToPdf(element.replace(' ', '_') + '.xlsx', False)
                 await message.channel.send(content = toSendMsg, file = discord.File(element.replace(' ', '_') + '.pdf'))
