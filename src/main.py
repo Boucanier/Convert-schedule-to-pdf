@@ -4,6 +4,7 @@ import scraper
 import elementSchedule
 import dbOperations
 
+OUTPUT_DIR = "output/"
 
 if __name__ == "__main__" :
 
@@ -40,9 +41,9 @@ if __name__ == "__main__" :
 
             courseList, overCourse = scraper.sortCourse(courseList)
 
-            scraper.clearFiles()
-            toXLSX.createXlsx(courseList, overCourse, weekDesc, title, title.replace(' ', '_'))
-            toPDF.convertToPdf(title.replace(' ', '_') + ".xlsx")
+            scraper.clearFiles(OUTPUT_DIR)
+            toXLSX.createXlsx(courseList, overCourse, weekDesc, title, OUTPUT_DIR + title.replace(' ', '_'))
+            toPDF.convertToPdf(OUTPUT_DIR + title.replace(' ', '_') + ".xlsx")
 
             choice = 0
         
@@ -63,9 +64,9 @@ if __name__ == "__main__" :
                 courseList = elementSchedule.mergeCourse(courseList)
                 courseList, overCourse = scraper.sortCourse(courseList)
 
-                scraper.clearFiles()
-                toXLSX.createXlsx(courseList, overCourse, weekDesc, elementChoice, elementChoice.replace(' ', '_'))
-                toPDF.convertToPdf(elementChoice.replace(' ', '_') + ".xlsx")
+                scraper.clearFiles(OUTPUT_DIR)
+                toXLSX.createXlsx(courseList, overCourse, weekDesc, elementChoice, OUTPUT_DIR + elementChoice.replace(' ', '_'))
+                toPDF.convertToPdf(OUTPUT_DIR + elementChoice.replace(' ', '_') + ".xlsx")
             
             else :
                 IUTurl, IUTtitle = scraper.getLink(True, "IUT")

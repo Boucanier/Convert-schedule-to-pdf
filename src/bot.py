@@ -1,13 +1,16 @@
-import discord, scraper, toXLSX, toPDF, time, elementSchedule, dbOperations
+import discord, scraper, toXLSX, toPDF, time, elementSchedule, dbOperations, json
 from discord.ext import tasks, commands
 
-with open('data/token.txt', 'r') as fl :
-    token = fl.readline()
+with open('config/token.json', 'r') as fl :
+    token = json.load(fl)['token']
 
-TO_PING = '<@&1185252532717637682>'
-DEFAULT_GROUP = 'IUT'
-PRECISED_GROUP = 'INF2-FI-A'
-DEFAULT_CHANNEL = 1185252325170892891
+with open('config/bot_config.json', 'r') as fl :
+    obj = json.load(fl)
+    TO_PING = obj['to_ping']
+    DEFAULT_GROUP = obj['default_group']
+    PRECISED_GROUP = obj['precised_group']
+    DEFAULT_CHANNEL = int(obj['default_channel'])
+    OUTPUT_DIR = obj['output_dir']
 
 
 def byGroupSchedule(group : str) :
@@ -28,10 +31,10 @@ def byGroupSchedule(group : str) :
         courseList, weekDesc = scraper.parseSchedule(response)
         courseList, overCourse = scraper.sortCourse(courseList)
 
-        scraper.clearFiles()
+        scraper.clearFiles(OUTPUT_DIR)
         print(f'Found {group} as group') 
-        toXLSX.createXlsx(courseList, overCourse, weekDesc, title, group.replace(' ', '_'))
-        toPDF.convertToPdf(group.replace(' ', '_') + '.xlsx', False)
+        toXLSX.createXlsx(courseList, overCourse, weekDesc, title, OUTPUT_DIR + group.replace(' ', '_'))
+        toPDF.convertToPdf(OUTPUT_DIR + group.replace(' ', '_') + '.xlsx', False)
 
         return group
     
@@ -126,7 +129,7 @@ async def on_message(message : discord.Message) -> None :
                 confGroup = byGroupSchedule(element)
 
                 if confGroup :
-                    await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{element}*** :', file = discord.File(element + '.pdf'))
+                    await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{element}*** :', file = discord.File(OUTPUT_DIR + element + '.pdf'))
 
                 else :
                     while (not courseList) and (cpt < 2) :
@@ -147,26 +150,26 @@ async def on_message(message : discord.Message) -> None :
                 courseList = elementSchedule.checkEquals(courseList)
                 courseList, overCourse = scraper.sortCourse(courseList)
                 
-                scraper.clearFiles()
+                scraper.clearFiles(OUTPUT_DIR)
 
                 if type[cpt] == 'staff' :
                     if dbOperations.countElement('staff', element) > 1 :
-                        toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent.split(" ")[0], element.replace(' ', '_'))
+                        toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent.split(" ")[0], OUTPUT_DIR + element.replace(' ', '_'))
                         toSendMsg = f'Voici l\'emploi du temps des ***{element}*** :'
                     else :
-                        toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent, element.replace(' ', '_'))
+                        toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].profContent, OUTPUT_DIR + element.replace(' ', '_'))
                         toSendMsg = f'Voici l\'emploi du temps de ***{courseList[0][0].profContent.split(",")[0]}*** :'
                 
                 elif type[cpt] == 'room' :
                     if dbOperations.countElement('room', element) > 1 :
-                        toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].roomContent.split(" ")[0], element.replace(' ', '_'))
+                        toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].roomContent.split(" ")[0], OUTPUT_DIR + element.replace(' ', '_'))
                         toSendMsg = f'Voici l\'emploi du temps des ***salles {element}*** :'
                     else :
-                        toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].roomContent, element.replace(' ', '_'))
+                        toXLSX.createXlsx(courseList, overCourse, weekDesc, courseList[0][0].roomContent, OUTPUT_DIR + element.replace(' ', '_'))
                         toSendMsg = f'Voici l\'emploi du temps de la ***salle {courseList[0][0].roomContent.split(",")[0]}*** :'
 
-                toPDF.convertToPdf(element.replace(' ', '_') + '.xlsx', False)
-                await message.channel.send(content = toSendMsg, file = discord.File(element.replace(' ', '_') + '.pdf'))
+                toPDF.convertToPdf(OUTPUT_DIR + element.replace(' ', '_') + '.xlsx', False)
+                await message.channel.send(content = toSendMsg, file = discord.File(OUTPUT_DIR + element.replace(' ', '_') + '.pdf'))
             
             elif not confGroup and not courseList :
                 print(f'Element {element} not found')

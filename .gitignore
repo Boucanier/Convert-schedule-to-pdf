@@ -1,8 +1,18 @@
+# Python cache files
 __pycache__/
-data/schedule.db
-token.txt
-temp.txt
+
+# IDE cache files
 .vscode
 .idea
-*.pdf
-*.xlsx
+
+# Output files
+output/
+
+# Configuration files
+config/
+
+# Database file
+data/schedule.db
+
+# Temporary files
+temp.txt
