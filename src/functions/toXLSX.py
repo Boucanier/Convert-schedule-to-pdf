@@ -65,7 +65,7 @@ def initWS(worksheet, row : int, col : int, short : bool = False) -> tuple:
     worksheet.center_horizontally()
     letters = ('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z')
     totalLetters = list()
-    for i in range(COL):
+    for i in range(col):
         if i < 26 :
             totalLetters.append(letters[i%26])
         else :
@@ -73,7 +73,7 @@ def initWS(worksheet, row : int, col : int, short : bool = False) -> tuple:
 
     worksheet.set_column('B:' + str(totalLetters[-1]), 0.8)
     worksheet.set_column('A:A', 12)
-    for i in range(ROW):
+    for i in range(row):
         worksheet.set_row((i+1),19)
 
     if short :
@@ -86,8 +86,14 @@ def initWS(worksheet, row : int, col : int, short : bool = False) -> tuple:
             worksheet.set_row(4 + 5*i, 25)
 
     worksheet.set_row(1,20)
-    worksheet.print_area('A1:' + str(totalLetters[-1]) + str(ROW))
-    worksheet.set_paper(9)
+    
+    worksheet.print_area('A1:' + str(totalLetters[-1]) + str(row))
+    
+    if short :
+        worksheet.set_paper(8)
+    else :
+        worksheet.set_paper(9)
+
     worksheet.fit_to_pages(1, 0)
     totalLetters = tuple(totalLetters)
     return totalLetters
@@ -454,7 +460,7 @@ def createXlsx(courseList : list[list[Course]], overCourse : list[list[Course]],
     workbook.close()
 
 
-def createShortXlsx(courseList : list[list[Course]], overCourse : list[list[Course]], weekDesc : list[str], title : str, name : str, toDate : date = date.today()) -> None:
+def createShortXlsx(courseList : list[list[Course]], weekDesc : list[str], title : str, name : str, toDate : date = date.today()) -> None:
     """
         Create a xlsx file with only one day schedule from course list
     """
