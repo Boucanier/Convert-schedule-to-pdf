@@ -2,11 +2,14 @@
     This module will convert the data scrapped with the scrapper into a xlsx file
 """
 import xlsxwriter
+from datetime import date, datetime, timedelta
 from models.course import *
 
 
 ROW = 27
 COL = 133 #EC
+
+ROW_SHORT = 7
 
 
 def setFormatWS(workbook : xlsxwriter.Workbook) -> tuple[xlsxwriter.workbook.Format, xlsxwriter.workbook.Format, xlsxwriter.workbook.Format, xlsxwriter.workbook.Format]:
@@ -44,12 +47,15 @@ def setFormatWS(workbook : xlsxwriter.Workbook) -> tuple[xlsxwriter.workbook.For
     return dayFormat, underFormat, rightFormat, cornerFormat
 
 
-def initWS(worksheet) -> tuple:
+def initWS(worksheet, row : int, col : int, short : bool = False) -> tuple:
     """
         Initialize the worksheet by setting the size of the cells and the columns
 
         - Args :
             - worksheet (xlsx worksheet) : worksheet to initialize
+            - row (int) : number of rows
+            - col (int) : number of columns
+            - short (bool) : default = False, if True : only format first day, else : format every day
 
         - Returns :
             - totalLetters (tuple[str]) : tuple containing the letters of the columns (A, B, C, ..., AA, AB, ..., BA, BB, ...)
@@ -69,9 +75,15 @@ def initWS(worksheet) -> tuple:
     worksheet.set_column('A:A', 12)
     for i in range(ROW):
         worksheet.set_row((i+1),19)
-    for i in range(5):
-        worksheet.set_row(5 + 5*i, 25)
-        worksheet.set_row(4 + 5*i, 25)
+
+    if short :
+        worksheet.set_row(5, 25)
+        worksheet.set_row(4, 25)
+
+    else :
+        for i in range(5):
+            worksheet.set_row(5 + 5*i, 25)
+            worksheet.set_row(4 + 5*i, 25)
 
     worksheet.set_row(1,20)
     worksheet.print_area('A1:' + str(totalLetters[-1]) + str(ROW))
@@ -81,7 +93,7 @@ def initWS(worksheet) -> tuple:
     return totalLetters
     
 
-def formatWS(worksheet, dayFormat : xlsxwriter.workbook.Format, totalLetters : tuple, underFormat : xlsxwriter.workbook.Format, rightFormat : xlsxwriter.workbook.Format, cornerFormat : xlsxwriter.workbook.Format, title : str, week : str) -> None:
+def formatWS(worksheet, dayFormat : xlsxwriter.workbook.Format, totalLetters : tuple, underFormat : xlsxwriter.workbook.Format, rightFormat : xlsxwriter.workbook.Format, cornerFormat : xlsxwriter.workbook.Format, title : str, week : str, row : int, col : int, dayInd : int = 5) -> None:
     """
         Set the frame for the schedule with days and times
 
@@ -93,12 +105,19 @@ def formatWS(worksheet, dayFormat : xlsxwriter.workbook.Format, totalLetters : t
             - rightFormat (xlsxwriter format) : format used to create the right border of the schedule
             - cornerFormat (xlsxwriter format) : format used to create corner border of the schedule
             - title (str) : title of the schedule
+            - row (int) : Number of rows
+            - col (int) : Number of columns
+            - dayInd (int) : Day of week index, default = 5, dayInd > 5 means all week is requested
 
         - Returns :
             - None
     """
     weekDays = ('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi')
-    for i in range(0,ROW - 2,5):
+
+    if dayInd < 5 :
+        weekDays = [weekDays[dayInd]]
+
+    for i in range(0, row - 2, 5):
         worksheet.merge_range('A' + str(i+3) + ':A' + str(i+7), weekDays[i//5], dayFormat)
     listWeek = list(week)
     for i in range(len(listWeek)):
@@ -107,13 +126,13 @@ def formatWS(worksheet, dayFormat : xlsxwriter.workbook.Format, totalLetters : t
     week = ''.join(listWeek)
     worksheet.merge_range('B1:' + str(totalLetters[-1]) + '1', title + ', semaine du ' + week, dayFormat)
     worksheet.set_row(0,25)
-    for i in range(1,COL-10,12):
+    for i in range(1, col-10, 12):
         worksheet.merge_range(str(totalLetters[i]) + '2:' + str(totalLetters[i+11]) + '2', str(round(i/12)+8) + ':00 - ' + str(round(i/12)+9) + ':00', dayFormat)
-    for i in range(3,ROW + 1) :
+    for i in range(3, row + 1) :
         worksheet.write_blank(str(totalLetters[-1]) + str(i), None, rightFormat)
-    for i in range(1,COL):
-        worksheet.write_blank(str(totalLetters[i]) + str(ROW), None, underFormat)
-    worksheet.write_blank(str(totalLetters[-1]) + str(ROW), None, cornerFormat)
+    for i in range(1, col):
+        worksheet.write_blank(str(totalLetters[i]) + str(row), None, underFormat)
+    worksheet.write_blank(str(totalLetters[-1]) + str(row), None, cornerFormat)
 
 
 def setToColumn(courseList : list[Course], totalLetters : tuple) -> list[list[list[str]]] :
@@ -138,7 +157,7 @@ def setToColumn(courseList : list[Course], totalLetters : tuple) -> list[list[li
     return timeColumn
 
 
-def addCourse(worksheet, columnTime : list, courseList : list, workbook : xlsxwriter.Workbook) -> None:
+def addCourse(worksheet, columnTime : list, courseList : list, workbook : xlsxwriter.Workbook, short : bool = False) -> None:
     """
         Create formats used to add course\n
         Add a course to the xlsx file
@@ -147,6 +166,8 @@ def addCourse(worksheet, columnTime : list, courseList : list, workbook : xlsxwr
             - worksheet (xlsx worksheet)
             - columntime (list)
             - courseList (list[Course])
+            - workbook (xlsx workbook)
+            - short (bool) : default False, if True : add course to first row only
     """
     fmtList = [[],[],[]]
     for e in courseList :
@@ -188,7 +209,10 @@ def addCourse(worksheet, columnTime : list, courseList : list, workbook : xlsxwr
         fmtList[2].append(botfmt)
 
     for i in range(len(courseList)):
-        rowNbr = int(courseList[i].dayContent)*5+3
+        if short :
+            rowNbr = 3
+        else :
+            rowNbr = int(courseList[i].dayContent)*5+3
 
         worksheet.merge_range(columnTime[i][0] + str(rowNbr) + ':' + columnTime[i][1] + str(rowNbr), courseList[i].timeContent[0] + ' - ' + courseList[i].timeContent[1], fmtList[0][i])
         worksheet.merge_range(columnTime[i][0] + str(rowNbr + 1) + ':' + columnTime[i][1] + str(rowNbr + 1), courseList[i].groupContent, fmtList[1][i])
@@ -413,18 +437,47 @@ def createXlsx(courseList : list[list[Course]], overCourse : list[list[Course]],
         worksheet = workbook.add_worksheet(str(weekDesc[i]))
         worksheet.center_vertically()
         dayFormat, underFormat, rightFormat, cornerFormat = setFormatWS(workbook)
-        totalLetters = initWS(worksheet)
-        formatWS(worksheet, dayFormat, totalLetters, underFormat, rightFormat, cornerFormat, title, str(weekDesc[i]))
+        totalLetters = initWS(worksheet, ROW, COL)
+        formatWS(worksheet, dayFormat, totalLetters, underFormat, rightFormat, cornerFormat, title, str(weekDesc[i]), ROW, COL)
         columnTime = setToColumn(courseList[i], totalLetters)
         addCourse(worksheet, columnTime, courseList[i], workbook)
 
         if len(overCourse[i]) > 0 or len(courseList[i]) > 0:
             worksheet = workbook.add_worksheet('Liste des cours ' + str(cpt))
-            totalLetters = initWS(worksheet)
+            totalLetters = initWS(worksheet, ROW, COL)
             totalCourse, bigfmt, fmt = writeToList(workbook, worksheet, overCourse[i], courseList[i], weekDesc[i], totalLetters)
             worksheet = workbook.add_worksheet('Statistiques ' + str(cpt))
-            totalLetters = initWS(worksheet)
+            totalLetters = initWS(worksheet, ROW, COL)
             statList(totalCourse, worksheet, bigfmt, fmt, totalLetters, weekDesc[i])
             cpt += 1
         
+    workbook.close()
+
+
+def createShortXlsx(courseList : list[list[Course]], overCourse : list[list[Course]], weekDesc : list[str], title : str, name : str, toDate : date = date.today()) -> None:
+    """
+        Create a xlsx file with only one day schedule from course list
+    """
+    workbook = xlsxwriter.Workbook(name + '.xlsx')
+
+    wIndex, i = -1, 0
+    while wIndex < 0 or i < len(weekDesc):
+        compDate = datetime.strptime(weekDesc[i], "%d_%m_%Y").date()
+        if ((compDate - toDate).days) <= 5 :
+            wIndex = i
+        i += 1
+    
+    chosenDay = list()
+    for e in courseList[wIndex] :
+        if e.dayContent == toDate.weekday() :
+            chosenDay.append(e)
+    
+    worksheet = workbook.add_worksheet(str(weekDesc[wIndex]))
+    worksheet.center_vertically()
+    dayFormat, underFormat, rightFormat, cornerFormat = setFormatWS(workbook)
+    totalLetters = initWS(worksheet, ROW_SHORT, COL, short = True)
+    formatWS(worksheet, dayFormat, totalLetters, underFormat, rightFormat, cornerFormat, title, str(weekDesc[wIndex]), ROW_SHORT, COL, toDate.weekday())
+    columnTime = setToColumn(chosenDay, totalLetters)
+    addCourse(worksheet, columnTime, chosenDay, workbook, short = True)
+
     workbook.close()
