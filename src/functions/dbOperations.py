@@ -1,6 +1,6 @@
-from itertools import count
-import sqlite3, os, elementSchedule
-from course import *
+import sqlite3, os
+from models.course import *
+from functions import elementSchedule
 from datetime import datetime, timedelta
 
 

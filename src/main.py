@@ -1,8 +1,4 @@
-import toXLSX
-import toPDF
-import scraper
-import elementSchedule
-import dbOperations
+from functions import toPDF, toXLSX, scraper, elementSchedule, dbOperations
 
 OUTPUT_DIR = "output/"
 

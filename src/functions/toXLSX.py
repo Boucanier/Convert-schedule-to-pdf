@@ -2,7 +2,7 @@
     This module will convert the data scrapped with the scrapper into a xlsx file
 """
 import xlsxwriter
-from course import *
+from models.course import *
 
 
 ROW = 27

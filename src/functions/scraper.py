@@ -2,9 +2,9 @@
     This code will scrap the schedule data with requests\n
     It will parse it using beauriful soup in objects of a "Course" class
 """
-import requests, subprocess, platform
+import requests
 from bs4 import BeautifulSoup
-from course import *
+from models.course import *
 from datetime import date, timedelta
 
 

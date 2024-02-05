@@ -1,5 +1,6 @@
-import discord, scraper, toXLSX, toPDF, time, elementSchedule, dbOperations, json
+import discord, time, json
 from discord.ext import tasks, commands
+from functions import toPDF, toXLSX, scraper, elementSchedule, dbOperations
 
 with open('config/token.json', 'r') as fl :
     token = json.load(fl)['token']

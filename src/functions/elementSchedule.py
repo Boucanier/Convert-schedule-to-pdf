@@ -1,8 +1,8 @@
 """
     This code contains functions that will be used to fetch a specific schedule based on a room/professor
 """
-import scraper
-from course import *
+import functions.scraper as scraper
+from models.course import *
 
 
 def getFullSchedule(urlList :list[str], titleList : list[str]) -> tuple[list[list[Course]], list[str]] :
