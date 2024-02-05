@@ -31,7 +31,7 @@ def byGroupSchedule(group : str) :
         courseList, weekDesc = scraper.parseSchedule(response)
         courseList, overCourse = scraper.sortCourse(courseList)
 
-        scraper.clearFiles(OUTPUT_DIR)
+        toPDF.clearFiles(OUTPUT_DIR, 'xlsx', 'pdf')
         print(f'Found {group} as group') 
         toXLSX.createXlsx(courseList, overCourse, weekDesc, title, OUTPUT_DIR + group.replace(' ', '_'))
         toPDF.convertToPdf(OUTPUT_DIR + group.replace(' ', '_') + '.xlsx', False)
@@ -70,7 +70,7 @@ async def refresh_db() -> None:
 
 
 @bot.event
-async def on_ready():
+async def on_ready() -> None:
     print(f'We have logged in as {bot.user}')
     refresh_db.start()
 
@@ -150,7 +150,7 @@ async def on_message(message : discord.Message) -> None :
                 courseList = elementSchedule.checkEquals(courseList)
                 courseList, overCourse = scraper.sortCourse(courseList)
                 
-                scraper.clearFiles(OUTPUT_DIR)
+                toPDF.clearFiles(OUTPUT_DIR, 'xlsx', 'pdf')
 
                 if type[cpt] == 'staff' :
                     if dbOperations.countElement('staff', element) > 1 :

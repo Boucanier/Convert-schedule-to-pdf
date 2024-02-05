@@ -39,22 +39,6 @@ def clearText(txt : str) -> str :
     return txt
 
 
-def clearFiles(path : str = "") -> None :
-    """
-        Delete every .pdf and .xlsx files in the current directory in order to avoid file overload
-
-        - Args :
-            - path (str) : Default value = "", path to the directory to clean
-
-        - Returns :
-            - None
-    """
-    if platform.system() == "Linux" :
-        subprocess.run('rm ' + path + '*.pdf ' + path + '*.xlsx', shell = True)
-    elif platform.system() == "Windows" :
-        subprocess.run('del ' + path + '*.pdf ' + path + '*.xlsx', shell = True)
-
-
 def getContent(dayContent : list[str], weekContent : list[int], resourceList : list) -> list[Course] :
     """
         Collect all the content of a type for every resource in the xml file and create every Course with it

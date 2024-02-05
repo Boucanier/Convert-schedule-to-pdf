@@ -43,5 +43,24 @@ def convertToPdf(file_name : str, display = True) -> None:
             subprocess.run('start /B ' + file_name.split('.')[0] + '.pdf', shell = True)
 
 
+def clearFiles(path : str = "", *ext : str) -> None :
+    """
+        Delete every files in the current directory with the given extensions
+
+        - Args :
+            - path (str) : Default value = "", path to the directory to clean
+            - *ext (str) : List of extensions to delete
+
+        - Returns :
+            - None
+    """
+    if platform.system() == "Linux" :
+        for e in ext :
+            subprocess.run('rm ' + path + '*.' + e, shell = True)
+    elif platform.system() == "Windows" :
+        for e in ext :
+            subprocess.run('del ' + path + '*.' + e, shell = True)
+
+
 if __name__ == "__main__" :
     convertToPdf(input("File to convert with its extension : "))
