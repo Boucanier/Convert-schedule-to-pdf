@@ -1,4 +1,4 @@
-from functions import toPDF, toXLSX, scraper, elementSchedule, dbOperations, drawing
+from functions import toPDF, toXLSX, scraper, elementSchedule, dbOperations
 
 OUTPUT_DIR = "output/"
 
@@ -38,12 +38,10 @@ if __name__ == "__main__" :
             courseList, overCourse = scraper.sortCourse(courseList)
 
             toPDF.clearFiles(OUTPUT_DIR, 'xlsx', 'pdf')
-            # toXLSX.createXlsx(courseList, overCourse, weekDesc, title, OUTPUT_DIR + title.replace(' ', '_'))
-            # toPDF.convertToPdf(OUTPUT_DIR + title.replace(' ', '_') + ".xlsx")
+            toXLSX.createXlsx(courseList, overCourse, weekDesc, title, OUTPUT_DIR + title.replace(' ', '_'))
+            toPDF.convertToPdf(OUTPUT_DIR + title.replace(' ', '_') + ".xlsx")
 
             choice = 0
-
-            drawing.createScheduleImage(courseList, weekDesc, title, title.replace(' ', '_'))
         
         elif choice in (2, 3, 4) :
             if choice in (2, 3) :
