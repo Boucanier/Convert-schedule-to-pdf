@@ -1,6 +1,7 @@
 import discord, time, json
 from discord.ext import tasks, commands
-from functions import toPDF, toXLSX, scraper, elementSchedule, dbOperations
+from datetime import date, timedelta
+from functions import toPDF, toXLSX, scraper, elementSchedule, dbOperations, drawing
 
 with open('config/token.json', 'r') as fl :
     token = json.load(fl)['token']
@@ -14,7 +15,7 @@ with open('config/bot_config.json', 'r') as fl :
     OUTPUT_DIR = obj['output_dir']
 
 
-def byGroupSchedule(group : str) :
+def byGroupSchedule(group : str, toDate : date = date.today(), short : bool = False) :
     """
         Get the schedule of a given group if it exists
 
@@ -31,11 +32,16 @@ def byGroupSchedule(group : str) :
         response = scraper.getSchedule(url)
         courseList, weekDesc = scraper.parseSchedule(response)
         courseList, overCourse = scraper.sortCourse(courseList)
+        print(f'Found {group} as group')
 
-        toPDF.clearFiles(OUTPUT_DIR, 'xlsx', 'pdf')
-        print(f'Found {group} as group') 
-        toXLSX.createXlsx(courseList, overCourse, weekDesc, title, OUTPUT_DIR + group.replace(' ', '_'))
-        toPDF.convertToPdf(OUTPUT_DIR + group.replace(' ', '_') + '.xlsx', False)
+        if not short :
+            toPDF.clearFiles(OUTPUT_DIR, 'xlsx', 'pdf', 'png')
+            
+            toXLSX.createXlsx(courseList, overCourse, weekDesc, title, OUTPUT_DIR + group.replace(' ', '_'))
+            toPDF.convertToPdf(OUTPUT_DIR + group.replace(' ', '_') + '.xlsx', False)
+
+        elif short :
+            drawing.createScheduleImage(courseList, weekDesc, OUTPUT_DIR + group.replace(' ', '_'), toDate)
 
         return group
     
@@ -120,17 +126,25 @@ async def on_message(message : discord.Message) -> None :
                         print(f'Found {element} as {type[cpt]}')                
             
             else :
-                if message.content == '!edt' :
+                if message.content in ('!edt', '!edt today', '!edt td', '!edt tomorrow', '!edt tm') :
                     element = PRECISED_GROUP
                 else :
                     element = message.content.split(' ')[1]
 
                 print(f'\n{message.author} asked for schedule ({element.replace(" ", "_")}) at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
                 
-                confGroup = byGroupSchedule(element)
+                if message.content in ('!edt today', '!edt td') :
+                    confGroup = byGroupSchedule(element, short = True)
+                elif message.content in ('!edt tomorrow', '!edt tm') :
+                    confGroup = byGroupSchedule(element, toDate = date.today() + timedelta(days = 1) ,short = True)
+                else :
+                    confGroup = byGroupSchedule(element)
 
                 if confGroup :
-                    await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{element}*** :', file = discord.File(OUTPUT_DIR + element + '.pdf'))
+                    if message.content in ('!edt today', '!edt td', '!edt tomorrow', '!edt tm') :
+                        await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{element}*** :', file = discord.File(OUTPUT_DIR + element + '.png'))
+                    else :
+                        await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{element}*** :', file = discord.File(OUTPUT_DIR + element + '.pdf'))
 
                 else :
                     while (not courseList) and (cpt < 2) :

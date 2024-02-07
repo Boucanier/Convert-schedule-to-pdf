@@ -3,7 +3,7 @@
 """
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 from models.course import *
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 HEIGHT = 1000
 WIDTH = 400
@@ -80,7 +80,7 @@ def addCourses(scheduleDraw : ImageDraw.ImageDraw, courseList : list[Course]) ->
 
 
 
-def createScheduleImage(courseList : list[list[Course]], weekDesc : list[str], title : str, name : str, toDate : date = date.today()) -> None:
+def createScheduleImage(courseList : list[list[Course]], weekDesc : list[str], name : str, toDate : date = date.today()) -> None:
     """
         Create a xlsx file with only one day schedule from course list
 
@@ -114,4 +114,4 @@ def createScheduleImage(courseList : list[list[Course]], weekDesc : list[str], t
 
     addCourses(scheduleDraw, chosenDay)
 
-    scheduleImg.show()
+    scheduleImg.save(name + '.png')
