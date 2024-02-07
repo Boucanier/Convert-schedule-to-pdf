@@ -275,7 +275,7 @@ def multipleSort(courseList : list[Course]) -> tuple[list[Course], list[Course]]
                 tempend = courseList[k].endMinutes
                 hend = courseList[k].timeContent[1]
 
-        replaceCourse.append(Course(courseList[e[0]].dayContent, [hstart,hend], "COURS", "- - -", "MULTIPLES", "- - -", courseList[e[0]].weekContent, "- - -", '#7BEBFF'))
+        replaceCourse.append(Course(courseList[e[0]].dayContent, [hstart,hend], "COURS", "- - -", "MULTIPLES", "- - -", courseList[e[0]].weekContent, "- - -", '7BEBFF'))
 
     for e in courseList:
         if len(e.sameTime) != 0 :
