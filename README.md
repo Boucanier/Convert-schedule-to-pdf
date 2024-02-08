@@ -42,12 +42,15 @@ To run the discord bot, make sure that you have a ___config___ folder with this 
 Each file contain respectively this information :
 
 - _token.son_ :
+
 ```json
 {
 "token": "[your bot token]"
 }
 ```
+
 - _bot_config.json_ :
+
 ```json
 {
   "to_ping": "[ping id]",
