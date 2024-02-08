@@ -194,4 +194,5 @@ async def on_message(message : discord.Message) -> None :
             await message.channel.send(content = f'***{message.author.mention}***, tu racontes quoi mon reuf ?!')
 
 
-bot.run(token)
+if __name__ == "__main__" :
+    bot.run(token)
