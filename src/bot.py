@@ -1,6 +1,6 @@
 import discord, time, json
 from discord.ext import tasks, commands
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from functions import toPDF, toXLSX, scraper, elementSchedule, dbOperations, drawing
 
 with open('config/token.json', 'r') as fl :
@@ -57,6 +57,24 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+
+async def schedule_img() -> None:
+    """
+        Create the schedule image of the default precised group and send it to the default channel
+
+        - Args :
+            - None
+
+        - Returns :
+            - None
+    """
+    days = ('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche')
+    tmDate = date.today() + timedelta(days = 1)
+    byGroupSchedule(PRECISED_GROUP, tmDate, short = True)
+    message_channel = bot.get_channel(DEFAULT_CHANNEL)
+    await message_channel.send(content = f'Voici l\'emploi du temps du groupe ***{PRECISED_GROUP}*** pour **{days[tmDate.weekday()]} {tmDate.strftime("%d/%m/%Y")}** :', file = discord.File(OUTPUT_DIR + PRECISED_GROUP + '.png')) # type: ignore
+
+
 @tasks.loop(minutes=5)
 async def refresh_db() -> None:
     """
@@ -80,6 +98,7 @@ async def refresh_db() -> None:
 async def on_ready() -> None:
     print(f'We have logged in as {bot.user}')
     refresh_db.start()
+    await schedule_img()
 
 
 @bot.event
