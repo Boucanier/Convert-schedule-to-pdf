@@ -2,7 +2,7 @@
     This module will convert the data scrapped with the scrapper into a xlsx file
 """
 import xlsxwriter
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from models.course import *
 
 

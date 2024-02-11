@@ -1,6 +1,6 @@
 import discord, time, json
 from discord.ext import tasks, commands
-from datetime import date, timedelta, datetime
+from datetime import date, timedelta
 from functions import toPDF, toXLSX, scraper, elementSchedule, dbOperations, drawing
 
 with open('config/token.json', 'r') as fl :
