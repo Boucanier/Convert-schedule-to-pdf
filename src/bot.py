@@ -13,6 +13,7 @@ with open('config/bot_config.json', 'r') as fl :
     PRECISED_GROUP = obj['precised_group']
     DEFAULT_CHANNEL = int(obj['default_channel'])
     OUTPUT_DIR = obj['output_dir']
+    SEND_TIME = obj['send_time']
 
 
 def byGroupSchedule(group : str, toDate : date = date.today(), short : bool = False) :
@@ -73,6 +74,7 @@ async def schedule_img() -> None:
     byGroupSchedule(PRECISED_GROUP, tmDate, short = True)
     message_channel = bot.get_channel(DEFAULT_CHANNEL)
     await message_channel.send(content = f'Voici l\'emploi du temps du groupe ***{PRECISED_GROUP}*** pour **{days[tmDate.weekday()]} {tmDate.strftime("%d/%m/%Y")}** :', file = discord.File(OUTPUT_DIR + PRECISED_GROUP + '.png')) # type: ignore
+    print(f'Sent image schedule at {time.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]", time.localtime())}\n')
 
 
 @tasks.loop(minutes=5)
@@ -93,12 +95,14 @@ async def refresh_db() -> None:
     dbOperations.overwriteDB(allCourse, weekDesc)
     print(f'Got schedule {DEFAULT_GROUP} at {time.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]", time.localtime())}\n')
 
+    if SEND_TIME[0] == int(time.strftime("%H", time.localtime())) and abs(SEND_TIME[1] - int(time.strftime("%M", time.localtime()))) < 5 :
+        await schedule_img()
+
 
 @bot.event
 async def on_ready() -> None:
     print(f'We have logged in as {bot.user}')
     refresh_db.start()
-    await schedule_img()
 
 
 @bot.event

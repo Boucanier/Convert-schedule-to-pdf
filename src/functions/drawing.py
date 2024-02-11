@@ -103,7 +103,7 @@ def createScheduleImage(courseList : list[list[Course]], weekDesc : list[str], n
     wIndex, i = -1, 0
     while wIndex < 0 and i < len(weekDesc):
         compDate = datetime.strptime(weekDesc[i], "%d_%m_%Y").date()
-        if ((compDate - toDate).days) <= 6 :
+        if 0 <= ((compDate - toDate).days) <= 6 :
             wIndex = i
         i += 1
     
