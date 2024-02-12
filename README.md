@@ -14,6 +14,7 @@ To run the code, you need to have the following packages installed :
 - __BeautifulSoup__ module (_```pip install bs4```_)
 - __xlsxwriter__ module (_```pip install xlsxwriter```_)
 - __discord__ module (_```pip install discord```_) : _only for_ __discord bot__
+- __pil__ module (_```pip install pil```_) : _only for_ __discord bot__
 - __lxml parser__ module (_```pip install lxml```_)
 - __LibreOffice 7.3__ or above (_```sudo apt install libreoffice```_)
 - __xdg-utils__ (_```sudo apt install xdg-utils```_) : _only for __Linux__ distribution_
