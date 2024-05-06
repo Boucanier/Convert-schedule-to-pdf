@@ -42,7 +42,7 @@ Then the program will create a xlsx file and a pdf file from it. It will open th
 To run the discord bot, make sure that you have a ___config___ folder with this files : _token.json_ and _bot_config.json_.
 Each file contain respectively this information :
 
-- _token.son_ :
+- _token.json_ :
 
 ```json
 {
