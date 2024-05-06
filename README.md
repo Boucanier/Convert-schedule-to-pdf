@@ -27,7 +27,7 @@ To install all these requirements on a Debian based Linux distribution, you can 
 
 ### Local program
 
-Run [_src/main.py_](src/main.py), then enter the element you want your schedule based on (1 : group, 2 : staff, 3 : room), refresh the list of schedule (4 : refresh), create or reset the SQL database (5 : DB creation), update the SQL database (6 : DB update) or exit the program (7 : quit).
+Run [_src/main.py_](src/main.py), then enter the element you want your schedule based on (__1 : group__, __2 : staff__, __3 : room__), refresh the list of schedule (__4 : refresh__), create or reset the SQL database (__5 : DB creation__), update the SQL database (__6 : DB update__) or exit the program (__7 : quit__).
 
 If you chose to get a schedule based on room or staff (option 3 or 4), the program will get the schedule of every group and then you will have to specify a room/professor. The program will filter every schedule with your choice and merge everything together. Once you have created a schedule based on a room/professor, the program will not refresh every schedule unless you refresh it with option 4 in the menu.
 
@@ -46,7 +46,7 @@ Each file contain respectively this information :
 
 ```json
 {
-"token": "[your bot token]"
+  "token": "[your bot token]"
 }
 ```
 
