@@ -1,13 +1,13 @@
 import sqlite3, os
 from models.course import *
-from functions import elementSchedule
+from functions import element_schedule
 from datetime import datetime, timedelta
 
 
 FILE_PATH = "data/schedule.db"
 ELEMENTS = ("staff", "room", "module", "groups")
 
-def createDB(allCourse : list[list[Course]]) -> None:
+def create_db(all_course : list[list[Course]]) -> None :
     """
         Create new database with every tables and fill tables STAFF, ROOM, MODULE, GROUPS
 
@@ -46,9 +46,9 @@ def createDB(allCourse : list[list[Course]]) -> None:
                  color VARCHAR(10))")
 
     for e in ELEMENTS :
-        elementList = elementSchedule.getFullList(allCourse, e)
-        for i in range(len(elementList)) :
-            cur.execute("INSERT INTO " + e + " VALUES (" + str(i) + ", '" + elementList[i] + "')")
+        element_list = element_schedule.get_full_list(all_course, e)
+        for i in range(len(element_list)) :
+            cur.execute("INSERT INTO " + e + " VALUES (" + str(i) + ", '" + element_list[i] + "')")
 
     conn.commit()
     cur.close()
@@ -56,7 +56,7 @@ def createDB(allCourse : list[list[Course]]) -> None:
     print("DataBase created\n")
 
 
-def updateDB(allCourse : list[list[Course]]) -> None:
+def update_db(all_course : list[list[Course]]) -> None :
     """
         Update database by adding missing elements of tables
 
@@ -71,25 +71,25 @@ def updateDB(allCourse : list[list[Course]]) -> None:
     new_db = os.path.exists(FILE_PATH)
     if not new_db :
         print("DataBase does not exist")
-        createDB(allCourse)
+        create_db(all_course)
     conn = sqlite3.connect(FILE_PATH)
     cur = conn.cursor()
 
     for e in ELEMENTS :
-        elementList = elementSchedule.getFullList(allCourse, e)
-        elementData = (cur.execute("SELECT * FROM " + e + " ORDER BY " + e + "_id")).fetchall()
-        for l in elementList :
-            if not any(l in sub for sub in elementData):
-                elementData.append((elementData[-1][0] + 1, l))
-                cur.execute("INSERT INTO " + e + " VALUES (" + str(elementData[-1][0]) + ", '" + l + "')")
-    
+        element_list = element_schedule.get_full_list(all_course, e)
+        element_data = (cur.execute("SELECT * FROM " + e + " ORDER BY " + e + "_id")).fetchall()
+        for l in element_list :
+            if not any(l in sub for sub in element_data):
+                element_data.append((element_data[-1][0] + 1, l))
+                cur.execute("INSERT INTO " + e + " VALUES (" + str(element_data[-1][0]) + ", '" + l + "')")
+
     conn.commit()
     cur.close()
     conn.close()
     print("DataBase updated\n")
 
 
-def getElements(tableName : str) -> dict[str, str]:
+def get_elements(table_name : str) -> dict[str, str]:
     """
         Get every element of a given table from database
 
@@ -101,15 +101,15 @@ def getElements(tableName : str) -> dict[str, str]:
     """
     conn = sqlite3.connect(FILE_PATH)
     cur = conn.cursor()
-    data = cur.execute("SELECT * FROM " + tableName).fetchall()
-    elementDic = {e[1] : str(e[0]) for e in data}
+    data = cur.execute("SELECT * FROM " + table_name).fetchall()
+    element_dic = {e[1] : str(e[0]) for e in data}
 
     cur.close()
     conn.close()
-    return elementDic
+    return element_dic
 
 
-def deleteByWeek(weekDesc : list[str]) -> None:
+def delete_by_week(week_desc : list[str]) -> None:
     """
         Delete every course of a given week from database
 
@@ -119,15 +119,15 @@ def deleteByWeek(weekDesc : list[str]) -> None:
     conn = sqlite3.connect(FILE_PATH)
     cur = conn.cursor()
 
-    for e in weekDesc :
+    for e in week_desc :
         cur.execute("DELETE FROM COURSE WHERE first_day_week LIKE '" + e[6:10] + "_" + e[3:5] + "_" + e[0:2] + "'")
-    
+
     conn.commit()
     cur.close()
     conn.close()
 
 
-def insertCourse(courseList : list[list[Course]], weekDesc : list[str]) -> None:
+def insert_course(course_list : list[list[Course]], week_desc : list[str]) -> None:
     """
         Insert every course from courseList into database
         Check if course is already in database before insertion and insert it only if it is not
@@ -142,24 +142,24 @@ def insertCourse(courseList : list[list[Course]], weekDesc : list[str]) -> None:
     conn = sqlite3.connect(FILE_PATH)
     cur = conn.cursor()
 
-    elementList = [getElements(e) for e in ELEMENTS]
+    element_list = [get_elements(e) for e in ELEMENTS]
 
-    insertedList = []
+    inserted_list = []
 
-    for k in courseList:
+    for k in course_list:
         for e in k :
-            if e not in insertedList :
-                cur.execute("INSERT INTO course VALUES('" + str(e.dayContent) + "', '" + e.timeContent[0] + "', '" + e.timeContent[1] + "', FALSE, '" +\
-                            elementList[0][e.profContent] + "', '" + elementList[1][e.roomContent] + "', '" + elementList[2][e.moduleContent] + "', '" +\
-                            elementList[3][e.groupContent] + "', '" + e.noteContent + "', '" + weekDesc[e.weekContent][6:10] + "_" + weekDesc[e.weekContent][3:5] + "_" + weekDesc[e.weekContent][0:2] + "', '" + e.colorContent + "')")
-                insertedList.append(e)
-    
+            if e not in inserted_list :
+                cur.execute("INSERT INTO course VALUES('" + str(e.day_content) + "', '" + e.time_content[0] + "', '" + e.time_content[1] + "', FALSE, '" +\
+                            element_list[0][e.prof_content] + "', '" + element_list[1][e.room_content] + "', '" + element_list[2][e.module_content] + "', '" +\
+                            element_list[3][e.group_content] + "', '" + e.note_content + "', '" + week_desc[e.week_content][6:10] + "_" + week_desc[e.week_content][3:5] + "_" + week_desc[e.week_content][0:2] + "', '" + e.color_content + "')")
+                inserted_list.append(e)
+
     conn.commit()
     cur.close()
     conn.close()
 
 
-def overwriteDB(allCourse : list[list[Course]], weekDesc : list[str]) -> None:
+def overwrite_db(all_course : list[list[Course]], week_desc : list[str]) -> None :
     """
         Update and overwrite database with new data for the 4 next weeks
 
@@ -171,18 +171,18 @@ def overwriteDB(allCourse : list[list[Course]], weekDesc : list[str]) -> None:
             - None
     """
     # Update rooms, staffs, modules and groups tables
-    updateDB(allCourse)
+    update_db(all_course)
 
     # Delete all courses of the 4 next weeks since it will be reinserted
-    deleteByWeek(weekDesc)
+    delete_by_week(week_desc)
 
     # Insert all courses of the 4 next weeks
-    detailedCourse = elementSchedule.getFullDetailedList(allCourse)
-    insertCourse(detailedCourse, weekDesc)
+    detailed_course = element_schedule.get_full_detailed_list(all_course)
+    insert_course(detailed_course, week_desc)
     print("DataBase overwritten\n")
 
 
-def getCourseByElement(type : str, element : str) -> tuple[list[Course], list[str]]:
+def get_course_by_element(filter_type : str, element : str) -> tuple[list[Course], list[str]]:
     """
         Get every course of a given element
 
@@ -194,8 +194,8 @@ def getCourseByElement(type : str, element : str) -> tuple[list[Course], list[st
             - courseList (list[list[Course]])
             - weekDesc (list[str]) : list of weeks' first days
     """
-    type = type + "_name"
-    courseList = list()
+    filter_type = filter_type + "_name"
+    course_list = list()
     weekDesc = list()
     conn = sqlite3.connect(FILE_PATH)
     cur = conn.cursor()
@@ -203,7 +203,7 @@ def getCourseByElement(type : str, element : str) -> tuple[list[Course], list[st
     today = (datetime.today() - timedelta(days = 6)).strftime(r"%Y_%m_%d")
     request = str()
 
-    if type == "staff_name" :
+    if filter_type == "staff_name" :
         request = "SELECT DISTINCT c1.week_day, c1.t_start, c1.t_end, module_name, room_name, s2.staff_name, group_name, c1.first_day_week, c1.note, c1.color\
                     FROM course c1, course c2, groups g, module m, room r, staff s1, staff s2\
                     WHERE c1.module_id = c2.module_id\
@@ -216,11 +216,11 @@ def getCourseByElement(type : str, element : str) -> tuple[list[Course], list[st
                     AND c1.room_id = r.room_id\
                     AND c1.staff_id = s1.staff_id\
                     AND c2.staff_id = s2.staff_id\
-                    AND s1." + type + " LIKE '%" + element + "%'\
+                    AND s1." + filter_type + " LIKE '%" + element + "%'\
                     AND c1.first_day_week >= '" + today +"'\
                     ORDER BY c1.first_day_week;"
     
-    elif type == "room_name" :
+    elif filter_type == "room_name" :
         request = "SELECT DISTINCT c1.week_day, c1.t_start, c1.t_end, module_name, r2.room_name, s.staff_name, group_name, c1.first_day_week, c1.note, c1.color\
                     FROM course c1, course c2, groups g, module m, room r1, room r2, staff s\
                     WHERE c1.module_id = c2.module_id\
@@ -233,7 +233,7 @@ def getCourseByElement(type : str, element : str) -> tuple[list[Course], list[st
                     AND c1.room_id = r1.room_id\
                     AND c2.room_id = r2.room_id\
                     AND c1.staff_id = s.staff_id\
-                    AND r1." + type + " LIKE '%" + element + "%'\
+                    AND r1." + filter_type + " LIKE '%" + element + "%'\
                     AND c1.first_day_week >= '" + today +"'\
                     ORDER BY c1.first_day_week;"
 
@@ -245,14 +245,14 @@ def getCourseByElement(type : str, element : str) -> tuple[list[Course], list[st
             weekDesc.append(e[7][8:10] + '_' + e[7][5:7] + '_' + e[7][0:4])
 
     for e in data :
-        courseList.append(Course(e[0], [e[1], e[2]], e[3], e[4], e[5], e[6], weekDesc.index(e[7][8:10] + '_' + e[7][5:7] + '_' + e[7][0:4]), e[8], e[9]))
+        course_list.append(Course(e[0], [e[1], e[2]], e[3], e[4], e[5], e[6], weekDesc.index(e[7][8:10] + '_' + e[7][5:7] + '_' + e[7][0:4]), e[8], e[9]))
 
     cur.close()
     conn.close()
 
-    courseList = elementSchedule.mergeCourse(courseList)
+    course_list = element_schedule.merge_course(course_list)
     
-    return courseList, weekDesc
+    return course_list, weekDesc
 
 
 def countElement(type : str, element : str) -> int :

@@ -5,7 +5,7 @@ import platform
 import subprocess
 
 
-def convertToPdf(file_name : str, display = True) -> None:
+def convert_to_pdf(file_name : str, display = True) -> None:
     '''
         Convert a file to pdf using a libreOffice command\n
         Clear the terminal\n
@@ -27,7 +27,7 @@ def convertToPdf(file_name : str, display = True) -> None:
         if display :
             subprocess.run('clear', shell = True)
             subprocess.run('xdg-open ' + file_name.split('.')[0] + '.pdf', shell = True)
-        
+
     elif platform.system() == "Windows" :
         subprocess.run('cd > path.txt', shell = True)
         with open("path.txt", "r") as fl :
@@ -43,7 +43,7 @@ def convertToPdf(file_name : str, display = True) -> None:
             subprocess.run('start /B ' + file_name.split('.')[0] + '.pdf', shell = True)
 
 
-def clearFiles(path : str = "", *ext : str) -> None :
+def clear_files(path : str = "", *ext : str) -> None :
     """
         Delete every files in the current directory with the given extensions
 
@@ -63,4 +63,4 @@ def clearFiles(path : str = "", *ext : str) -> None :
 
 
 if __name__ == "__main__" :
-    convertToPdf(input("File to convert with its extension : "))
+    convert_to_pdf(input("File to convert with its extension : "))
