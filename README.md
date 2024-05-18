@@ -59,7 +59,7 @@ Each file contain respectively this information :
   "precised_group": "[your default precised group (your group)]",
   "default_channel": "[your discord channel id]",
   "output_dir": "[your_files_output_directory/]", 
-  "send_time": [HH, MM],
+  "send_time": ["HH", "MM"],
 }
 ```
 
