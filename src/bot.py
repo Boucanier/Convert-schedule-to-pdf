@@ -1,12 +1,13 @@
 import discord, time, json
 from discord.ext import tasks, commands
 from datetime import date, timedelta
+
 from functions import db_operations, element_schedule, to_pdf, to_xlsx, scraper, drawing
 
-with open('config/token.json', 'r') as fl :
+with open('config/token.json', 'r', encoding="utf-8") as fl :
     token = json.load(fl)['token']
 
-with open('config/bot_config.json', 'r') as fl :
+with open('config/bot_config.json', 'r', encoding="utf-8") as fl :
     obj = json.load(fl)
     TO_PING = obj['to_ping']
     DEFAULT_GROUP = obj['default_group']

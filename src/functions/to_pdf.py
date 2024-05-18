@@ -30,7 +30,7 @@ def convert_to_pdf(file_name : str, display = True) -> None:
 
     elif platform.system() == "Windows" :
         subprocess.run('cd > path.txt', shell = True)
-        with open("path.txt", "r") as fl :
+        with open("path.txt", "r", encoding="utf-8") as fl :
             path = str(fl.readlines()[0][:-1])
         file_path = path
         path = '\"' + path + '\"'
