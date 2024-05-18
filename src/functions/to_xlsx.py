@@ -55,15 +55,18 @@ def init_ws(worksheet, row : int, col : int, short : bool = False) -> tuple:
             - worksheet (xlsx worksheet) : worksheet to initialize
             - row (int) : number of rows
             - col (int) : number of columns
-            - short (bool) : default = False, if True : only format first day, else : format every day
+            - short (bool) : default = False,
+                if True : only format first day, else : format every day
 
         - Returns :
-            - total_letters (tuple[str]) : tuple containing the letters of the columns (A, B, C, ..., AA, AB, ..., BA, BB, ...)
+            - total_letters (tuple[str]) : tuple containing the letters of the columns
+                (A, B, C, ..., AA, AB, ..., BA, BB, ...)
     """
     worksheet.set_landscape()
     worksheet.set_margins(left = 0.15, right = 0.15, top = 0.15, bottom = 0.15)
     worksheet.center_horizontally()
-    letters = ('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z')
+    letters = ('A','B','C','D','E','F','G','H','I','J','K','L','M',
+               'N','O','P','Q','R','S','T','U','V','W','X','Y','Z')
     total_letters = list()
     for i in range(col):
         if i < 26 :
@@ -100,7 +103,17 @@ def init_ws(worksheet, row : int, col : int, short : bool = False) -> tuple:
     return total_letters
 
 
-def format_ws(worksheet, day_format : xlsxwriter.workbook.Format, total_letters : tuple, under_format : xlsxwriter.workbook.Format, right_format : xlsxwriter.workbook.Format, corner_format : xlsxwriter.workbook.Format, title : str, week : str, row : int, col : int, day_ind : int = 5) -> None:
+def format_ws(worksheet,
+              day_format : xlsxwriter.workbook.Format,
+              total_letters : tuple,
+              under_format : xlsxwriter.workbook.Format,
+              right_format : xlsxwriter.workbook.Format,
+              corner_format : xlsxwriter.workbook.Format,
+              title : str,
+              week : str,
+              row : int,
+              col : int,
+              day_ind : int = 5) -> None:
     """
         Set the frame for the schedule with days and times
 
@@ -114,7 +127,8 @@ def format_ws(worksheet, day_format : xlsxwriter.workbook.Format, total_letters 
             - title (str) : title of the schedule
             - row (int) : Number of rows
             - col (int) : Number of columns
-            - day_ind (int) : Day of week index, default = 5, day_ind > 5 means all week is requested
+            - day_ind (int) : Day of week index, default = 5,
+                day_ind > 5 means entire week is requested
 
         - Returns :
             - None
@@ -127,18 +141,28 @@ def format_ws(worksheet, day_format : xlsxwriter.workbook.Format, total_letters 
     for i in range(0, row - 2, 5):
         worksheet.merge_range('A' + str(i+3) + ':A' + str(i+7), week_days[i//5], day_format)
     list_week = list(week)
-    for i in range(len(list_week)):
-        if list_week[i] == '_':
+
+    for (i, item) in enumerate(list_week):
+        if item == '_':
             list_week[i] = '/'
+
     week = ''.join(list_week)
-    worksheet.merge_range('B1:' + str(total_letters[-1]) + '1', title + ', semaine du ' + week, day_format)
+    worksheet.merge_range('B1:' + str(total_letters[-1]) + '1',
+                          title + ', semaine du ' + week,
+                          day_format)
+
     worksheet.set_row(0,25)
     for i in range(1, col-10, 12):
-        worksheet.merge_range(str(total_letters[i]) + '2:' + str(total_letters[i+11]) + '2', str(round(i/12)+8) + ':00 - ' + str(round(i/12)+9) + ':00', day_format)
+        worksheet.merge_range(str(total_letters[i]) + '2:' + str(total_letters[i+11]) + '2',
+                              str(round(i/12)+8) + ':00 - ' + str(round(i/12)+9) + ':00',
+                              day_format)
+
     for i in range(3, row + 1) :
         worksheet.write_blank(str(total_letters[-1]) + str(i), None, right_format)
+
     for i in range(1, col):
         worksheet.write_blank(str(total_letters[i]) + str(row), None, under_format)
+
     worksheet.write_blank(str(total_letters[-1]) + str(row), None, corner_format)
 
 
@@ -154,17 +178,24 @@ def set_to_column(course_list : list[Course], total_letters : tuple) -> list[lis
             - time_column (list[list[list[str]]])
     """
     time_column = []
-    for j in range(len(course_list)):
+    for crs in course_list :
         temp_list = []
         for i in range(2):
             temp_time = 0
-            temp_time += (int(((course_list[j].time_content)[i].split(':'))[0])-8) * 12 + 1 + int(((course_list[j].time_content)[i].split(':'))[1])//5 - i
+            temp_time += (int(((crs.time_content)[i].split(':'))[0])-8) * 12 + 1 \
+                + int(((crs.time_content)[i].split(':'))[1])//5 - i
+
             temp_list.append(total_letters[temp_time])
         time_column.append(temp_list)
+
     return time_column
 
 
-def add_course(worksheet, column_time : list, course_list : list, workbook : xlsxwriter.Workbook, short : bool = False) -> None:
+def add_course(worksheet,
+               column_time : list,
+               course_list : list,
+               workbook : xlsxwriter.Workbook,
+               short : bool = False) -> None:
     """
         Create formats used to add course\n
         Add a course to the xlsx file
@@ -215,20 +246,39 @@ def add_course(worksheet, column_time : list, course_list : list, workbook : xls
         botfmt.set_bg_color(e.color_content)
         fmt_list[2].append(botfmt)
 
-    for i in range(len(course_list)):
+    for (i, item) in enumerate(course_list):
         if short :
             row_nbr = 3
         else :
-            row_nbr = int(course_list[i].day_content)*5+3
+            row_nbr = int(item.day_content)*5+3
 
-        worksheet.merge_range(column_time[i][0] + str(row_nbr) + ':' + column_time[i][1] + str(row_nbr), course_list[i].time_content[0] + ' - ' + course_list[i].time_content[1], fmt_list[0][i])
-        worksheet.merge_range(column_time[i][0] + str(row_nbr + 1) + ':' + column_time[i][1] + str(row_nbr + 1), course_list[i].group_content, fmt_list[1][i])
-        worksheet.merge_range(column_time[i][0] + str(row_nbr + 2) + ':' + column_time[i][1] + str(row_nbr + 2), course_list[i].module_content, fmt_list[1][i])
-        worksheet.merge_range(column_time[i][0] + str(row_nbr + 3) + ':' + column_time[i][1] + str(row_nbr + 3), course_list[i].prof_content, fmt_list[1][i])
-        worksheet.merge_range(column_time[i][0] + str(row_nbr + 4) + ':' + column_time[i][1] + str(row_nbr + 4), course_list[i].room_content, fmt_list[2][i])
+        worksheet.merge_range(column_time[i][0] + str(row_nbr) \
+                               + ':' + column_time[i][1] + str(row_nbr),
+                              item.time_content[0] + ' - ' + item.time_content[1], fmt_list[0][i])
+
+        worksheet.merge_range(column_time[i][0] + str(row_nbr + 1) \
+                               + ':' + column_time[i][1] + str(row_nbr + 1),
+                              item.group_content, fmt_list[1][i])
+
+        worksheet.merge_range(column_time[i][0] + str(row_nbr + 2) \
+                               + ':' + column_time[i][1] + str(row_nbr + 2),
+                              item.module_content, fmt_list[1][i])
+
+        worksheet.merge_range(column_time[i][0] + str(row_nbr + 3) \
+                               + ':' + column_time[i][1] + str(row_nbr + 3),
+                              item.prof_content, fmt_list[1][i])
+
+        worksheet.merge_range(column_time[i][0] + str(row_nbr + 4) \
+                               + ':' + column_time[i][1] + str(row_nbr + 4),
+                              item.room_content, fmt_list[2][i])
 
 
-def write_to_list(workbook : xlsxwriter.Workbook, worksheet, over_course : list, course_list : list, week : str, total_letters : tuple) -> tuple[list[Course], xlsxwriter.workbook.Format, xlsxwriter.workbook.Format]:
+def write_to_list(workbook : xlsxwriter.Workbook,
+                  worksheet,
+                  over_course : list,
+                  course_list : list,
+                  week : str,
+                  total_letters : tuple) -> tuple[list[Course], xlsxwriter.workbook.Format, xlsxwriter.workbook.Format]:
     """
         Write a list of every courses
 
@@ -265,16 +315,24 @@ def write_to_list(workbook : xlsxwriter.Workbook, worksheet, over_course : list,
     fmt.set_border()
 
     worksheet.set_row(0, 25)
-    worksheet.merge_range('A1:' + total_letters[-1] + '1', 'Liste des cours - semaine du ' + week[:2] + '/' + week[3:5] + '/' + week[-4:], bigfmt)
+    worksheet.merge_range('A1:' + total_letters[-1] + '1',
+                          'Liste des cours - semaine du ' + week[:2] \
+                            + '/' + week[3:5] + '/' + week[-4:],
+                          bigfmt)
 
     over_cpt = 0
     course_cpt = 0
     total_course = []
 
     while over_cpt < len(over_course) or course_cpt < len(course_list):
-        if (over_cpt < len(over_course) and course_cpt < len(course_list) and over_course[over_cpt].start_before(course_list[course_cpt])) or course_cpt == len(course_list):
+        if (over_cpt < len(over_course) \
+            and course_cpt < len(course_list) \
+            and over_course[over_cpt].start_before(course_list[course_cpt])) \
+            or course_cpt == len(course_list):
+
             total_course.append(over_course[over_cpt])
             over_cpt += 1
+
         else :
             if course_list[course_cpt].prof_content != 'MULTIPLES' :
                 total_course.append(course_list[course_cpt])
@@ -282,16 +340,24 @@ def write_to_list(workbook : xlsxwriter.Workbook, worksheet, over_course : list,
 
     new_line = 3
 
-    for i in range(len(total_course)):
+    for (i, tcrs) in enumerate(total_course):
 
-        if i == 0 or (total_course[i-1].day_content != total_course[i].day_content) :
+        if i == 0 or (total_course[i-1].day_content != tcrs.day_content) :
             new_line += 1
             worksheet.set_row(new_line - 1, 22)
-            worksheet.merge_range('A' + str(new_line) + ':' + total_letters[-1] + str(new_line), week_days[total_course[i].day_content], bigfmt)
+            worksheet.merge_range('A' + str(new_line) + ':' + total_letters[-1] + str(new_line),
+                                  week_days[tcrs.day_content],
+                                  bigfmt)
             new_line += 1
 
-        msg = ' ' + total_course[i].group_content + ', ' + total_course[i].module_content + ', ' + total_course[i].prof_content + ' : ' + total_course[i].room_content
-        worksheet.merge_range('A' + str(new_line) + ':D' + str(new_line), total_course[i].time_content[0] + '-' + total_course[i].time_content[1], bigfmt)
+        msg = ' ' + tcrs.group_content \
+            + ', ' + tcrs.module_content \
+            + ', ' + tcrs.prof_content \
+            + ' : ' + tcrs.room_content
+
+        worksheet.merge_range('A' + str(new_line) + ':D' + str(new_line),
+                              tcrs.time_content[0] + '-' + tcrs.time_content[1],
+                              bigfmt)
 
         if len(msg) > 115 :
             worksheet.set_row(new_line - 1, 32)
@@ -299,16 +365,20 @@ def write_to_list(workbook : xlsxwriter.Workbook, worksheet, over_course : list,
         else :
             worksheet.set_row(new_line - 1, 18)
 
-        worksheet.merge_range('E' + str(new_line) + ':' + total_letters[-1] + str(new_line), msg, fmt)
+        worksheet.merge_range('E' + str(new_line) + ':' + total_letters[-1] + str(new_line),
+                              msg,
+                              fmt)
         new_line += 1
 
-        if total_course[i].note_content != '- - -':
-            if len(total_course[i].note_content) > 115 :
+        if tcrs.note_content != '- - -':
+            if len(tcrs.note_content) > 115 :
                 worksheet.set_row(new_line - 1, 32)
             else :
                 worksheet.set_row(new_line - 1, 20)
             worksheet.merge_range('A' + str(new_line) + ':D' + str(new_line), 'Remarques', bigfmt)
-            worksheet.merge_range('E' + str(new_line) + ':' + total_letters[-1] + str(new_line), ' ' + total_course[i].note_content, fmt)
+            worksheet.merge_range('E' + str(new_line) + ':' + total_letters[-1] + str(new_line),
+                                  ' ' + tcrs.note_content,
+                                  fmt)
             new_line += 1
 
     worksheet.print_area('A1:' + str(total_letters[-1]) + str(new_line))
@@ -341,7 +411,12 @@ def avg_time_to_str(time_list : list[int]) -> str :
     return h_time + ':' + m_time
 
 
-def stat_list(total_course : list[Course], worksheet, bigfmt : xlsxwriter.workbook.Format, fmt : xlsxwriter.workbook.Format, total_letters : tuple, week : str) -> None :
+def stat_list(total_course : list[Course],
+              worksheet,
+              bigfmt : xlsxwriter.workbook.Format,
+              fmt : xlsxwriter.workbook.Format,
+              total_letters : tuple,
+              week : str) -> None :
     """
         Create and display some statistical data from a list of courses in a new page
 
@@ -382,47 +457,68 @@ def stat_list(total_course : list[Course], worksheet, bigfmt : xlsxwriter.workbo
     start_list = []
     end_list = []
 
-    for i in range(len(total_course)):
-        if i == 0 or (total_course[i-1].day_content != total_course[i].day_content) :
-            start_list.append(total_course[i].start_minutes)
+    for (i, tcrs) in enumerate(total_course):
+        if i == 0 or (total_course[i-1].day_content != tcrs.day_content) :
+            start_list.append(tcrs.start_minutes)
         if i == len(total_course) - 1:
-            end_list.append(total_course[i].end_minutes)
-        elif i != 0 and total_course[i-1].day_content != total_course[i].day_content :
+            end_list.append(tcrs.end_minutes)
+        elif i != 0 and total_course[i-1].day_content != tcrs.day_content :
             end_list.append(total_course[i - 1].end_minutes)
 
     start_time = avg_time_to_str(start_list)
     end_time = avg_time_to_str(end_list)
 
     worksheet.set_row(0, 25)
-    worksheet.merge_range('A1:' + total_letters[-1] + '1', 'Statistiques des cours - semaine du ' + week[:2] + '/' + week[3:5] + '/' + week[-4:], bigfmt)
+    worksheet.merge_range('A1:' + total_letters[-1] + '1',
+                          'Statistiques des cours - semaine du ' + week[:2] \
+                            + '/' + week[3:5] + '/' + week[-4:],
+                          bigfmt)
     new_line = 3
 
     worksheet.set_row(new_line - 1, 20)
-    worksheet.merge_range('A' + str(new_line) + ':' + total_letters[-1] + str(new_line), 'Horaires moyennes : ' + start_time + ' - ' + end_time, bigfmt)
+    worksheet.merge_range('A' + str(new_line) + ':' + total_letters[-1] + str(new_line),
+                          'Horaires moyennes : ' + start_time + ' - ' + end_time,
+                          bigfmt)
     new_line += 1
 
     worksheet.set_row(new_line - 1, 20)
-    worksheet.merge_range('A' + str(new_line) + ':' + str(total_letters[-1]) + str(new_line), 'Temps de cours journalier moyen : ' + avg_daily_time, bigfmt)
+    worksheet.merge_range('A' + str(new_line) + ':' + str(total_letters[-1]) + str(new_line),
+                          'Temps de cours journalier moyen : ' + avg_daily_time,
+                          bigfmt)
     new_line += 1
 
     worksheet.set_row(new_line - 1, 20)
-    worksheet.merge_range('A' + str(new_line) + ':' + str(total_letters[-1]) + str(new_line), 'Total des heures de cours : ' + full_time + ' - ' + str(len(total_course)) + ' cours', bigfmt)
+    worksheet.merge_range('A' + str(new_line) + ':' + str(total_letters[-1]) + str(new_line),
+                          'Total des heures de cours : ' + full_time\
+                              + ' - ' + str(len(total_course)) + ' cours',
+                          bigfmt)
     new_line += 2
 
     worksheet.set_row(new_line - 1, 20)
-    worksheet.merge_range('A' + str(new_line) + ':' + str(total_letters[-1]) + str(new_line), 'Durées cumulées pour chaque module', bigfmt)
+    worksheet.merge_range('A' + str(new_line) + ':' + str(total_letters[-1]) + str(new_line),
+                          'Durées cumulées pour chaque module',
+                          bigfmt)
     new_line += 1
 
     for i in range(len(module_dic)):
         worksheet.set_row(new_line - 1, 25)
-        worksheet.merge_range('A' + str(new_line) + ':' + str(total_letters[len(total_letters) - 10]) + str(new_line), ' ' + module_name[i], fmt)
-        worksheet.merge_range(str(total_letters[len(total_letters) - 9]) + str(new_line) + ':' + total_letters[-1] + str(new_line), module_time[i], bigfmt)
+        worksheet.merge_range('A' + str(new_line) + ':' \
+                               + str(total_letters[len(total_letters) - 10]) + str(new_line),
+                              ' ' + module_name[i], fmt)
+
+        worksheet.merge_range(str(total_letters[len(total_letters) - 9]) + str(new_line)\
+                               + ':' + total_letters[-1] + str(new_line),
+                              module_time[i], bigfmt)
         new_line += 1
 
     worksheet.print_area('A1:' + str(total_letters[-1]) + str(new_line))
 
 
-def create_xlsx(course_list : list[list[Course]], over_course : list[list[Course]], week_desc : list[str], title : str, name : str) -> None:
+def create_xlsx(course_list : list[list[Course]],
+                over_course : list[list[Course]],
+                week_desc : list[str],
+                title : str,
+                name : str) -> None:
     """
         Create a xlsx file from course list
         
@@ -439,28 +535,46 @@ def create_xlsx(course_list : list[list[Course]], over_course : list[list[Course
     workbook = xlsxwriter.Workbook(name + '.xlsx')
 
     cpt = 1
-    for i in range (len(week_desc)):
-        worksheet = workbook.add_worksheet(str(week_desc[i]))
+    for (i, wd) in enumerate(week_desc):
+        worksheet = workbook.add_worksheet(str(wd))
         worksheet.center_vertically()
         day_format, under_format, right_format, corner_format = set_format_ws(workbook)
         total_letters = init_ws(worksheet, ROW, COL)
-        format_ws(worksheet, day_format, total_letters, under_format, right_format, corner_format, title, str(week_desc[i]), ROW, COL)
+        format_ws(worksheet,
+                  day_format,
+                  total_letters,
+                  under_format,
+                  right_format,
+                  corner_format,
+                  title,
+                  str(wd),
+                  ROW,
+                  COL)
         column_time = set_to_column(course_list[i], total_letters)
         add_course(worksheet, column_time, course_list[i], workbook)
 
         if len(over_course[i]) > 0 or len(course_list[i]) > 0:
             worksheet = workbook.add_worksheet('Liste des cours ' + str(cpt))
             total_letters = init_ws(worksheet, ROW, COL)
-            total_course, bigfmt, fmt = write_to_list(workbook, worksheet, over_course[i], course_list[i], week_desc[i], total_letters)
+            total_course, bigfmt, fmt = write_to_list(workbook,
+                                                      worksheet,
+                                                      over_course[i],
+                                                      course_list[i],
+                                                      wd,
+                                                      total_letters)
             worksheet = workbook.add_worksheet('Statistiques ' + str(cpt))
             total_letters = init_ws(worksheet, ROW, COL)
-            stat_list(total_course, worksheet, bigfmt, fmt, total_letters, week_desc[i])
+            stat_list(total_course, worksheet, bigfmt, fmt, total_letters, wd)
             cpt += 1
 
     workbook.close()
 
 
-def create_short_xlsx(course_list : list[list[Course]], week_desc : list[str], title : str, name : str, to_date : date = date.today()) -> None:
+def create_short_xlsx(course_list : list[list[Course]],
+                      week_desc : list[str],
+                      title : str,
+                      name : str,
+                      to_date : date = date.today()) -> None:
     """
         Create a xlsx file with only one day schedule from course list
     """
@@ -482,7 +596,17 @@ def create_short_xlsx(course_list : list[list[Course]], week_desc : list[str], t
     worksheet.center_vertically()
     day_format, under_format, right_format, corner_format = set_format_ws(workbook)
     total_letters = init_ws(worksheet, ROW_SHORT, COL, short = True)
-    format_ws(worksheet, day_format, total_letters, under_format, right_format, corner_format, title, str(week_desc[w_index]), ROW_SHORT, COL, to_date.weekday())
+    format_ws(worksheet,
+              day_format,
+              total_letters,
+              under_format,
+              right_format,
+              corner_format,
+              title,
+              str(week_desc[w_index]),
+              ROW_SHORT,
+              COL,
+              to_date.weekday())
     column_time = set_to_column(chosen_day, total_letters)
     add_course(worksheet, column_time, chosen_day, workbook, short = True)
 

@@ -35,7 +35,9 @@ def create_db(all_course : list[list[Course]]) -> None :
     cur.execute("CREATE TABLE module (module_id NUMBER(3) PRIMARY KEY, module_name TEXT)")
     cur.execute("CREATE TABLE groups (groups_id NUMBER(3) PRIMARY KEY, group_name VARCHAR(20))")
     cur.execute("CREATE TABLE room (room_id NUMBER(3) PRIMARY KEY, room_name VARCHAR(10))")
-    cur.execute("CREATE TABLE course (week_day NUMBER(1), t_start VARCHAR(5) NOT NULL, t_end VARCHAR(5) NOT NULL,\
+    cur.execute("CREATE TABLE course (week_day NUMBER(1),\
+                 t_start VARCHAR(5) NOT NULL,\
+                 t_end VARCHAR(5) NOT NULL,\
                  man_set BOOLEAN NOT NULL,\
                  staff_id INTEGER REFERENCES staff(staff_id),\
                  room_id INTEGER REFERENCES room(room_id),\
@@ -47,8 +49,8 @@ def create_db(all_course : list[list[Course]]) -> None :
 
     for e in ELEMENTS :
         element_list = element_schedule.get_full_list(all_course, e)
-        for i in range(len(element_list)) :
-            cur.execute("INSERT INTO " + e + " VALUES (" + str(i) + ", '" + element_list[i] + "')")
+        for (i, item) in enumerate(element_list) :
+            cur.execute("INSERT INTO " + e + " VALUES (" + str(i) + ", '" + item + "')")
 
     conn.commit()
     cur.close()
@@ -120,7 +122,8 @@ def delete_by_week(week_desc : list[str]) -> None:
     cur = conn.cursor()
 
     for e in week_desc :
-        cur.execute("DELETE FROM COURSE WHERE first_day_week LIKE '" + e[6:10] + "_" + e[3:5] + "_" + e[0:2] + "'")
+        cur.execute("DELETE FROM COURSE WHERE first_day_week LIKE '" +\
+                    e[6:10] + "_" + e[3:5] + "_" + e[0:2] + "'")
 
     conn.commit()
     cur.close()
@@ -149,9 +152,19 @@ def insert_course(course_list : list[list[Course]], week_desc : list[str]) -> No
     for k in course_list:
         for e in k :
             if e not in inserted_list :
-                cur.execute("INSERT INTO course VALUES('" + str(e.day_content) + "', '" + e.time_content[0] + "', '" + e.time_content[1] + "', FALSE, '" +\
-                            element_list[0][e.prof_content] + "', '" + element_list[1][e.room_content] + "', '" + element_list[2][e.module_content] + "', '" +\
-                            element_list[3][e.group_content] + "', '" + e.note_content + "', '" + week_desc[e.week_content][6:10] + "_" + week_desc[e.week_content][3:5] + "_" + week_desc[e.week_content][0:2] + "', '" + e.color_content + "')")
+                cur.execute("INSERT INTO course VALUES('" +\
+                            str(e.day_content) + "', '" +\
+                            e.time_content[0] + "', '" +\
+                            e.time_content[1] + "', FALSE, '" +\
+                            element_list[0][e.prof_content] + "', '" +\
+                            element_list[1][e.room_content] + "', '" +\
+                            element_list[2][e.module_content] + "', '" +\
+                            element_list[3][e.group_content] + "', '" +\
+                            e.note_content + "', '" +\
+                            week_desc[e.week_content][6:10] + "_" +\
+                                week_desc[e.week_content][3:5] + "_" +\
+                                week_desc[e.week_content][0:2] + "', '" +\
+                            e.color_content + "')")
                 inserted_list.append(e)
 
     conn.commit()
@@ -196,7 +209,7 @@ def get_course_by_element(filter_type : str, element : str) -> tuple[list[Course
     """
     filter_type = filter_type + "_name"
     course_list = list()
-    weekDesc = list()
+    week_desc = list()
     conn = sqlite3.connect(FILE_PATH)
     cur = conn.cursor()
 
@@ -204,7 +217,8 @@ def get_course_by_element(filter_type : str, element : str) -> tuple[list[Course
     request = str()
 
     if filter_type == "staff_name" :
-        request = "SELECT DISTINCT c1.week_day, c1.t_start, c1.t_end, module_name, room_name, s2.staff_name, group_name, c1.first_day_week, c1.note, c1.color\
+        request = "SELECT DISTINCT c1.week_day, c1.t_start, c1.t_end, module_name, room_name,\
+                        s2.staff_name, group_name, c1.first_day_week, c1.note, c1.color\
                     FROM course c1, course c2, groups g, module m, room r, staff s1, staff s2\
                     WHERE c1.module_id = c2.module_id\
                     AND c1.first_day_week = c2.first_day_week\
@@ -219,9 +233,10 @@ def get_course_by_element(filter_type : str, element : str) -> tuple[list[Course
                     AND s1." + filter_type + " LIKE '%" + element + "%'\
                     AND c1.first_day_week >= '" + today +"'\
                     ORDER BY c1.first_day_week;"
-    
+
     elif filter_type == "room_name" :
-        request = "SELECT DISTINCT c1.week_day, c1.t_start, c1.t_end, module_name, r2.room_name, s.staff_name, group_name, c1.first_day_week, c1.note, c1.color\
+        request = "SELECT DISTINCT c1.week_day, c1.t_start, c1.t_end, module_name, r2.room_name,\
+                        s.staff_name, group_name, c1.first_day_week, c1.note, c1.color\
                     FROM course c1, course c2, groups g, module m, room r1, room r2, staff s\
                     WHERE c1.module_id = c2.module_id\
                     AND c1.first_day_week = c2.first_day_week\
@@ -241,21 +256,24 @@ def get_course_by_element(filter_type : str, element : str) -> tuple[list[Course
     data = cur.execute(request).fetchall()
 
     for e in data :
-        if (e[7][8:10] + '_' + e[7][5:7] + '_' + e[7][0:4]) not in weekDesc :
-            weekDesc.append(e[7][8:10] + '_' + e[7][5:7] + '_' + e[7][0:4])
+        if (e[7][8:10] + '_' + e[7][5:7] + '_' + e[7][0:4]) not in week_desc :
+            week_desc.append(e[7][8:10] + '_' + e[7][5:7] + '_' + e[7][0:4])
 
     for e in data :
-        course_list.append(Course(e[0], [e[1], e[2]], e[3], e[4], e[5], e[6], weekDesc.index(e[7][8:10] + '_' + e[7][5:7] + '_' + e[7][0:4]), e[8], e[9]))
+        course_list.append(Course(e[0],
+                                  [e[1], e[2]], e[3], e[4], e[5], e[6],
+                                  week_desc.index(e[7][8:10] + '_' + e[7][5:7] + '_' + e[7][0:4]),
+                                  e[8], e[9]))
 
     cur.close()
     conn.close()
 
     course_list = element_schedule.merge_course(course_list)
-    
-    return course_list, weekDesc
+
+    return course_list, week_desc
 
 
-def countElement(type : str, element : str) -> int :
+def count_element(filter_type : str, element : str) -> int :
     """
         Count the number of row containing a given element in a given table
 
@@ -269,7 +287,9 @@ def countElement(type : str, element : str) -> int :
     conn = sqlite3.connect(FILE_PATH)
     cur = conn.cursor()
 
-    request = "SELECT COUNT(DISTINCT " + type + "_name) FROM " + type + " WHERE " + type + "_name LIKE '%" + element + "%';"
+    request = "SELECT COUNT(DISTINCT " + filter_type + "_name)\
+                FROM " + filter_type + " WHERE " +\
+                filter_type + "_name LIKE '%" + element + "%';"
     count = cur.execute(request).fetchone()[0]
 
     cur.close()

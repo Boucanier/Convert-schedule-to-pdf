@@ -25,8 +25,16 @@ def create_header(schedule_draw : ImageDraw.ImageDraw, schedule_date : date) -> 
 
     schedule_draw.rectangle((0, 0, WIDTH, 100), fill=(220, 220, 220))
 
-    schedule_draw.text((WIDTH/2, 40), week_days[schedule_date.weekday()], font=t_font, fill= "black", anchor="ms")
-    schedule_draw.text((WIDTH/2, 80), schedule_date.strftime("%d/%m/%Y"), font=t_font, fill= "black", anchor="ms")
+    schedule_draw.text((WIDTH/2, 40),
+                       week_days[schedule_date.weekday()],
+                       font=t_font,
+                       fill= "black",
+                       anchor="ms")
+    schedule_draw.text((WIDTH/2, 80),
+                       schedule_date.strftime("%d/%m/%Y"),
+                       font=t_font,
+                       fill= "black",
+                       anchor="ms")
 
     schedule_draw.line((0, 100, WIDTH, 100), fill="black", width=2)
 
@@ -46,8 +54,8 @@ def create_side_bar(schedule_draw : ImageDraw.ImageDraw) -> None :
 
     schedule_draw.rectangle((0, 100, 60, HEIGHT), fill=(220, 220, 220))
 
-    for i in range(len(time_list)) :
-        schedule_draw.text((60, 120 + i * 78), time_list[i] + " -", font=t_font, fill= "black", anchor="rm")
+    for (i, item) in enumerate(time_list) :
+        schedule_draw.text((60, 120 + i * 78), item + " -", font=t_font, fill= "black", anchor="rm")
 
     schedule_draw.line((60, 100, 60, HEIGHT), fill="black", width=2)
 
@@ -71,16 +79,35 @@ def add_courses(schedule_draw : ImageDraw.ImageDraw, course_list : list[Course])
         start_offset = 121 + ((course.start_minutes) / 60 - 8) * 78
         end_offset = 121 + ((course.end_minutes) / 60 - 8) * 78
 
-        schedule_draw.rectangle((65, start_offset, WIDTH - 4, end_offset), fill=ImageColor.getrgb('#' + course.color_content), outline="black", width=2)
+        schedule_draw.rectangle((65, start_offset, WIDTH - 4, end_offset),
+                                fill=ImageColor.getrgb('#' + course.color_content),
+                                outline="black",
+                                width=2)
 
-        f_line = course.time_content[0] + " - " + course.time_content[1] + " : " + course.room_content
-        schedule_draw.text(((61 + WIDTH)/2, start_offset + 15), f_line, font=t_font, fill= "black", anchor="mm")
-        schedule_draw.text(((61 + WIDTH)/2, start_offset + 40), course.module_content, font=t_font, fill= "black", anchor="mm")
-        schedule_draw.text(((61 + WIDTH)/2, start_offset + 62), course.prof_content, font=t_font, fill= "black", anchor="mm")
+        f_line = course.time_content[0] + " - " + course.time_content[1]\
+                + " : " + course.room_content
+
+        schedule_draw.text(((61 + WIDTH)/2, start_offset + 15),
+                           f_line, font=t_font,
+                           fill= "black",
+                           anchor="mm")
+        schedule_draw.text(((61 + WIDTH)/2, start_offset + 40),
+                           course.module_content,
+                           font=t_font,
+                           fill= "black",
+                           anchor="mm")
+        schedule_draw.text(((61 + WIDTH)/2, start_offset + 62),
+                           course.prof_content,
+                           font=t_font,
+                           fill= "black",
+                           anchor="mm")
 
 
 
-def create_schedule_image(course_list : list[list[Course]], week_desc : list[str], name : str, to_date : date = date.today()) -> None:
+def create_schedule_image(course_list : list[list[Course]],
+                          week_desc : list[str],
+                          name : str,
+                          to_date : date = date.today()) -> None:
     """
         Create a xlsx file with only one day schedule from course list
 
@@ -107,7 +134,7 @@ def create_schedule_image(course_list : list[list[Course]], week_desc : list[str
             w_index = i
         i += 1
 
-    chosen_day = list()
+    chosen_day = []
     for e in course_list[w_index] :
         if e.day_content == to_date.weekday() :
             chosen_day.append(e)

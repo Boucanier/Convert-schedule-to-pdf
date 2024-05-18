@@ -23,13 +23,13 @@ def clear_text(txt : str) -> str :
     if txt :
         if '\n' in txt or "'" in txt:
             txt_letters = list(txt)
-            for i in range(len(txt_letters)) :
-                if txt_letters[i] == '\n':
+            for (i, item) in enumerate(txt_letters) :
+                if item == '\n':
                     if i == 0 :
                         txt_letters[i] = ''
                     else :
                         txt_letters[i] = ', '
-                if txt_letters[i] == "'" :
+                if item == "'" :
                     txt_letters[i] = "`"
         if txt_letters[0] == ' ':
             txt_letters[0] = ''
@@ -39,9 +39,12 @@ def clear_text(txt : str) -> str :
     return txt
 
 
-def get_content(day_content : list[str], week_content : list[int], resource_list : list) -> list[Course]:
+def get_content(day_content : list[str],
+                week_content : list[int],
+                resource_list : list) -> list[Course]:
     """
-        Collect all the _content of a type for every resource in the xml file and create every Course with it
+        Collect all the _content of a type for every resource in the xml file
+        and create every Course with it
         
         - Args :
             - day_content (list[str])
@@ -64,7 +67,16 @@ def get_content(day_content : list[str], week_content : list[int], resource_list
             else :
                 param_list.append(clear_text((resource.find(element)).text))
         param_list.append(resource['colour'])
-        course_list.append(Course(day_content[cpt], [param_list[0], param_list[1]], param_list[2], param_list[3], param_list[4], param_list[5], week_content[cpt], param_list[6], param_list[7]))
+        course_list.append(Course(day_content[cpt],
+                                  [param_list[0],
+                                   param_list[1]],
+                                   param_list[2],
+                                   param_list[3],
+                                   param_list[4],
+                                   param_list[5],
+                                   week_content[cpt],
+                                   param_list[6],
+                                   param_list[7]))
         cpt += 1
 
     return course_list
@@ -72,7 +84,8 @@ def get_content(day_content : list[str], week_content : list[int], resource_list
 
 def menu(group_list : list[str], link_list : list[str], group_choice = -1) -> tuple[str, str]:
     """
-        Display the list of all group and ask the user the one he wants if groupChoice == -1, if not, do not display the menu
+        Display the list of all group and ask the user the one he wants
+        if groupChoice == -1, if not, do not display the menu
         
         - Args :
             - groupList (list)
@@ -83,8 +96,8 @@ def menu(group_list : list[str], link_list : list[str], group_choice = -1) -> tu
             - (tuple[str, str])
     """
     if group_choice == -1 :
-        for i in range(len(group_list)):
-            print(i, group_list[i])
+        for (i, item) in enumerate(group_list):
+            print(i, item)
 
         group_choice = input('\nGroupe : ')
 
@@ -112,8 +125,10 @@ def get_link(full_list : bool = False, chosen_group_name = None) -> tuple :
         Get the url for the requested schedule and its name after calling menu
 
         - Args :
-            - fullList (boolean) : Default value = False, if True, get every available course in a list with group name using a loop and function menu()
-            - chosenGroupName (str) : Default value = None, if not None, get the url and the group name of the schedule with the specified name
+            - fullList (boolean) : Default value = False,
+                if True, get every available course in a list with group name using a loop and function menu()
+            - chosenGroupName (str) : Default value = None,
+                if not None, get the url and the group name of the schedule with the specified name
         
         - Returns :
             - link (str) : (if not fullList) schedule url
@@ -129,7 +144,7 @@ def get_link(full_list : bool = False, chosen_group_name = None) -> tuple :
 
     assert (response.ok), url + " can not be reached"
 
-    soup = BeautifulSoup(response._content, "lxml")
+    soup = BeautifulSoup(response.content, "lxml")
 
     group_list = soup.findAll('name')
     group_list = [e.text for e in group_list]
@@ -138,10 +153,10 @@ def get_link(full_list : bool = False, chosen_group_name = None) -> tuple :
     link_list = [e['href'] for e in link_list]
 
     # If the user has chosen a group name, return the link and the group name of the schedule
-    if chosen_group_name != None :
-        for i in range(len(group_list)) :
-            if clear_text(group_list[i]) == chosen_group_name :
-                return ("http://chronos.iut-velizy.uvsq.fr/EDT/" + link_list[i]), group_list[i]
+    if chosen_group_name :
+        for (i, item) in enumerate(group_list) :
+            if clear_text(item) == chosen_group_name :
+                return ("http://chronos.iut-velizy.uvsq.fr/EDT/" + link_list[i]), item
 
         # If the group name is not found, return None
         return None, None
@@ -180,7 +195,8 @@ def get_schedule(url : str) -> requests.models.Response :
 
 def sort_sourse(course_list : list[Course]) -> tuple[list[list[Course]], list[list[Course]]]:
     """
-        Check overlapping courses and divide all courses into 4 lists (2 per week) of normal courses and overlapping courses
+        Check overlapping courses and divide all courses into 4 lists (2 per week)
+            of normal courses and overlapping courses
         
         - Args :
             - courseList (list[Course]) : list of courses
@@ -237,18 +253,18 @@ def multiple_sort(course_list : list[Course]) -> tuple[list[Course], list[Course
         if tempindex.count(e) > 1 :
             tempindex.remove(e)
 
-    if (len(tempindex) > 1) :
-        for i in range(len(tempindex)):
-            for j in range(len(tempindex)):
-                if (i != j) and all(e in tempindex[i] for e in tempindex[j]) and tempindex[i]!=tempindex[j]:
-                    temp2index.append(tempindex[j])
+    if len(tempindex) > 1 :
+        for (i, item) in enumerate(tempindex):
+            for (j, jtem) in enumerate(tempindex):
+                if (i != j) and all(e in item for e in jtem) and item != jtem:
+                    temp2index.append(jtem)
 
         tempindex = [e for e in tempindex if e not in temp2index]
-        for i in range(len(tempindex)):
-            for j in range(len(tempindex[i])):
-                for k in range(len(tempindex)):
-                    if (i!=k) and tempindex[i][j] in tempindex[k]:
-                        [tempindex[k].append(e) for e in tempindex[i] if e not in tempindex[k]]
+        for (i, item) in enumerate(tempindex):
+            for (j, jtem) in enumerate(item):
+                for (k, ktem) in enumerate(tempindex):
+                    if (i!=k) and jtem in ktem:
+                        _tk = [tempindex[k].append(e) for e in item if e not in ktem]
 
         for e in tempindex :
             for k in e :
@@ -275,13 +291,22 @@ def multiple_sort(course_list : list[Course]) -> tuple[list[Course], list[Course
                 tempend = course_list[k].end_minutes
                 hend = course_list[k].time_content[1]
 
-        replace_course.append(Course(course_list[e[0]].day_content, [hstart,hend], "COURS", "- - -", "MULTIPLES", "- - -", course_list[e[0]].week_content, "- - -", '7BEBFF'))
+        replace_course.append(Course(course_list[e[0]].day_content,
+                                     [hstart,hend],
+                                     "COURS",
+                                     "- - -",
+                                     "MULTIPLES",
+                                     "- - -",
+                                     course_list[e[0]].week_content,
+                                     "- - -",
+                                     '7BEBFF'))
 
     for e in course_list:
         if len(e.same_time) != 0 :
             n_comp.append(e)
+
     g_comp = [e for e in course_list if e not in n_comp]
-    [g_comp.append(e) for e in replace_course]
+    _ge = [g_comp.append(e) for e in replace_course]
 
     return g_comp, n_comp
 
@@ -333,14 +358,14 @@ def check_multiple(course_list : list[Course]) -> list[Course]:
         - Returns :
             - courseList (list[Course])
     """
-    for i in range(len(course_list)):
-        for j in range(len(course_list)):
-            if (i != j):
-                if not course_list[i].is_compatible(course_list[j]):
-                    if j not in list(course_list[i].same_time) :
-                        course_list[i].same_time.append(j)
-                    if i not in list(course_list[i].same_time) :
-                        course_list[i].same_time.append(i)
+    for (i, item) in enumerate(course_list):
+        for (j, jtem) in enumerate(course_list):
+            if i != j :
+                if not item.is_compatible(jtem):
+                    if j not in list(item.same_time) :
+                        item.same_time.append(j)
+                    if i not in list(item.same_time) :
+                        item.same_time.append(i)
     return course_list
 
 
@@ -355,8 +380,14 @@ def add_missing_weeks(week_desc : list[str]) -> list[str]:
             - weekDesc (list[str])
     """
     for i in range(len(week_desc)-1):
-        curr_date = date(int(week_desc[i][-4:]), int(week_desc[i][3:5]), int(week_desc[i][:2]))
-        next_date = date(int(week_desc[i+1][-4:]), int(week_desc[i+1][3:5]), int(week_desc[i+1][:2]))
+        curr_date = date(int(week_desc[i][-4:]),
+                         int(week_desc[i][3:5]),
+                         int(week_desc[i][:2]))
+
+        next_date = date(int(week_desc[i+1][-4:]),
+                         int(week_desc[i+1][3:5]),
+                         int(week_desc[i+1][:2]))
+
         if (next_date - curr_date).days > 7 :
             for j in range(1, (next_date - curr_date).days // 7):
                 week_desc.insert(i+j, (curr_date + timedelta(days = 7*j)).strftime("%d_%m_%Y"))
@@ -383,13 +414,14 @@ def parse_schedule(response : requests.models.Response) -> tuple[list[Course], l
     week_full = soup.find_all("description")
     t_week = [(e.text)[-10:] for e in week_full]
     week_desc = []
+
     for e in t_week:
         temp = ''
-        for i in range(len(e)):
-            if e[i] == "/":
+        for ei in e :
+            if ei == "/":
                 temp += "_"
             else :
-                temp += e[i]
+                temp += ei
         week_desc.append(temp)
 
     week_desc = add_missing_weeks(week_desc)

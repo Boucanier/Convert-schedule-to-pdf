@@ -1,8 +1,18 @@
 class Course :
     """
-        Class of a course containing day, time, "content", room, staff, group, week, duration, color parameters
+        Class of a course containing day, time, "content", room,
+        staff, group, week, duration, color parameters
     """
-    def __init__(self, par_day : str, par_time : list[str], par_module : str, par_room : str, par_prof : str, par_group : str, par_week : int, par_note : str, par_color : str) -> None:
+    def __init__(self,
+                 par_day : str,
+                 par_time : list[str],
+                 par_module : str,
+                 par_room : str,
+                 par_prof : str,
+                 par_group : str,
+                 par_week : int,
+                 par_note : str,
+                 par_color : str) -> None:
         """
             Constructor of the class
 
@@ -50,10 +60,22 @@ class Course :
         st = ''
         for e in self.same_time :
             st += ' ' + str(e)
-        display = str(self.week_content) + ' ' + str(self.day_content) + ' [' + self.time_content[0] + ':' + self.time_content[1] + '] - [' + str(self.start_minutes) + ':' + str(self.end_minutes) + '] - ' + str(self.duration) + ', ' \
-            + self.module_content + ' ' + self.room_content + ' ' + self.prof_content + ' ' + self.group_content
+
+        display = str(self.week_content)\
+            + ' ' + str(self.day_content)\
+            + ' [' + self.time_content[0]\
+            + ':' + self.time_content[1]\
+            + '] - [' + str(self.start_minutes)\
+            + ':' + str(self.end_minutes)\
+            + '] - ' + str(self.duration)\
+            + ', ' + self.module_content\
+            + ' ' + self.room_content\
+            + ' ' + self.prof_content\
+            + ' ' + self.group_content
+
         if len(self.same_time) != 0 :
             display += ', incompatible with :' + st
+
         return display
 
 
@@ -99,12 +121,17 @@ class Course :
                 - (boolean)
         """
         if (self.week_content == hr2.week_content) and (self.day_content == hr2.day_content) :
-            if ((self.start_minutes <= hr2.start_minutes < self.end_minutes) or (self.start_minutes < hr2.end_minutes <= self.end_minutes)):
+            if ((self.start_minutes <= hr2.start_minutes < self.end_minutes) \
+                or (self.start_minutes < hr2.end_minutes <= self.end_minutes)):
                 return False
-            if ((hr2.start_minutes <= self.start_minutes < hr2.end_minutes) or (hr2.start_minutes < self.end_minutes <= hr2.end_minutes)):
+
+            if ((hr2.start_minutes <= self.start_minutes < hr2.end_minutes) \
+                or (hr2.start_minutes < self.end_minutes <= hr2.end_minutes)):
                 return False
+
             if (hr2.start_minutes == self.start_minutes) and (hr2.end_minutes == self.end_minutes):
                 return False
+
         return True
 
 
@@ -120,8 +147,11 @@ class Course :
         """
         if self.day_content < course2.day_content :
             return True
-        elif (course2.day_content == self.day_content) and (self.start_minutes < course2.start_minutes) :
+
+        if (course2.day_content == self.day_content) \
+            and (self.start_minutes < course2.start_minutes) :
             return True
+
         return False
 
 

@@ -29,7 +29,7 @@ def by_group_schedule(group : str, to_date : date = date.today(), short : bool =
     url, title = scraper.get_link(True, group.upper())
 
     # If the group exists
-    if url != None and title != None :
+    if url is not None and title is not None :
         response = scraper.get_schedule(url)
         course_list, week_desc = scraper.parse_schedule(response)
         course_list, over_course = scraper.sort_sourse(course_list)
@@ -38,19 +38,25 @@ def by_group_schedule(group : str, to_date : date = date.today(), short : bool =
         if not short :
             to_pdf.clear_files(OUTPUT_DIR, 'xlsx', 'pdf', 'png')
 
-            to_xlsx.create_xlsx(course_list, over_course, week_desc, title, OUTPUT_DIR + group.replace(' ', '_'))
+            to_xlsx.create_xlsx(course_list,
+                                over_course,
+                                week_desc,
+                                title,
+                                OUTPUT_DIR + group.replace(' ', '_'))
+
             to_pdf.convert_to_pdf(OUTPUT_DIR + group.replace(' ', '_') + '.xlsx', False)
 
         elif short :
-            drawing.create_schedule_image(course_list, week_desc, OUTPUT_DIR + group.replace(' ', '_'), to_date)
+            drawing.create_schedule_image(course_list,
+                                          week_desc,
+                                          OUTPUT_DIR + group.replace(' ', '_'),
+                                          to_date)
 
         return group
 
-    else :
-        print(f'Group {group} not found')
-        no_group = None
+    print(f'Group {group} not found')
 
-    return no_group
+    return None
 
 
 intents = discord.Intents.default()
@@ -73,7 +79,8 @@ async def schedule_img() -> None :
     tm_date = date.today() + timedelta(days = 1)
     by_group_schedule(PRECISED_GROUP, tm_date, short = True)
     message_channel = bot.get_channel(DEFAULT_CHANNEL)
-    await message_channel.send(content = f'Voici l\'emploi du temps du groupe ***{PRECISED_GROUP}*** pour **{days[tm_date.weekday()]} {tm_date.strftime("%d/%m/%Y")}** :', file = discord.File(OUTPUT_DIR + PRECISED_GROUP + '.png')) # type: ignore
+    await message_channel.send(content = f'Voici l\'emploi du temps du groupe ***{PRECISED_GROUP}*** pour **{days[tm_date.weekday()]} {tm_date.strftime("%d/%m/%Y")}** :', # type: ignore
+                               file = discord.File(OUTPUT_DIR + PRECISED_GROUP + '.png'))
     print(f'Sent image schedule at {time.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]", time.localtime())}\n')
 
 
@@ -120,8 +127,11 @@ async def on_message(message : discord.Message) -> None :
         return
 
     if message.content.startswith('!edt'):
-        if len(message.content) >= 4 and len(message.content.split(' ')) <= 3 and message.content.split(' ')[0] == '!edt':
-            week_desc = list()
+        if len(message.content) >= 4\
+            and len(message.content.split(' ')) <= 3\
+            and message.content.split(' ')[0] == '!edt':
+
+            week_desc = []
             course_list = None
             filter_type = ['staff', 'staff', 'room', 'room']
             cpt = 0
@@ -149,7 +159,11 @@ async def on_message(message : discord.Message) -> None :
                         print(f'Found {element} as {filter_type[cpt]}')
 
             else :
-                if message.content in ('!edt', '!edt today', '!edt td', '!edt tomorrow', '!edt tm') :
+                if message.content in ('!edt',
+                                       '!edt today',
+                                       '!edt td',
+                                       '!edt tomorrow',
+                                       '!edt tm') :
                     element = PRECISED_GROUP
                 else :
                     element = message.content.split(' ')[1]
@@ -159,15 +173,19 @@ async def on_message(message : discord.Message) -> None :
                 if message.content in ('!edt today', '!edt td') :
                     conf_group = by_group_schedule(element, short = True)
                 elif message.content in ('!edt tomorrow', '!edt tm') :
-                    conf_group = by_group_schedule(element, to_date = date.today() + timedelta(days = 1) ,short = True)
+                    conf_group = by_group_schedule(element,
+                                                   to_date = date.today() + timedelta(days = 1),
+                                                   short = True)
                 else :
                     conf_group = by_group_schedule(element)
 
                 if conf_group :
                     if message.content in ('!edt today', '!edt td', '!edt tomorrow', '!edt tm') :
-                        await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{element}*** :', file = discord.File(OUTPUT_DIR + element + '.png'))
+                        await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{element}*** :',
+                                                   file = discord.File(OUTPUT_DIR + element + '.png'))
                     else :
-                        await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{element}*** :', file = discord.File(OUTPUT_DIR + element + '.pdf'))
+                        await message.channel.send(content = f'Voici l\'emploi du temps du groupe ***{element}*** :',
+                                                   file = discord.File(OUTPUT_DIR + element + '.pdf'))
 
                 else :
                     while (not course_list) and (cpt < 2) :
@@ -191,23 +209,40 @@ async def on_message(message : discord.Message) -> None :
                 to_pdf.clear_files(OUTPUT_DIR, 'xlsx', 'pdf')
 
                 if filter_type[cpt] == 'staff' :
-                    if db_operations.countElement('staff', element) > 1 :
-                        to_xlsx.create_xlsx(course_list, over_course, week_desc, course_list[0][0].prof_content.split(" ")[0], OUTPUT_DIR + element.replace(' ', '_'))
+                    if db_operations.count_element('staff', element) > 1 :
+                        to_xlsx.create_xlsx(course_list,
+                                            over_course,
+                                            week_desc,
+                                            course_list[0][0].prof_content.split(" ")[0],
+                                            OUTPUT_DIR + element.replace(' ', '_'))
                         to_send_msg = f'Voici l\'emploi du temps des ***{element}*** :'
+
                     else :
-                        to_xlsx.create_xlsx(course_list, over_course, week_desc, course_list[0][0].prof_content, OUTPUT_DIR + element.replace(' ', '_'))
+                        to_xlsx.create_xlsx(course_list,
+                                            over_course,
+                                            week_desc,
+                                            course_list[0][0].prof_content,
+                                            OUTPUT_DIR + element.replace(' ', '_'))
                         to_send_msg = f'Voici l\'emploi du temps de ***{course_list[0][0].prof_content.split(",")[0]}*** :'
 
                 elif filter_type[cpt] == 'room' :
-                    if db_operations.countElement('room', element) > 1 :
-                        to_xlsx.create_xlsx(course_list, over_course, week_desc, course_list[0][0].room_content.split(" ")[0], OUTPUT_DIR + element.replace(' ', '_'))
+                    if db_operations.count_element('room', element) > 1 :
+                        to_xlsx.create_xlsx(course_list,
+                                            over_course,
+                                            week_desc,
+                                            course_list[0][0].room_content.split(" ")[0],
+                                            OUTPUT_DIR + element.replace(' ', '_'))
                         to_send_msg = f'Voici l\'emploi du temps des ***salles {element}*** :'
+
                     else :
-                        to_xlsx.create_xlsx(course_list, over_course, week_desc, course_list[0][0].room_content, OUTPUT_DIR + element.replace(' ', '_'))
+                        to_xlsx.create_xlsx(course_list, over_course,
+                                            week_desc, course_list[0][0].room_content,
+                                            OUTPUT_DIR + element.replace(' ', '_'))
                         to_send_msg = f'Voici l\'emploi du temps de la ***salle {course_list[0][0].room_content.split(",")[0]}*** :'
 
                 to_pdf.convert_to_pdf(OUTPUT_DIR + element.replace(' ', '_') + '.xlsx', False)
-                await message.channel.send(content = to_send_msg, file = discord.File(OUTPUT_DIR + element.replace(' ', '_') + '.pdf'))
+                await message.channel.send(content = to_send_msg,
+                                           file = discord.File(OUTPUT_DIR + element.replace(' ', '_') + '.pdf'))
 
             elif not conf_group and not course_list :
                 print(f'Element {element} not found')

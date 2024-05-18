@@ -38,7 +38,11 @@ if __name__ == "__main__" :
             courseList, overCourse = scraper.sort_sourse(courseList)
 
             to_pdf.clear_files(OUTPUT_DIR, 'xlsx', 'pdf')
-            to_xlsx.create_xlsx(courseList, overCourse, weekDesc, title, OUTPUT_DIR + title.replace(' ', '_'))
+            to_xlsx.create_xlsx(courseList,
+                                overCourse,
+                                weekDesc,
+                                title,
+                                OUTPUT_DIR + title.replace(' ', '_'))
             to_pdf.convert_to_pdf(OUTPUT_DIR + title.replace(' ', '_') + ".xlsx")
 
             CHOICE = 0
@@ -54,14 +58,20 @@ if __name__ == "__main__" :
                 elementChoice = element_schedule.element_choice(elementList)
 
                 # Get the list of all courses of the selected element
-                courseList = element_schedule.get_course_element(elementChoice, allCourse, options[CHOICE - 2])
+                courseList = element_schedule.get_course_element(elementChoice,
+                                                                 allCourse,
+                                                                 options[CHOICE - 2])
 
                 courseList = element_schedule.check_equals(courseList)
                 courseList = element_schedule.merge_course(courseList)
                 courseList, overCourse = scraper.sort_sourse(courseList)
 
                 to_pdf.clear_files(OUTPUT_DIR, 'xlsx', 'pdf')
-                to_xlsx.create_xlsx(courseList, overCourse, weekDesc, elementChoice, OUTPUT_DIR + elementChoice.replace(' ', '_'))
+                to_xlsx.create_xlsx(courseList,
+                                    overCourse,
+                                    weekDesc,
+                                    elementChoice,
+                                    OUTPUT_DIR + elementChoice.replace(' ', '_'))
                 to_pdf.convert_to_pdf(OUTPUT_DIR + elementChoice.replace(' ', '_') + ".xlsx")
 
             else :

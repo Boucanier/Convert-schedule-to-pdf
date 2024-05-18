@@ -36,7 +36,10 @@ def convert_to_pdf(file_name : str, display = True) -> None:
         path = '\"' + path + '\"'
         file_path += '/' + file_name
         file_path = '\"' + file_path + '\"'
-        subprocess.run('"C:/Program Files/LibreOffice/program/soffice.exe" --convert-to pdf:writer_pdf_Export ' + file_path + ' --outdir ' + path + '/' + outdir)
+        subprocess.run('"C:/Program Files/LibreOffice/program/soffice.exe" \
+                       --convert-to pdf:writer_pdf_Export ' \
+                       + file_path + ' --outdir ' + path + '/' + outdir)
+
         subprocess.run('del path.txt', shell = True)
         if display :
             subprocess.run('cls', shell = True)

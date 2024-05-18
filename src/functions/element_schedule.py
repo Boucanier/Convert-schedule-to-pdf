@@ -1,13 +1,16 @@
 """
-    This code contains functions that will be used to fetch a specific schedule based on a room/professor
+    This code contains functions that will be used
+    to fetch a specific schedule based on a room/professor
 """
 import functions.scraper as scraper
 from models.course import *
 
 
-def get_full_schedule(url_list :list[str], title_list : list[str]) -> tuple[list[list[Course]], list[str]]:
+def get_full_schedule(url_list :list[str],
+                      title_list : list[str]) -> tuple[list[list[Course]], list[str]]:
     """
-        Get every available schedule from a list of url and title, parse them and return a list with every schedule
+        Get every available schedule from a list of url and title,
+        parse them and return a list with every schedule
 
         - Args :
             - urlList (list[str]) : list of schedules' urls
@@ -27,8 +30,8 @@ def get_full_schedule(url_list :list[str], title_list : list[str]) -> tuple[list
     if type(title_list) == str :
         title_list = [title_list]
 
-    for i in range(len(url_list)):
-        response = scraper.get_schedule(url_list[i])
+    for (i, item) in enumerate(url_list):
+        response = scraper.get_schedule(item)
 
         course_list, week_desc = scraper.parse_schedule(response)
         course_full_list.append(course_list)
@@ -82,7 +85,8 @@ def get_full_list(course_full_list : list[list[Course]], element : str) -> list[
 
 def clear_element(element_list : list[str]) -> list[str]:
     """
-        Check if many elements are assigned to a single course and add them to the main element list if they are not already in it
+        Check if many elements are assigned to a single course
+        and add them to the main element list if they are not already in it
 
         - Args :
             - elementList (list[str])
@@ -92,14 +96,16 @@ def clear_element(element_list : list[str]) -> list[str]:
     """
     to_remove = []
     to_add = []
-    for i in range(len(element_list)):
+    for (i, item) in enumerate(element_list):
         if ',' in element_list[i] :
-            to_remove.append(element_list[i])
-            temp_element_list = element_list[i].split(', ')
+            to_remove.append(item)
+            temp_element_list = item.split(', ')
             [to_add.append(e) for e in temp_element_list]
+
     for e in to_add :
         if e not in element_list :
             element_list.append(e)
+
     for e in to_remove :
         element_list.remove(e)
 
@@ -117,12 +123,12 @@ def element_choice(element_list : list[str]) -> str :
             - (str)
     """
     element_list.sort()
-    for i in range(len(element_list)) :
-        print(i, element_list[i])
+    for (i, item) in enumerate(element_list) :
+        print(i, item)
 
     choice = -1
 
-    while not (0 <= int(choice) <= len(element_list) - 1) :
+    while not 0 <= int(choice) <= len(element_list) - 1 :
         choice = input("\nChoix : ")
         if choice.isdigit() and (0 <= int(choice) <= len(element_list) - 1) :
             choice = int(choice)
@@ -182,11 +188,11 @@ def check_equals(course_list : list[Course]) -> list[Course]:
     to_remove = []
     int_to_remove = []
 
-    for i in range(len(course_list)):
-        for j in range(len(course_list)):
+    for (i, item) in enumerate(course_list):
+        for (j, jtem) in enumerate(course_list):
             if i != j and i not in int_to_remove :
-                if course_list[i] == course_list[j] :
-                    to_remove.append(course_list[j])
+                if item == jtem :
+                    to_remove.append(jtem)
                     int_to_remove.append(j)
 
     for e in to_remove :
@@ -204,7 +210,8 @@ def check_equals(course_list : list[Course]) -> list[Course]:
 
 def get_full_detailed_list(course_list : list[list[Course]]) -> list[list[Course]] :
     """
-        Get every course of a schedule and split them if they are assigned to many elements except for modules (maybe there are commas in module names)
+        Get every course of a schedule and split them if they are assigned to many elements
+        except for modules (maybe there are commas in module names)
 
         - Args :
             - courseList (list[list[Course]])
@@ -219,7 +226,15 @@ def get_full_detailed_list(course_list : list[list[Course]]) -> list[list[Course
             if ", " in k.prof_content :
                 to_remove.append(k)
                 for i in range(len(k.prof_content.split(', '))):
-                    e.append(Course(str(k.day_content), k.time_content, k.module_content, k.room_content, (k.prof_content.split(", "))[i], k.group_content, k.week_content, k.note_content, k.color_content))
+                    e.append(Course(str(k.day_content),
+                                    k.time_content,
+                                    k.module_content,
+                                    k.room_content,
+                                    (k.prof_content.split(", "))[i],
+                                    k.group_content,
+                                    k.week_content,
+                                    k.note_content,
+                                    k.color_content))
         [e.remove(k) for k in to_remove]
         to_remove.clear()
         e = check_equals(e)
@@ -227,7 +242,16 @@ def get_full_detailed_list(course_list : list[list[Course]]) -> list[list[Course
             if ", " in k.room_content :
                 to_remove.append(k)
                 for i in range(len(k.room_content.split(', '))):
-                    e.append(Course(str(k.day_content), k.time_content, k.module_content, (k.room_content.split(", "))[i], k.prof_content, k.group_content, k.week_content, k.note_content, k.color_content))
+                    e.append(Course(str(k.day_content),
+                                    k.time_content,
+                                    k.module_content,
+                                    (k.room_content.split(", "))[i],
+                                    k.prof_content,
+                                    k.group_content,
+                                    k.week_content,
+                                    k.note_content,
+                                    k.color_content))
+
         [e.remove(k) for k in to_remove]
         to_remove.clear()
         e = check_equals(e)
@@ -235,7 +259,16 @@ def get_full_detailed_list(course_list : list[list[Course]]) -> list[list[Course
             if ", " in k.group_content :
                 to_remove.append(k)
                 for i in range(len(k.group_content.split(', '))):
-                    e.append(Course(str(k.day_content), k.time_content, k.module_content, k.room_content, k.prof_content, (k.group_content.split(", "))[i], k.week_content, k.note_content, k.color_content))
+                    e.append(Course(str(k.day_content),
+                                    k.time_content,
+                                    k.module_content,
+                                    k.room_content,
+                                    k.prof_content,
+                                    (k.group_content.split(", "))[i],
+                                    k.week_content,
+                                    k.note_content,
+                                    k.color_content))
+
         [e.remove(k) for k in to_remove]
         to_remove.clear()
         e = check_equals(e)
@@ -269,12 +302,16 @@ def merge_course(course_list : list[Course]) -> list[Course]:
         cpt = 0
         temp_id = []
         stop = False
-        for j in range(len(multiple_id)) :
-            if i in multiple_id[j] :
+        for (j, jtem) in enumerate(multiple_id) :
+            if i in jtem :
                 stop = True
 
         if not stop :
-            while (i + cpt + 1 < len(course_list)) and (course_list[i].module_content == course_list[i + cpt + 1].module_content) and (course_list[i].time_content == course_list[i + cpt + 1].time_content) and (course_list[i].day_content == course_list[i + cpt + 1].day_content) :
+            while (i + cpt + 1 < len(course_list))\
+                and (course_list[i].module_content == course_list[i + cpt + 1].module_content)\
+                and (course_list[i].time_content == course_list[i + cpt + 1].time_content)\
+                and (course_list[i].day_content == course_list[i + cpt + 1].day_content) :
+
                 temp_id.append(i + cpt + 1)
                 cpt += 1
 
@@ -283,16 +320,16 @@ def merge_course(course_list : list[Course]) -> list[Course]:
                 multiple_id.append(temp_id)
                 merged_course.append(course_list[i])
 
-    for i in range(len(first_id)) :
+    for (i, item) in enumerate(first_id) :
         for j in range(len(multiple_id[i])) :
             merged_course[i].merge(course_list[multiple_id[i][j]])
 
-        course_list[first_id[i]] = merged_course[i]
+        course_list[item] = merged_course[i]
 
     cpt = 0
-    for i in range(len(multiple_id)) :
-        for j in range(len(multiple_id[i])) :
-            course_list.pop(multiple_id[i][j] - cpt)
+    for (i, item) in enumerate(multiple_id) :
+        for (j, jtem) in enumerate(item) :
+            course_list.pop(jtem - cpt)
             cpt += 1
 
     return course_list
