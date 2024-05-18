@@ -57,9 +57,9 @@ Each file contain respectively this information :
   "to_ping": "[ping id]",
   "default_group": "[your default group (for whole university)]",
   "precised_group": "[your default precised group (your group)]",
-  "default_channel": "[your discord channel id]",
+  "default_channel": 123456789,
   "output_dir": "[your_files_output_directory/]", 
-  "send_time": ["HH", "MM"],
+  "send_time": [0, 0],
 }
 ```
 
