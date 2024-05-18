@@ -117,7 +117,9 @@ def menu(group_list : list[str], link_list : list[str], group_choice = -1) -> tu
 
         print(group_list[group_choice])
 
-    return ("http://chronos.iut-velizy.uvsq.fr/EDT/" + link_list[group_choice]), group_list[group_choice]
+    full_url = "http://chronos.iut-velizy.uvsq.fr/EDT/" + link_list[group_choice]
+
+    return full_url, group_list[group_choice]
 
 
 def get_link(full_list : bool = False, chosen_group_name = None) -> tuple :
@@ -126,7 +128,9 @@ def get_link(full_list : bool = False, chosen_group_name = None) -> tuple :
 
         - Args :
             - fullList (boolean) : Default value = False,
-                if True, get every available course in a list with group name using a loop and function menu()
+                if True, get every available course in a list with group name
+                using a loop and function menu()
+
             - chosenGroupName (str) : Default value = None,
                 if not None, get the url and the group name of the schedule with the specified name
         

@@ -90,7 +90,8 @@ class Course :
                 - dt (int)
         """
         d1 = (int((self.time_content[1].split(':'))[0]) - int((self.time_content[0].split(':'))[0]))
-        d2 = ((int((self.time_content[1].split(':'))[1]) - int((self.time_content[0].split(':'))[1])))
+        d2 = ((int((self.time_content[1].split(':'))[1]) \
+               - int((self.time_content[0].split(':'))[1])))
         d1 *= 60
         dt = d1 + d2
         return dt

@@ -12,7 +12,10 @@ COL = 133 #EC
 ROW_SHORT = 7
 
 
-def set_format_ws(workbook : xlsxwriter.Workbook) -> tuple[xlsxwriter.workbook.Format, xlsxwriter.workbook.Format, xlsxwriter.workbook.Format, xlsxwriter.workbook.Format]:
+def set_format_ws(workbook : xlsxwriter.Workbook) -> tuple[xlsxwriter.workbook.Format,
+                                                           xlsxwriter.workbook.Format,
+                                                           xlsxwriter.workbook.Format,
+                                                           xlsxwriter.workbook.Format]:
     '''
         Create formats used to set the sheet of the schedule in the xlsx document
 
@@ -278,7 +281,9 @@ def write_to_list(workbook : xlsxwriter.Workbook,
                   over_course : list,
                   course_list : list,
                   week : str,
-                  total_letters : tuple) -> tuple[list[Course], xlsxwriter.workbook.Format, xlsxwriter.workbook.Format]:
+                  total_letters : tuple) -> tuple[list[Course],
+                                                  xlsxwriter.workbook.Format,
+                                                  xlsxwriter.workbook.Format]:
     """
         Write a list of every courses
 
