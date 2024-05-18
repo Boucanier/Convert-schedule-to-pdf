@@ -1,9 +1,9 @@
 """
     This file contains functions to create an image representing a one day schedule
 """
-from PIL import Image, ImageDraw, ImageFont, ImageColor
-from models.course import *
 from datetime import date, datetime
+from PIL import Image, ImageDraw, ImageFont, ImageColor
+from models.course import Course
 
 HEIGHT = 1000
 WIDTH = 400
@@ -72,7 +72,7 @@ def add_courses(schedule_draw : ImageDraw.ImageDraw, course_list : list[Course])
         - Returns :
             - None
     """
-    b_font = ImageFont.truetype('src/lib/fonts/Arial/arial_bold.ttf', 18)
+    # b_font = ImageFont.truetype('src/lib/fonts/Arial/arial_bold.ttf', 18)
     t_font = ImageFont.truetype('src/lib/fonts/Arial/arial.ttf', 18)
 
     for course in course_list :

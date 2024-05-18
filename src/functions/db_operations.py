@@ -1,7 +1,8 @@
-import sqlite3, os
-from models.course import *
-from functions import element_schedule
+import sqlite3
+import os
 from datetime import datetime, timedelta
+from models.course import Course
+from functions import element_schedule
 
 
 FILE_PATH = "data/schedule.db"

@@ -2,7 +2,7 @@
     This code contains functions that will be used
     to fetch a specific schedule based on a room/professor
 """
-import functions.scraper as scraper
+from functions import scraper
 from models.course import Course
 
 

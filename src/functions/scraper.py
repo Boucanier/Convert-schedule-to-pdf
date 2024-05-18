@@ -2,10 +2,10 @@
     This code will scrap the schedule data with requests\n
     It will parse it using beauriful soup in objects of a "Course" class
 """
+from datetime import date, timedelta
 import requests
 from bs4 import BeautifulSoup
-from models.course import *
-from datetime import date, timedelta
+from models.course import Course
 
 
 def clear_text(txt : str) -> str :

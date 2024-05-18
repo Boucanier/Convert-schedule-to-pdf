@@ -1,7 +1,8 @@
-import discord, time, json
-from discord.ext import tasks, commands
+import time
+import json
 from datetime import date, timedelta
-
+import discord
+from discord.ext import tasks, commands
 from functions import db_operations, element_schedule, to_pdf, to_xlsx, scraper, drawing
 
 with open('config/token.json', 'r', encoding="utf-8") as fl :
