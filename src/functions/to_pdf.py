@@ -23,13 +23,17 @@ def convert_to_pdf(file_name : str, display = True) -> None:
         out_option = " --outdir " + outdir
 
     if platform.system() == "Linux" :
-        subprocess.run('libreoffice --convert-to pdf ' + file_name + out_option, shell = True)
+        subprocess.run('libreoffice --convert-to pdf ' + file_name + out_option,
+                       shell = True,
+                       check = True)
         if display :
-            subprocess.run('clear', shell = True)
-            subprocess.run('xdg-open ' + file_name.split('.')[0] + '.pdf', shell = True)
+            subprocess.run('clear', shell = True, check = False)
+            subprocess.run('xdg-open ' + file_name.split('.')[0] + '.pdf',
+                           shell = True,
+                           check = False)
 
     elif platform.system() == "Windows" :
-        subprocess.run('cd > path.txt', shell = True)
+        subprocess.run('cd > path.txt', shell = True, check = True)
         with open("path.txt", "r", encoding="utf-8") as fl :
             path = str(fl.readlines()[0][:-1])
         file_path = path
@@ -38,12 +42,16 @@ def convert_to_pdf(file_name : str, display = True) -> None:
         file_path = '\"' + file_path + '\"'
         subprocess.run('"C:/Program Files/LibreOffice/program/soffice.exe" \
                        --convert-to pdf:writer_pdf_Export ' \
-                       + file_path + ' --outdir ' + path + '/' + outdir)
+                       + file_path + ' --outdir ' + path + '/' + outdir,
+                       shell = True,
+                       check = True)
 
-        subprocess.run('del path.txt', shell = True)
+        subprocess.run('del path.txt', shell = True, check = False)
         if display :
-            subprocess.run('cls', shell = True)
-            subprocess.run('start /B ' + file_name.split('.')[0] + '.pdf', shell = True)
+            subprocess.run('cls', shell = True, check=False)
+            subprocess.run('start /B ' + file_name.split('.')[0] + '.pdf',
+                           shell = True,
+                           check = False)
 
 
 def clear_files(path : str = "", *ext : str) -> None :
@@ -59,10 +67,10 @@ def clear_files(path : str = "", *ext : str) -> None :
     """
     if platform.system() == "Linux" :
         for e in ext :
-            subprocess.run('rm ' + path + '*.' + e, shell = True)
+            subprocess.run('rm ' + path + '*.' + e, shell = True, check = True)
     elif platform.system() == "Windows" :
         for e in ext :
-            subprocess.run('del ' + path + '*.' + e, shell = True)
+            subprocess.run('del ' + path + '*.' + e, shell = True, check = True)
 
 
 if __name__ == "__main__" :
