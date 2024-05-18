@@ -3,7 +3,7 @@
     to fetch a specific schedule based on a room/professor
 """
 import functions.scraper as scraper
-from models.course import *
+from models.course import Course
 
 
 def get_full_schedule(url_list :list[str],
@@ -112,7 +112,7 @@ def clear_element(element_list : list[str]) -> list[str]:
     return element_list
 
 
-def element_choice(element_list : list[str]) -> str :
+def choose_element(element_list : list[str]) -> str :
     """
         Display the list of every element and ask the user to choose an element
 

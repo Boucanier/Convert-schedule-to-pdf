@@ -55,7 +55,7 @@ if __name__ == "__main__" :
                 elementList = element_schedule.get_full_list(allCourse, options[CHOICE - 2])
 
                 # Ask the user to select an element from the list
-                elementChoice = element_schedule.element_choice(elementList)
+                elementChoice = element_schedule.choose_element(elementList)
 
                 # Get the list of all courses of the selected element
                 courseList = element_schedule.get_course_element(elementChoice,
