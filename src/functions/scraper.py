@@ -249,8 +249,9 @@ def multiple_sort(course_list : list[Course]) -> tuple[list[Course], list[Course
             if e.count(l) > 1 :
                 e.remove(l)
 
-    for e in tempindex :
-        if tempindex.count(e) > 1 :
+    tempindex_copy = tempindex.copy()
+    for e in tempindex_copy:
+        if tempindex.count(e) > 1:
             tempindex.remove(e)
 
     if len(tempindex) > 1 :

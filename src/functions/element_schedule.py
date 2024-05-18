@@ -100,7 +100,7 @@ def clear_element(element_list : list[str]) -> list[str]:
         if ',' in element_list[i] :
             to_remove.append(item)
             temp_element_list = item.split(', ')
-            [to_add.append(e) for e in temp_element_list]
+            _ta = [to_add.append(e) for e in temp_element_list]
 
     for e in to_add :
         if e not in element_list :
@@ -235,7 +235,8 @@ def get_full_detailed_list(course_list : list[list[Course]]) -> list[list[Course
                                     k.week_content,
                                     k.note_content,
                                     k.color_content))
-        [e.remove(k) for k in to_remove]
+
+        _rmk = [e.remove(k) for k in to_remove]
         to_remove.clear()
         e = check_equals(e)
         for k in e :
@@ -252,7 +253,7 @@ def get_full_detailed_list(course_list : list[list[Course]]) -> list[list[Course
                                     k.note_content,
                                     k.color_content))
 
-        [e.remove(k) for k in to_remove]
+        _rmk = [e.remove(k) for k in to_remove]
         to_remove.clear()
         e = check_equals(e)
         for k in e :
@@ -269,7 +270,7 @@ def get_full_detailed_list(course_list : list[list[Course]]) -> list[list[Course
                                     k.note_content,
                                     k.color_content))
 
-        [e.remove(k) for k in to_remove]
+        _rmk = [e.remove(k) for k in to_remove]
         to_remove.clear()
         e = check_equals(e)
         n = len(e)
