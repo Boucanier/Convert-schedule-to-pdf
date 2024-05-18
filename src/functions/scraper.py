@@ -139,7 +139,7 @@ def get_link(full_list : bool = False, chosen_group_name = None) -> tuple :
     """
     url = "http://chronos.iut-velizy.uvsq.fr/EDT/finder.xml"
 
-    response = requests.get(url)
+    response = requests.get(url, timeout=5)
     response.encoding = 'utf-8'
 
     assert (response.ok), url + " can not be reached"
@@ -185,7 +185,7 @@ def get_schedule(url : str) -> requests.models.Response :
         - Returns :
             - response (response)
     """
-    response = requests.get(url)
+    response = requests.get(url, timeout=5)
     response.encoding = 'utf-8'
 
     assert (response.ok), url + " can not be reached"
