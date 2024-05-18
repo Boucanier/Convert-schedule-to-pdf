@@ -83,7 +83,8 @@ def update_db(all_course : list[list[Course]]) -> None :
         for l in element_list :
             if not any(l in sub for sub in element_data):
                 element_data.append((element_data[-1][0] + 1, l))
-                cur.execute("INSERT INTO " + e + " VALUES (" + str(element_data[-1][0]) + ", '" + l + "')")
+                cur.execute("INSERT INTO " + e + " \
+                            VALUES (" + str(element_data[-1][0]) + ", '" + l + "')")
 
     conn.commit()
     cur.close()

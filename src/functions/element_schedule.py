@@ -24,10 +24,10 @@ def get_full_schedule(url_list :list[str],
     week_desc = []
 
     # If the url is a string, convert url and title to a list for the further loop
-    if type(url_list) == str :
+    if isinstance(url_list, str) :
         url_list = [url_list]
 
-    if type(title_list) == str :
+    if isinstance(title_list, str) :
         title_list = [title_list]
 
     for (i, item) in enumerate(url_list):
