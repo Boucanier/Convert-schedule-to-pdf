@@ -9,8 +9,6 @@ from discord.ext import tasks, commands
 from functions import element_schedule, to_pdf, to_xlsx, scraper, drawing
 import functions.db_operations as db_op
 
-with open('config/token.json', 'r', encoding="utf-8") as fl :
-    token = json.load(fl)['token']
 
 with open('config/bot_config.json', 'r', encoding="utf-8") as fl :
     obj = json.load(fl)
@@ -133,6 +131,52 @@ async def on_ready() -> None:
     refresh_db.start()
 
 
+def create_staff_room_xlsx(course_list : list,
+                     over_course : list,
+                     week_desc : list,
+                     element : str,
+                     element_type : str) -> str :
+    """
+        Create the xlsx file of a room schedule
+
+        - Args :
+            - course_list (list) : list of courses
+            - over_course (list) : list of over courses
+            - week_desc (list) : list of week description
+            - room (str) : name of the room
+            - type (str) : type of the element (staff or room)
+
+        - Returns :
+            - str : message to send
+    """
+    if element_type == 'staff' :
+        var_content = course_list[0][0].prof_content
+        comp_msg_mt = ""
+        comp_msg_sl = "***"
+
+    else :
+        var_content = course_list[0][0].room_content
+        comp_msg_mt = "salles "
+        comp_msg_sl = "la ***salle "
+
+    if db_op.count_element(element_type, element) > 1 :
+        to_xlsx.create_xlsx(course_list,
+                            over_course,
+                            week_desc,
+                            var_content.split(" ")[0],
+                            OUTPUT_DIR + element.replace(' ', '_'))
+        to_send_msg = f'Voici l\'emploi du temps des ***{comp_msg_mt}{element}*** :'
+
+    else :
+        to_xlsx.create_xlsx(course_list, over_course,
+                            week_desc, var_content,
+                            OUTPUT_DIR + element.replace(' ', '_'))
+        content = var_content.split(",")[0]
+        to_send_msg = f'Voici l\'emploi du temps de {comp_msg_sl}{content}*** :'
+
+    return to_send_msg
+
+
 @bot.event
 async def on_message(message : discord.Message) -> None :
     """
@@ -236,39 +280,11 @@ async def on_message(message : discord.Message) -> None :
 
                 to_pdf.clear_files('xlsx', 'pdf', path = OUTPUT_DIR)
 
-                if filter_type[cpt] == 'staff' :
-                    if db_op.count_element('staff', element) > 1 :
-                        to_xlsx.create_xlsx(course_list,
-                                            over_course,
-                                            week_desc,
-                                            course_list[0][0].prof_content.split(" ")[0],
-                                            OUTPUT_DIR + element.replace(' ', '_'))
-                        to_send_msg = f'Voici l\'emploi du temps des ***{element}*** :'
-
-                    else :
-                        to_xlsx.create_xlsx(course_list,
-                                            over_course,
-                                            week_desc,
-                                            course_list[0][0].prof_content,
-                                            OUTPUT_DIR + element.replace(' ', '_'))
-                        prof = course_list[0][0].prof_content.split(",")[0]
-                        to_send_msg = f'Voici l\'emploi du temps de ***{prof}*** :'
-
-                elif filter_type[cpt] == 'room' :
-                    if db_op.count_element('room', element) > 1 :
-                        to_xlsx.create_xlsx(course_list,
-                                            over_course,
-                                            week_desc,
-                                            course_list[0][0].room_content.split(" ")[0],
-                                            OUTPUT_DIR + element.replace(' ', '_'))
-                        to_send_msg = f'Voici l\'emploi du temps des ***salles {element}*** :'
-
-                    else :
-                        to_xlsx.create_xlsx(course_list, over_course,
-                                            week_desc, course_list[0][0].room_content,
-                                            OUTPUT_DIR + element.replace(' ', '_'))
-                        room = course_list[0][0].room_content.split(",")[0]
-                        to_send_msg = f'Voici l\'emploi du temps de la ***salle {room}*** :'
+                to_send_msg = create_staff_room_xlsx(course_list,
+                                                     over_course,
+                                                     week_desc,
+                                                     element,
+                                                     filter_type[cpt])
 
                 to_pdf.convert_to_pdf(OUTPUT_DIR + element.replace(' ', '_') + '.xlsx', False)
                 filepath = OUTPUT_DIR + element.replace(' ', '_') + '.pdf'
@@ -286,4 +302,7 @@ async def on_message(message : discord.Message) -> None :
 
 
 if __name__ == "__main__" :
+    with open('config/token.json', 'r', encoding="utf-8") as fl :
+        token = json.load(fl)['token']
+
     bot.run(token)
