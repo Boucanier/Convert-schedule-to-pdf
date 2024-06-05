@@ -1,3 +1,6 @@
+"""
+    Main file to run the discord bot
+"""
 import time
 import json
 from datetime import date, timedelta
@@ -117,6 +120,15 @@ async def refresh_db() -> None:
 
 @bot.event
 async def on_ready() -> None:
+    """
+        Triggered when the bot is ready
+
+        - Args :
+            - None
+
+        - Returns :
+            - None
+    """
     print(f'We have logged in as {bot.user}')
     refresh_db.start()
 

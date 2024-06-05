@@ -1,3 +1,6 @@
+"""
+    Main file to run the CLI version of the project
+"""
 from functions import element_schedule, to_pdf, to_xlsx, scraper
 import functions.db_operations as db_op
 

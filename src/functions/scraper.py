@@ -137,7 +137,6 @@ def get_link(full_list : bool = False, chosen_group_name = None) -> tuple :
         - Returns :
             - link (str) : (if not fullList) schedule url
             - group (str) : (if not fullList) group name
-
             - linkFullList (list[str]) : (if fullList) list _containing schedule links
             - groupList (list[str]) : (if fullList) list _containing group names
     """

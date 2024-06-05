@@ -1,3 +1,6 @@
+"""
+    This file contains functions to create, update, overwrite and get data from database
+"""
 import sqlite3
 import os
 from datetime import datetime, timedelta
