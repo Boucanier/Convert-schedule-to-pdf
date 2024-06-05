@@ -1,4 +1,4 @@
-from functions import db_operations, element_schedule, to_pdf, to_xlsx, scraper
+from functions import db_op, element_schedule, to_pdf, to_xlsx, scraper
 
 OUTPUT_DIR = "output/"
 
@@ -10,7 +10,7 @@ if __name__ == "__main__" :
     # If the general school schedule is not found, get every schedule
     IUTurl, IUTtitle = scraper.get_link(True, "IUT")
     allCourse, weekDesc = element_schedule.get_full_schedule(IUTurl, IUTtitle)
-    db_operations.overwrite_db(allCourse, weekDesc)
+    db_op.overwrite_db(allCourse, weekDesc)
 
     while CHOICE != 5 :
 
@@ -37,7 +37,7 @@ if __name__ == "__main__" :
 
             courseList, overCourse = scraper.sort_sourse(courseList)
 
-            to_pdf.clear_files(OUTPUT_DIR, 'xlsx', 'pdf')
+            to_pdf.clear_files('xlsx', 'pdf', path = OUTPUT_DIR)
             to_xlsx.create_xlsx(courseList,
                                 overCourse,
                                 weekDesc,
@@ -66,7 +66,7 @@ if __name__ == "__main__" :
                 courseList = element_schedule.merge_course(courseList)
                 courseList, overCourse = scraper.sort_sourse(courseList)
 
-                to_pdf.clear_files(OUTPUT_DIR, 'xlsx', 'pdf')
+                to_pdf.clear_files('xlsx', 'pdf', path = OUTPUT_DIR)
                 to_xlsx.create_xlsx(courseList,
                                     overCourse,
                                     weekDesc,
@@ -77,6 +77,6 @@ if __name__ == "__main__" :
             else :
                 IUTurl, IUTtitle = scraper.get_link(True, "IUT")
                 allCourse, weekDesc = element_schedule.get_full_schedule(IUTurl, IUTtitle)
-                db_operations.overwrite_db(allCourse, weekDesc)
+                db_op.overwrite_db(allCourse, weekDesc)
 
             CHOICE = 0

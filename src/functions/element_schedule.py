@@ -46,7 +46,8 @@ def get_full_list(course_full_list : list[list[Course]], element : str) -> list[
             then extract the list of every different element using function clearElement()
 
         - Args :
-            - courseFullList (list[list[Course]]) : list containing list of schedule link and list of schedule title
+            - courseFullList (list[list[Course]]) : list containing list of schedule link
+                                                    and list of schedule title
 
         - Returns :
             - elementList (list[str]) : list of every different element

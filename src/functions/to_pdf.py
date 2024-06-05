@@ -54,7 +54,7 @@ def convert_to_pdf(file_name : str, display = True) -> None:
                            check = False)
 
 
-def clear_files(path : str = "", *ext : str) -> None :
+def clear_files(*ext : str, path : str = "") -> None :
     """
         Delete every files in the current directory with the given extensions
 

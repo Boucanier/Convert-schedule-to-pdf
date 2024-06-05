@@ -3,7 +3,8 @@ import json
 from datetime import date, timedelta
 import discord
 from discord.ext import tasks, commands
-from functions import db_operations, element_schedule, to_pdf, to_xlsx, scraper, drawing
+from functions import element_schedule, to_pdf, to_xlsx, scraper, drawing
+import functions.db_operations as db_op
 
 with open('config/token.json', 'r', encoding="utf-8") as fl :
     token = json.load(fl)['token']
@@ -38,7 +39,7 @@ def by_group_schedule(group : str, to_date : date = date.today(), short : bool =
         print(f'Found {group} as group')
 
         if not short :
-            to_pdf.clear_files(OUTPUT_DIR, 'xlsx', 'pdf', 'png')
+            to_pdf.clear_files('xlsx', 'pdf', 'png', path = OUTPUT_DIR)
 
             to_xlsx.create_xlsx(course_list,
                                 over_course,
@@ -81,7 +82,10 @@ async def schedule_img() -> None :
     tm_date = date.today() + timedelta(days = 1)
     by_group_schedule(PRECISED_GROUP, tm_date, short = True)
     message_channel = bot.get_channel(DEFAULT_CHANNEL)
-    await message_channel.send(content = f'Voici l\'emploi du temps du groupe ***{PRECISED_GROUP}*** pour **{days[tm_date.weekday()]} {tm_date.strftime("%d/%m/%Y")}** :', # type: ignore
+    w_d = days[tm_date.weekday()]
+    ft_d = tm_date.strftime("%d/%m/%Y")
+    content = f'Voici l\'emploi du temps du groupe ***{PRECISED_GROUP}*** pour **{w_d} {ft_d}** :'
+    await message_channel.send(content = content, # type: ignore
                                file = discord.File(OUTPUT_DIR + PRECISED_GROUP + '.png'))
     print(f'Sent image schedule at \
           {time.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]", time.localtime())}\n')
@@ -102,9 +106,9 @@ async def refresh_db() -> None:
     print(f"Got channel {message_channel}")
     iut_url, iut_title = scraper.get_link(True, "IUT")
     all_course, week_desc = element_schedule.get_full_schedule(iut_url, iut_title)
-    db_operations.overwrite_db(all_course, week_desc)
-    print(f'Got schedule {DEFAULT_GROUP} at \
-          {time.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]", time.localtime())}\n')
+    db_op.overwrite_db(all_course, week_desc)
+    g_time = time.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]", time.localtime())
+    print(f'Got schedule {DEFAULT_GROUP} at {g_time}\n')
 
     if SEND_TIME[0] == int(time.strftime("%H", time.localtime())) \
         and abs(SEND_TIME[1] - int(time.strftime("%M", time.localtime()))) < 5 :
@@ -152,7 +156,7 @@ async def on_message(message : discord.Message) -> None :
                       at {message.created_at.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]")}\n')
 
                 while (not course_list) and (cpt < 4) :
-                    course_list, week_desc = db_operations.get_course_by_element(filter_type[cpt],
+                    course_list, week_desc = db_op.get_course_by_element(filter_type[cpt],
                                                                                  element)
 
                     if not course_list :
@@ -188,18 +192,19 @@ async def on_message(message : discord.Message) -> None :
                     conf_group = by_group_schedule(element)
 
                 if conf_group :
+                    msg = f'Voici l\'emploi du temps du groupe ***{element}*** :'
                     if message.content in ('!edt today', '!edt td', '!edt tomorrow', '!edt tm') :
-                        await message.channel.send(content = f'Voici l\'emploi du temps \
-                                                   du groupe ***{element}*** :',
-                                                   file = discord.File(OUTPUT_DIR +element +'.png'))
+                        filepath = OUTPUT_DIR + element + '.png'
+                        await message.channel.send(content = msg,
+                                                   file = discord.File(filepath))
                     else :
-                        await message.channel.send(content = f'Voici l\'emploi du temps \
-                                                   du groupe ***{element}*** :',
-                                                   file = discord.File(OUTPUT_DIR + element + '.pdf'))
+                        filepath = OUTPUT_DIR + element + '.pdf'
+                        await message.channel.send(content = msg,
+                                                   file = discord.File(filepath))
 
                 else :
                     while (not course_list) and (cpt < 2) :
-                        course_list, week_desc = db_operations.get_course_by_element(filter_type[cpt * 2],
+                        course_list, week_desc = db_op.get_course_by_element(filter_type[cpt * 2],
                                                                                      element)
 
                         if not course_list :
@@ -217,10 +222,10 @@ async def on_message(message : discord.Message) -> None :
                 course_list = element_schedule.check_equals(course_list)
                 course_list, over_course = scraper.sort_sourse(course_list)
 
-                to_pdf.clear_files(OUTPUT_DIR, 'xlsx', 'pdf')
+                to_pdf.clear_files('xlsx', 'pdf', path = OUTPUT_DIR)
 
                 if filter_type[cpt] == 'staff' :
-                    if db_operations.count_element('staff', element) > 1 :
+                    if db_op.count_element('staff', element) > 1 :
                         to_xlsx.create_xlsx(course_list,
                                             over_course,
                                             week_desc,
@@ -234,11 +239,11 @@ async def on_message(message : discord.Message) -> None :
                                             week_desc,
                                             course_list[0][0].prof_content,
                                             OUTPUT_DIR + element.replace(' ', '_'))
-                        to_send_msg = f'Voici l\'emploi du temps de \
-                            ***{course_list[0][0].prof_content.split(",")[0]}*** :'
+                        prof = course_list[0][0].prof_content.split(",")[0]
+                        to_send_msg = f'Voici l\'emploi du temps de ***{prof}*** :'
 
                 elif filter_type[cpt] == 'room' :
-                    if db_operations.count_element('room', element) > 1 :
+                    if db_op.count_element('room', element) > 1 :
                         to_xlsx.create_xlsx(course_list,
                                             over_course,
                                             week_desc,
@@ -250,21 +255,22 @@ async def on_message(message : discord.Message) -> None :
                         to_xlsx.create_xlsx(course_list, over_course,
                                             week_desc, course_list[0][0].room_content,
                                             OUTPUT_DIR + element.replace(' ', '_'))
-                        to_send_msg = f'Voici l\'emploi du temps de la \
-                            ***salle {course_list[0][0].room_content.split(",")[0]}*** :'
+                        room = course_list[0][0].room_content.split(",")[0]
+                        to_send_msg = f'Voici l\'emploi du temps de la ***salle {room}*** :'
 
                 to_pdf.convert_to_pdf(OUTPUT_DIR + element.replace(' ', '_') + '.xlsx', False)
+                filepath = OUTPUT_DIR + element.replace(' ', '_') + '.pdf'
                 await message.channel.send(content = to_send_msg,
-                                           file = discord.File(OUTPUT_DIR + element.replace(' ', '_') + '.pdf'))
+                                           file = discord.File(filepath))
 
             elif not conf_group and not course_list :
                 print(f'Element {element} not found')
-                await message.channel.send(content = f'***{message.author.mention}*** : \
-                                           élément **{element}** introuvable')
+                msg = f'***{message.author.mention}*** : élément **{element}** introuvable'
+                await message.channel.send(content = msg)
 
         else :
-            await message.channel.send(content = f'***{message.author.mention}***, \
-                                       tu racontes quoi mon reuf ?!')
+            wtf_msg = f'***{message.author.mention}***, tu racontes quoi mon reuf ?!'
+            await message.channel.send(content = wtf_msg)
 
 
 if __name__ == "__main__" :
