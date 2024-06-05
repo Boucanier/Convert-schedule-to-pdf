@@ -1,4 +1,5 @@
-from functions import db_op, element_schedule, to_pdf, to_xlsx, scraper
+from functions import element_schedule, to_pdf, to_xlsx, scraper
+import functions.db_operations as db_op
 
 OUTPUT_DIR = "output/"
 
