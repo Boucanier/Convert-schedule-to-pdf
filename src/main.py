@@ -1,18 +1,22 @@
-from functions import toPDF, toXLSX, scraper, elementSchedule, dbOperations
+"""
+    Main file to run the CLI version of the project
+"""
+from functions import element_schedule, to_pdf, to_xlsx, scraper
+import functions.db_operations as db_op
 
 OUTPUT_DIR = "output/"
 
 if __name__ == "__main__" :
 
-    choice = 0
+    CHOICE = 0
 
     # Get every course from the schedule
     # If the general school schedule is not found, get every schedule
-    IUTurl, IUTtitle = scraper.getLink(True, "IUT")
-    allCourse, weekDesc = elementSchedule.getFullSchedule(IUTurl, IUTtitle)
-    dbOperations.overwriteDB(allCourse, weekDesc)
+    IUTurl, IUTtitle = scraper.get_link(True, "IUT")
+    allCourse, weekDesc = element_schedule.get_full_schedule(IUTurl, IUTtitle)
+    db_op.overwrite_db(allCourse, weekDesc)
 
-    while choice != 5 :
+    while CHOICE != 5 :
 
         print("1 Emploi du temps de groupe")
         print("2 Emploi du temps par prof")
@@ -20,53 +24,63 @@ if __name__ == "__main__" :
         print("4 Mise à jour de la base de données")
         print("5 Quitter\n")
 
-        while choice not in (1, 2, 3, 4, 5) :
-            choice = input("Sélectionner une option : ")
-            if choice.isdigit() and (int(choice) in (1, 2, 3, 4, 5)) :
-                choice = int(choice)
+        while CHOICE not in (1, 2, 3, 4, 5) :
+            CHOICE = input("Sélectionner une option : ")
+            if CHOICE.isdigit() and (int(CHOICE) in (1, 2, 3, 4, 5)) :
+                CHOICE = int(CHOICE)
             else :
                 print("Selectionner une option VALIDE\n")
-                choice = 0
+                CHOICE = 0
 
-        if choice == 1 :
-            
-            url, title = scraper.getLink()
-            response = scraper.getSchedule(url)
+        if CHOICE == 1 :
 
-            courseList, weekDesc = scraper.parseSchedule(response)
+            url, title = scraper.get_link()
+            response = scraper.get_schedule(url)
 
-            courseList, overCourse = scraper.sortCourse(courseList)
+            courseList, weekDesc = scraper.parse_schedule(response)
 
-            toPDF.clearFiles(OUTPUT_DIR, 'xlsx', 'pdf')
-            toXLSX.createXlsx(courseList, overCourse, weekDesc, title, OUTPUT_DIR + title.replace(' ', '_'))
-            toPDF.convertToPdf(OUTPUT_DIR + title.replace(' ', '_') + ".xlsx")
+            courseList, overCourse = scraper.sort_sourse(courseList)
 
-            choice = 0
-        
-        elif choice in (2, 3, 4) :
-            if choice in (2, 3) :
+            to_pdf.clear_files('xlsx', 'pdf', path = OUTPUT_DIR)
+            to_xlsx.create_xlsx(courseList,
+                                overCourse,
+                                weekDesc,
+                                title,
+                                OUTPUT_DIR + title.replace(' ', '_'))
+            to_pdf.convert_to_pdf(OUTPUT_DIR + title.replace(' ', '_') + ".xlsx")
+
+            CHOICE = 0
+
+        elif CHOICE in (2, 3, 4) :
+            if CHOICE in (2, 3) :
                 options = ("staff", "room")
 
                 # Get the list of all elements from the selected option
-                elementList = elementSchedule.getFullList(allCourse, options[choice - 2])
+                elementList = element_schedule.get_full_list(allCourse, options[CHOICE - 2])
 
                 # Ask the user to select an element from the list
-                elementChoice = elementSchedule.elementChoice(elementList)
+                elementChoice = element_schedule.choose_element(elementList)
 
                 # Get the list of all courses of the selected element
-                courseList = elementSchedule.getCourseElement(elementChoice, allCourse, options[choice - 2])
+                courseList = element_schedule.get_course_element(elementChoice,
+                                                                 allCourse,
+                                                                 options[CHOICE - 2])
 
-                courseList = elementSchedule.checkEquals(courseList)
-                courseList = elementSchedule.mergeCourse(courseList)
-                courseList, overCourse = scraper.sortCourse(courseList)
+                courseList = element_schedule.check_equals(courseList)
+                courseList = element_schedule.merge_course(courseList)
+                courseList, overCourse = scraper.sort_sourse(courseList)
 
-                toPDF.clearFiles(OUTPUT_DIR, 'xlsx', 'pdf')
-                toXLSX.createXlsx(courseList, overCourse, weekDesc, elementChoice, OUTPUT_DIR + elementChoice.replace(' ', '_'))
-                toPDF.convertToPdf(OUTPUT_DIR + elementChoice.replace(' ', '_') + ".xlsx")
-            
+                to_pdf.clear_files('xlsx', 'pdf', path = OUTPUT_DIR)
+                to_xlsx.create_xlsx(courseList,
+                                    overCourse,
+                                    weekDesc,
+                                    elementChoice,
+                                    OUTPUT_DIR + elementChoice.replace(' ', '_'))
+                to_pdf.convert_to_pdf(OUTPUT_DIR + elementChoice.replace(' ', '_') + ".xlsx")
+
             else :
-                IUTurl, IUTtitle = scraper.getLink(True, "IUT")
-                allCourse, weekDesc = elementSchedule.getFullSchedule(IUTurl, IUTtitle)
-                dbOperations.overwriteDB(allCourse, weekDesc)
-        
-            choice = 0
+                IUTurl, IUTtitle = scraper.get_link(True, "IUT")
+                allCourse, weekDesc = element_schedule.get_full_schedule(IUTurl, IUTtitle)
+                db_op.overwrite_db(allCourse, weekDesc)
+
+            CHOICE = 0
