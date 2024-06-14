@@ -3,4 +3,5 @@ bs4
 lxml
 xlsxwriter
 discord
-pil
+pillow
+logging

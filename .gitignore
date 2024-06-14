@@ -16,3 +16,6 @@ data/schedule.db
 
 # Temporary files
 temp.txt
+
+# Virtual environment
+venv*
