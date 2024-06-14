@@ -169,13 +169,12 @@ def get_link(full_list : bool = False, chosen_group_name = None) -> tuple :
 
         return link, group
 
-    else :
-        link_full_list = []
-        for i in range(len(link_list)) :
-            link = menu(group_list, link_list, i)[0]
-            link_full_list.append(link)
+    link_full_list = []
+    for i in range(len(link_list)) :
+        link = menu(group_list, link_list, i)[0]
+        link_full_list.append(link)
 
-        return link_full_list, group_list
+    return link_full_list, group_list
 
 
 def get_schedule(url : str) -> requests.models.Response :
