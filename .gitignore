@@ -19,3 +19,6 @@ temp.txt
 
 # Virtual environment
 venv*
+
+# Logs files
+logs*
