@@ -6,8 +6,10 @@ import functions.db_operations as db_op
 
 OUTPUT_DIR = "output/"
 
-if __name__ == "__main__" :
-
+def iut_schedule() :
+    """
+        Process to get the IUT schedule
+    """
     CHOICE = 0
 
     # Get every course from the schedule
@@ -65,8 +67,8 @@ if __name__ == "__main__" :
 
                 # Get the list of all courses of the selected element
                 courseList = element_schedule.get_course_element(elementChoice,
-                                                                 allCourse,
-                                                                 options[CHOICE - 2])
+                                                                allCourse,
+                                                                options[CHOICE - 2])
 
                 courseList = element_schedule.check_equals(courseList)
                 courseList = element_schedule.merge_course(courseList)
@@ -86,3 +88,33 @@ if __name__ == "__main__" :
                 db_op.overwrite_db(allCourse, weekDesc)
 
             CHOICE = 0
+
+
+def uqac_schedule() :
+    """
+        Process to get the UQAC schedule
+    """
+    print(" Work in progress...")
+
+
+if __name__ == "__main__" :
+
+    EST = 0
+    print("1 IUT\n2 UQAC\n")
+
+    while EST not in (1, 2) :
+        EST = input("Sélectionner une option : ")
+
+        if EST.isdigit() and (int(EST) in (1, 2)) :
+            EST = int(EST)
+        else :
+            print("Selectionner une option VALIDE\n")
+            EST = 0
+
+    print()
+
+    if EST == 1 :
+        iut_schedule()
+
+    elif EST == 2 :
+        uqac_schedule()
