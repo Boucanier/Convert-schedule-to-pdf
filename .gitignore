@@ -1,4 +1,21 @@
+# Python cache files
 __pycache__/
-schedule.xlsx
-schedule.pdf
+
+# IDE cache files
+.vscode
+.idea
+
+# Output files
+output/
+
+# Configuration files
+config/
+
+# Database file
 data/schedule.db
+
+# Temporary files
+temp.txt
+
+# Python virtual environment
+venv/

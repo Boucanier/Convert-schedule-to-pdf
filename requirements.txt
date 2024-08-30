@@ -2,3 +2,5 @@ requests
 bs4
 lxml
 xlsxwriter
+discord
+pil
