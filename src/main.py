@@ -13,8 +13,10 @@ if __name__ == "__main__" :
     # Get every course from the schedule
     # If the general school schedule is not found, get every schedule
     IUTurl, IUTtitle = scraper.get_link(True, "IUT")
-    allCourse, weekDesc = element_schedule.get_full_schedule(IUTurl, IUTtitle)
-    db_op.overwrite_db(allCourse, weekDesc)
+
+    if IUTtitle and IUTurl :
+        allCourse, weekDesc = element_schedule.get_full_schedule(IUTurl, IUTtitle)
+        db_op.overwrite_db(allCourse, weekDesc)
 
     while CHOICE != 5 :
 
