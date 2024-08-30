@@ -39,7 +39,7 @@ if __name__ == "__main__" :
 
             courseList, weekDesc = scraper.parse_schedule(response)
 
-            courseList, overCourse = scraper.sort_sourse(courseList)
+            courseList, overCourse = scraper.sort_courses(courseList)
 
             to_pdf.clear_files('xlsx', 'pdf', path = OUTPUT_DIR)
             to_xlsx.create_xlsx(courseList,
@@ -68,7 +68,7 @@ if __name__ == "__main__" :
 
                 courseList = element_schedule.check_equals(courseList)
                 courseList = element_schedule.merge_course(courseList)
-                courseList, overCourse = scraper.sort_sourse(courseList)
+                courseList, overCourse = scraper.sort_courses(courseList)
 
                 to_pdf.clear_files('xlsx', 'pdf', path = OUTPUT_DIR)
                 to_xlsx.create_xlsx(courseList,

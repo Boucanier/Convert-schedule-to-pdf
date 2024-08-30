@@ -36,7 +36,7 @@ def by_group_schedule(group : str, to_date : date = date.today(), short : bool =
     if url is not None and title is not None :
         response = scraper.get_schedule(url)
         course_list, week_desc = scraper.parse_schedule(response)
-        course_list, over_course = scraper.sort_sourse(course_list)
+        course_list, over_course = scraper.sort_courses(course_list)
         print(f'Found {group} as group')
 
         if not short :
@@ -276,7 +276,7 @@ async def on_message(message : discord.Message) -> None :
             if course_list :
                 to_send_msg = None
                 course_list = element_schedule.check_equals(course_list)
-                course_list, over_course = scraper.sort_sourse(course_list)
+                course_list, over_course = scraper.sort_courses(course_list)
 
                 to_pdf.clear_files('xlsx', 'pdf', path = OUTPUT_DIR)
 

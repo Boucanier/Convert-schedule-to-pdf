@@ -195,7 +195,7 @@ def get_schedule(url : str) -> requests.models.Response :
     return response
 
 
-def sort_sourse(course_list : list[Course]) -> tuple[list[list[Course]], list[list[Course]]]:
+def sort_courses(course_list : list[Course]) -> tuple[list[list[Course]], list[list[Course]]]:
     """
         Check overlapping courses and divide all courses into 4 lists (2 per week)
             of normal courses and overlapping courses
