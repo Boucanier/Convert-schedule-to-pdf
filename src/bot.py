@@ -6,7 +6,7 @@ import json
 from datetime import date, timedelta
 import discord
 from discord.ext import tasks, commands
-from functions import element_schedule, to_pdf, to_xlsx, scraper, drawing
+from functions import element_schedule, iut_scraper, to_pdf, to_xlsx, drawing
 import functions.db_operations as db_op
 
 
@@ -30,13 +30,13 @@ def by_group_schedule(group : str, to_date : date = date.today(), short : bool =
         - Returns :
             - group (str) : name of the group to get schedule from (None if group does not exist)
     """
-    url, title = scraper.get_link(True, group.upper())
+    url, title = iut_scraper.get_link(True, group.upper())
 
     # If the group exists
     if url is not None and title is not None :
-        response = scraper.get_schedule(url)
-        course_list, week_desc = scraper.parse_schedule(response)
-        course_list, over_course = scraper.sort_courses(course_list)
+        response = iut_scraper.get_schedule(url)
+        course_list, week_desc = iut_scraper.parse_schedule(response)
+        course_list, over_course = iut_scraper.sort_courses(course_list)
         print(f'Found {group} as group')
 
         if not short :
@@ -105,7 +105,7 @@ async def refresh_db() -> None:
     """
     message_channel = bot.get_channel(DEFAULT_CHANNEL)
     print(f"Got channel {message_channel}")
-    iut_url, iut_title = scraper.get_link(True, "IUT")
+    iut_url, iut_title = iut_scraper.get_link(True, "IUT")
     all_course, week_desc = element_schedule.get_full_schedule(iut_url, iut_title)
     db_op.overwrite_db(all_course, week_desc)
     g_time = time.strftime(r"%H:%M.%S on %d/%m/%Y [ %Z ]", time.localtime())
@@ -276,7 +276,7 @@ async def on_message(message : discord.Message) -> None :
             if course_list :
                 to_send_msg = None
                 course_list = element_schedule.check_equals(course_list)
-                course_list, over_course = scraper.sort_courses(course_list)
+                course_list, over_course = iut_scraper.sort_courses(course_list)
 
                 to_pdf.clear_files('xlsx', 'pdf', path = OUTPUT_DIR)
 

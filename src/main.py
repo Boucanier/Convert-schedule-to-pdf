@@ -1,8 +1,9 @@
 """
     Main file to run the CLI version of the project
 """
-from functions import element_schedule, to_pdf, to_xlsx, scraper
+from functions import element_schedule, iut_scraper, to_pdf, to_xlsx
 import functions.db_operations as db_op
+import functions.utils_scraper as uts
 
 OUTPUT_DIR = "output/"
 
@@ -14,7 +15,7 @@ def iut_schedule() :
 
     # Get every course from the schedule
     # If the general school schedule is not found, get every schedule
-    iut_url, iut_title = scraper.get_link(True, "IUT")
+    iut_url, iut_title = iut_scraper.get_link(True, "IUT")
 
     if iut_title and iut_url :
         all_course, week_desc = element_schedule.get_full_schedule(iut_url, iut_title)
@@ -38,12 +39,12 @@ def iut_schedule() :
 
         if choice == 1 :
 
-            url, title = scraper.get_link()
-            response = scraper.get_schedule(url)
+            url, title = iut_scraper.get_link()
+            response = iut_scraper.get_schedule(url)
 
-            course_list, week_desc = scraper.parse_schedule(response)
+            course_list, week_desc = iut_scraper.parse_schedule(response)
 
-            course_list, over_course = scraper.sort_courses(course_list)
+            course_list, over_course = uts.sort_courses(course_list)
 
             to_pdf.clear_files('xlsx', 'pdf', path = OUTPUT_DIR)
             to_xlsx.create_xlsx(course_list,
@@ -72,7 +73,7 @@ def iut_schedule() :
 
                 course_list = element_schedule.check_equals(course_list)
                 course_list = element_schedule.merge_course(course_list)
-                course_list, over_course = scraper.sort_courses(course_list)
+                course_list, over_course = uts.sort_courses(course_list)
 
                 to_pdf.clear_files('xlsx', 'pdf', path = OUTPUT_DIR)
                 to_xlsx.create_xlsx(course_list,
@@ -83,7 +84,7 @@ def iut_schedule() :
                 to_pdf.convert_to_pdf(OUTPUT_DIR + element_choice.replace(' ', '_') + ".xlsx")
 
             else :
-                iut_url, iut_title = scraper.get_link(True, "IUT")
+                iut_url, iut_title = iut_scraper.get_link(True, "IUT")
                 all_course, week_desc = element_schedule.get_full_schedule(iut_url, iut_title)
                 db_op.overwrite_db(all_course, week_desc)
 

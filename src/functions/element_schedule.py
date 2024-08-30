@@ -2,7 +2,7 @@
     This code contains functions that will be used
     to fetch a specific schedule based on a room/professor
 """
-from functions import scraper
+from functions import iut_scraper
 from models.course import Course
 
 
@@ -31,9 +31,9 @@ def get_full_schedule(url_list :list[str],
         title_list = [title_list]
 
     for (i, item) in enumerate(url_list):
-        response = scraper.get_schedule(item)
+        response = iut_scraper.get_schedule(item)
 
-        course_list, week_desc = scraper.parse_schedule(response)
+        course_list, week_desc = iut_scraper.parse_schedule(response)
         course_full_list.append(course_list)
         print(title_list[i] + " : " + str(len(course_list)) + " cours\n")
 
