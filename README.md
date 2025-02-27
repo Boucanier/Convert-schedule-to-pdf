@@ -5,6 +5,10 @@
 
 This project is a schedule scrapper that will convert it into a pdf file.
 
+## DEPRECATED !
+
+This project is deprecated since school changed its timetable service.
+
 ## Requirements
 
 To run the code, you need to have the following packages installed :
