@@ -8,16 +8,31 @@ import discord
 from discord.ext import tasks, commands
 from functions import element_schedule, to_pdf, to_xlsx, scraper, drawing
 import functions.db_operations as db_op
+from functions.utils import schedule_logger as logger
 
+try :
+    with open('config/bot_config.json', 'r', encoding="utf-8") as fl :
+        obj = json.load(fl)
+        TO_PING = obj['to_ping']
+        DEFAULT_GROUP = obj['default_group']
+        PRECISED_GROUP = obj['precised_group']
+        DEFAULT_CHANNEL = int(obj['default_channel'])
+        OUTPUT_DIR = obj['output_dir']
+        SEND_TIME = obj['send_time']
 
-with open('config/bot_config.json', 'r', encoding="utf-8") as fl :
-    obj = json.load(fl)
-    TO_PING = obj['to_ping']
-    DEFAULT_GROUP = obj['default_group']
-    PRECISED_GROUP = obj['precised_group']
-    DEFAULT_CHANNEL = int(obj['default_channel'])
-    OUTPUT_DIR = obj['output_dir']
-    SEND_TIME = obj['send_time']
+except Exception as conf_exc :
+    logger.error("Error while reading bot_config.json : %s", conf_exc)
+    raise conf_exc
+
+try :
+    intents = discord.Intents.default()
+    intents.message_content = True
+
+    bot = commands.Bot(command_prefix='!', intents=intents)
+
+except Exception as bot_exc :
+    logger.error("Error while creating discord bot : %s", bot_exc)
+    raise bot_exc
 
 
 def by_group_schedule(group : str, to_date : date = date.today(), short : bool = False) :
@@ -61,12 +76,6 @@ def by_group_schedule(group : str, to_date : date = date.today(), short : bool =
     print(f'Group {group} not found')
 
     return None
-
-
-intents = discord.Intents.default()
-intents.message_content = True
-
-bot = commands.Bot(command_prefix='!', intents=intents)
 
 
 async def schedule_img() -> None :
@@ -127,7 +136,7 @@ async def on_ready() -> None:
         - Returns :
             - None
     """
-    print(f'We have logged in as {bot.user}')
+    logger.info("Bot logged in as %s", bot.user)
     refresh_db.start()
 
 
@@ -303,6 +312,12 @@ async def on_message(message : discord.Message) -> None :
 
 if __name__ == "__main__" :
     with open('config/token.json', 'r', encoding="utf-8") as fl :
-        token = json.load(fl)['token']
+        try :
+            token = json.load(fl)['token']
+
+        except Exception as token_exc :
+            logger.error("Error while reading token.json : %s", token_exc)
+            raise token_exc
 
     bot.run(token)
+    logger.debug("Bot script ended")

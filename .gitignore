@@ -17,5 +17,9 @@ data/schedule.db
 # Temporary files
 temp.txt
 
+# Logs files
+logs*
+
 # Python virtual environment
+venv*
 venv/
